@@ -19,7 +19,7 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\hangar\relation;
+namespace n2n\impl\persistence\orm\property\hangar\relation;
 
 use hangar\entity\model\HangarPropDef;
 use hangar\entity\model\PropSourceDef;
@@ -28,15 +28,15 @@ use hangar\core\option\OrmRelationColumnOption;
 use n2n\util\config\Attributes;
 use hangar\entity\model\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
-use n2n\persistence\orm\property\impl\RelationEntityProperty;
+use n2n\impl\persistence\orm\property\RelationEntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
 use n2n\reflection\ArgUtils;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\annotation\AnnoOneToOne;
-use n2n\persistence\orm\property\impl\ToOneEntityProperty;
+use n2n\impl\persistence\orm\property\ToOneEntityProperty;
 use n2n\reflection\CastUtils;
-use n2n\persistence\orm\property\impl\relation\ToOneRelation;
-use n2n\persistence\orm\property\impl\relation\JoinColumnToOneRelation;
+use n2n\impl\persistence\orm\property\relation\ToOneRelation;
+use n2n\impl\persistence\orm\property\relation\JoinColumnToOneRelation;
 use hangar\core\config\ColumnDefaults;
 use hangar\entity\model\CompatibilityLevel;
 

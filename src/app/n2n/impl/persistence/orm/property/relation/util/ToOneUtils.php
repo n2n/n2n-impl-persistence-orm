@@ -19,9 +19,9 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\relation\util;
+namespace n2n\impl\persistence\orm\property\relation\util;
 
-use n2n\persistence\orm\property\impl\relation\ToOneRelation;
+use n2n\impl\persistence\orm\property\relation\ToOneRelation;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
 
 class ToOneUtils {

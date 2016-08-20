@@ -19,29 +19,29 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\relation;
+namespace n2n\impl\persistence\orm\property\relation;
 
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\from\MetaTreePoint;
-use n2n\persistence\orm\property\impl\relation\tree\JoinColumnTreePoint;
-use n2n\persistence\orm\property\impl\relation\MasterRelation;
+use n2n\impl\persistence\orm\property\relation\tree\JoinColumnTreePoint;
+use n2n\impl\persistence\orm\property\relation\MasterRelation;
 use n2n\persistence\orm\FetchType;
-use n2n\persistence\orm\property\impl\relation\selection\ToOneRelationSelection;
-use n2n\persistence\orm\property\impl\relation\selection\JoinColumnToManyLoader;
+use n2n\impl\persistence\orm\property\relation\selection\ToOneRelationSelection;
+use n2n\impl\persistence\orm\property\relation\selection\JoinColumnToManyLoader;
 use n2n\persistence\orm\store\SimpleLoaderUtils;
 use n2n\persistence\orm\store\action\PersistAction;
 use n2n\persistence\orm\store\action\RemoveAction;
 use n2n\persistence\orm\query\from\meta\TreePointMeta;
-use n2n\persistence\orm\property\impl\relation\util\ToOneValueHasher;
-use n2n\persistence\orm\property\impl\relation\util\OrphanRemover;
-use n2n\persistence\orm\property\impl\relation\compare\InverseJoinColumnToManyQueryItemFactory;
-use n2n\persistence\orm\property\impl\relation\compare\IdColumnComparableDecorator;
+use n2n\impl\persistence\orm\property\relation\util\ToOneValueHasher;
+use n2n\impl\persistence\orm\property\relation\util\OrphanRemover;
+use n2n\impl\persistence\orm\property\relation\compare\InverseJoinColumnToManyQueryItemFactory;
+use n2n\impl\persistence\orm\property\relation\compare\IdColumnComparableDecorator;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\model\ActionDependency;
-use n2n\persistence\orm\property\impl\relation\util\JoinColumnResetAction;
+use n2n\impl\persistence\orm\property\relation\util\JoinColumnResetAction;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
-use n2n\persistence\orm\property\impl\relation\util\RemoveConstraintMarker;
+use n2n\impl\persistence\orm\property\relation\util\RemoveConstraintMarker;
 use n2n\persistence\orm\EntityManager;
 
 class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, ActionDependency {
@@ -74,7 +74,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 		return $treePoint;
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\MasterRelation::createInverseJoinTreePoint()
+	 * @see \n2n\impl\persistence\orm\property\relation\MasterRelation::createInverseJoinTreePoint()
 	 */
 	public function createInverseJoinTreePoint(EntityModel $entityModel, TreePointMeta $targetTreePointMeta, QueryState $queryState) {
 		$treePointMeta = $entityModel->createTreePointMeta($queryState);
@@ -89,7 +89,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 		return $treePoint;
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\Relation::createColumnComparable()
+	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createColumnComparable()
 	 */
 	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
 		$meta = $metaTreePoint->getMeta();
@@ -101,13 +101,13 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 				$this->targetEntityModel);
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\ToOneRelation::createRepresentingQueryItem()
+	 * @see \n2n\impl\persistence\orm\property\relation\ToOneRelation::createRepresentingQueryItem()
 	 */
 	public function createRepresentingQueryItem(MetaTreePoint $metaTreePoint, QueryState $queryState) {
 		return $metaTreePoint->getMeta()->registerColumn($this->entityModel, $this->joinColumnName);
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\Relation::createSelection()
+	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createSelection()
 	 */
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
 		$targetIdProperty = $this->targetEntityModel->getIdDef()->getEntityProperty();
@@ -119,7 +119,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 		return $toOneRelationSelection;
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\MasterRelation::createInverseToManyLoader()
+	 * @see \n2n\impl\persistence\orm\property\relation\MasterRelation::createInverseToManyLoader()
 	 */
 	public function createInverseToManyLoader(EntityModel $entityModel, QueryState $queryState) {
 		return new JoinColumnToManyLoader(
@@ -146,7 +146,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 		}
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\Relation::supplyPersistAction()
+	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyPersistAction()
 	 */
 	public function supplyPersistAction($value, $valueHash, PersistAction $persistAction) {
 		if ($value === null) {
@@ -172,7 +172,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 		});
 	}
 // 	/* (non-PHPdoc)
-// 	 * @see \n2n\persistence\orm\property\impl\relation\Relation::supplyRemoveAction()
+// 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyRemoveAction()
 // 	 */
 // 	public function supplyRemoveAction($value, $valueHash, RemoveAction $removeAction) {
 		

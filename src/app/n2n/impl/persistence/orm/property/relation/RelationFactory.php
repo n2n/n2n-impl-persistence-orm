@@ -19,17 +19,17 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\relation;
+namespace n2n\impl\persistence\orm\property\relation;
 
 use n2n\persistence\orm\property\ClassSetup;
-use n2n\persistence\orm\property\impl\RelationEntityProperty;
+use n2n\impl\persistence\orm\property\RelationEntityProperty;
 use n2n\persistence\orm\annotation\OrmRelationAnnotation;
 use n2n\persistence\orm\model\EntityModelManager;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\OrmConfigurationException;
 use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\persistence\orm\model\UnknownEntityPropertyException;
-use n2n\persistence\orm\property\impl\relation\util\OrderDirective;
+use n2n\impl\persistence\orm\property\relation\util\OrderDirective;
 use n2n\persistence\orm\property\QueryItemRepresentableEntityProperty;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\annotation\AnnoOneToMany;

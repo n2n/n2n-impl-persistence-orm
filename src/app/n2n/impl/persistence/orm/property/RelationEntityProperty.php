@@ -19,9 +19,9 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl;
+namespace n2n\impl\persistence\orm\property;
 
-use n2n\persistence\orm\property\impl\relation\Relation;
+use n2n\impl\persistence\orm\property\relation\Relation;
 use n2n\persistence\orm\property\JoinableEntityProperty;
 
 interface RelationEntityProperty extends JoinableEntityProperty {

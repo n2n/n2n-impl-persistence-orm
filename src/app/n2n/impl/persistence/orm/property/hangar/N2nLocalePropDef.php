@@ -19,7 +19,7 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\hangar;
+namespace n2n\impl\persistence\orm\property\hangar;
 
 use hangar\entity\model\HangarPropDef;
 use hangar\entity\model\PropSourceDef;
@@ -28,7 +28,7 @@ use n2n\web\dispatch\mag\MagCollection;
 use hangar\entity\model\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
-use n2n\persistence\orm\property\impl\N2nLocaleEntityProperty;
+use n2n\impl\persistence\orm\property\N2nLocaleEntityProperty;
 use n2n\l10n\N2nLocale;
 use n2n\reflection\ArgUtils;
 use hangar\core\config\ColumnDefaults;

@@ -19,18 +19,18 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\relation;
+namespace n2n\impl\persistence\orm\property\relation;
 
 use n2n\persistence\orm\query\QueryState;
-use n2n\persistence\orm\property\impl\relation\tree\JoinTableTreePoint;
-use n2n\persistence\orm\property\impl\relation\selection\JoinTableToManyLoader;
+use n2n\impl\persistence\orm\property\relation\tree\JoinTableTreePoint;
+use n2n\impl\persistence\orm\property\relation\selection\JoinTableToManyLoader;
 use n2n\persistence\orm\store\SimpleLoaderUtils;
 use n2n\persistence\orm\store\action\RemoveAction;
 use n2n\persistence\Pdo;
 use n2n\persistence\orm\store\action\PersistAction;
 use n2n\persistence\orm\query\from\meta\TreePointMeta;
-use n2n\persistence\orm\property\impl\relation\util\JoinTableAction;
-use n2n\persistence\orm\property\impl\relation\compare\JoinTableToManyQueryItemFactory;
+use n2n\impl\persistence\orm\property\relation\util\JoinTableAction;
+use n2n\impl\persistence\orm\property\relation\compare\JoinTableToManyQueryItemFactory;
 use n2n\persistence\orm\model\EntityModel;
 
 abstract class JoinTableRelation extends MasterRelation {

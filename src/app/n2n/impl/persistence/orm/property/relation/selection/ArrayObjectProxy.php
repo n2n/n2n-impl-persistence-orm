@@ -19,10 +19,10 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\relation\selection;
+namespace n2n\impl\persistence\orm\property\relation\selection;
 
 use n2n\persistence\orm\property\EntityProperty;
-use n2n\persistence\orm\property\impl\relation\util\ToManyValueHasher;
+use n2n\impl\persistence\orm\property\relation\util\ToManyValueHasher;
 use n2n\util\ex\IllegalStateException;
 
 class ArrayObjectProxy extends \ArrayObject {

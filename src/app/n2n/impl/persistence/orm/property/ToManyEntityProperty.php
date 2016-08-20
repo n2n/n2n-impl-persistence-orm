@@ -19,17 +19,17 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl;
+namespace n2n\impl\persistence\orm\property;
 
-use n2n\persistence\orm\property\impl\relation\Relation;
+use n2n\impl\persistence\orm\property\relation\Relation;
 use n2n\reflection\property\TypeConstraint;
 use n2n\persistence\orm\store\operation\CascadeOperation;
 use n2n\util\col\ArrayUtils;
 use n2n\reflection\ArgUtils;
-use n2n\persistence\orm\property\impl\relation\selection\ArrayObjectProxy;
+use n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy;
 use n2n\persistence\orm\store\operation\MergeOperation;
 use n2n\persistence\orm\CascadeType;
-use n2n\persistence\orm\property\impl\relation\ToManyRelation;
+use n2n\impl\persistence\orm\property\relation\ToManyRelation;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\property\CustomComparableEntityProperty;
@@ -40,7 +40,7 @@ class ToManyEntityProperty extends RelationEntityPropertyAdapter implements Cust
 		ArgUtils::assertTrue($this->relation instanceof ToManyRelation);
 		$this->accessProxy->setConstraint(TypeConstraint::createArrayLike(null, true,
 				TypeConstraint::createSimple($relation->getTargetEntityModel()->getClass()->getName()), 
-				array('n2n\persistence\orm\property\impl\relation\selection\ArrayObjectProxy')));
+				array('n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy')));
 	}
 	
 	public function cascade($value, $cascadeType, CascadeOperation $cascadeOperation) {

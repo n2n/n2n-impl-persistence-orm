@@ -19,7 +19,7 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\hangar\relation;
+namespace n2n\impl\persistence\orm\property\hangar\relation;
 
 use hangar\entity\model\HangarPropDef;
 use hangar\entity\model\PropSourceDef;
@@ -32,12 +32,12 @@ use n2n\reflection\annotation\AnnotationSet;
 use n2n\reflection\ArgUtils;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\annotation\AnnoManyToOne;
-use n2n\persistence\orm\property\impl\ToOneEntityProperty;
+use n2n\impl\persistence\orm\property\ToOneEntityProperty;
 use hangar\core\config\ColumnDefaults;
-use n2n\persistence\orm\property\impl\relation\JoinColumnToOneRelation;
+use n2n\impl\persistence\orm\property\relation\JoinColumnToOneRelation;
 use n2n\persistence\meta\structure\IndexType;
 use n2n\persistence\meta\structure\Table;
-use n2n\persistence\orm\property\impl\RelationEntityProperty;
+use n2n\impl\persistence\orm\property\RelationEntityProperty;
 use hangar\entity\model\CompatibilityLevel;
 
 class ManyToOnePropDef implements HangarPropDef {

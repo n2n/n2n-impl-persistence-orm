@@ -19,7 +19,7 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\relation;
+namespace n2n\impl\persistence\orm\property\relation;
 
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\QueryState;
@@ -39,7 +39,7 @@ interface Relation {
 	public function getTargetEntityModel();
 	
 	/**
-	 * @return \n2n\persistence\orm\property\impl\relation\util\ActionMarker
+	 * @return \n2n\impl\persistence\orm\property\relation\util\ActionMarker
 	 */
 	public function getActionMarker();
 	
@@ -61,7 +61,7 @@ interface Relation {
 	/**
 	 * @param MetaTreePoint $metaTreePoint
 	 * @param QueryState $queryState
-	 * @return \n2n\persistence\orm\property\impl\relation\JoinColumnTreePoint
+	 * @return \n2n\impl\persistence\orm\property\relation\JoinColumnTreePoint
 	 */
 	public function createJoinTreePoint(TreePointMeta $treePointMeta, QueryState $queryState);
 	

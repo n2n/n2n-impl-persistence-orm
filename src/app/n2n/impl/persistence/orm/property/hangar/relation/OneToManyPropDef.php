@@ -19,7 +19,7 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\hangar\relation;
+namespace n2n\impl\persistence\orm\property\hangar\relation;
 
 use hangar\entity\model\HangarPropDef;
 use hangar\entity\model\PropSourceDef;
@@ -29,12 +29,12 @@ use n2n\util\config\Attributes;
 use hangar\entity\model\DbInfo;
 use n2n\persistence\orm\annotation\AnnoOneToMany;
 use n2n\persistence\meta\structure\Table;
-use n2n\persistence\orm\property\impl\relation\RelationFactory;
+use n2n\impl\persistence\orm\property\relation\RelationFactory;
 use n2n\persistence\orm\property\EntityProperty;
-use n2n\persistence\orm\property\impl\RelationEntityProperty;
+use n2n\impl\persistence\orm\property\RelationEntityProperty;
 use n2n\reflection\CastUtils;
-use n2n\persistence\orm\property\impl\relation\JoinTableRelation;
-use n2n\persistence\orm\property\impl\relation\InverseJoinColumnOneToManyRelation;
+use n2n\impl\persistence\orm\property\relation\JoinTableRelation;
+use n2n\impl\persistence\orm\property\relation\InverseJoinColumnOneToManyRelation;
 use n2n\reflection\annotation\AnnotationSet;
 use n2n\reflection\ArgUtils;
 use n2n\persistence\orm\annotation\AnnoJoinColumn;
@@ -42,7 +42,7 @@ use n2n\persistence\meta\structure\IndexType;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\annotation\AnnoJoinTable;
 use hangar\core\config\ColumnDefaults;
-use n2n\persistence\orm\property\impl\ToManyEntityProperty;
+use n2n\impl\persistence\orm\property\ToManyEntityProperty;
 use hangar\entity\model\CompatibilityLevel;
 
 class OneToManyPropDef implements HangarPropDef {
@@ -59,7 +59,7 @@ class OneToManyPropDef implements HangarPropDef {
 	}
 
 	public function getEntityPropertyClass() {
-		return new \ReflectionClass('n2n\persistence\orm\property\impl\ToManyEntityProperty');
+		return new \ReflectionClass('n2n\impl\persistence\orm\property\ToManyEntityProperty');
 	}
 
 	public function createMagCollection(PropSourceDef $propSourceDef = null) {

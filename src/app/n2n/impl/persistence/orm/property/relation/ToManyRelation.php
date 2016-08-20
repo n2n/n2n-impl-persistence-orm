@@ -19,9 +19,9 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\relation;
+namespace n2n\impl\persistence\orm\property\relation;
 
-use n2n\persistence\orm\property\impl\relation\Relation;
+use n2n\impl\persistence\orm\property\relation\Relation;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\QueryState;
 

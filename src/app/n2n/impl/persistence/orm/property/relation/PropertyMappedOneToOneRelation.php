@@ -19,16 +19,16 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\relation;
+namespace n2n\impl\persistence\orm\property\relation;
 
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\FetchType;
-use n2n\persistence\orm\property\impl\relation\selection\ToOneRelationSelection;
-use n2n\persistence\orm\property\impl\relation\util\ToOneValueHasher;
-use n2n\persistence\orm\property\impl\relation\compare\IdColumnComparableDecorator;
+use n2n\impl\persistence\orm\property\relation\selection\ToOneRelationSelection;
+use n2n\impl\persistence\orm\property\relation\util\ToOneValueHasher;
+use n2n\impl\persistence\orm\property\relation\compare\IdColumnComparableDecorator;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
-use n2n\persistence\orm\property\impl\relation\util\ToOneUtils;
+use n2n\impl\persistence\orm\property\relation\util\ToOneUtils;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\EntityManager;
@@ -43,13 +43,13 @@ class PropertyMappedOneToOneRelation extends MappedRelation implements ToOneRela
 		$this->toOneUtils = new ToOneUtils($this, false);
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\ToOneRelation::createRepresentingQueryItem()
+	 * @see \n2n\impl\persistence\orm\property\relation\ToOneRelation::createRepresentingQueryItem()
 	 */
 	public function createRepresentingQueryItem(MetaTreePoint $metaTreePoint, QueryState $queryState) {
 		return $metaTreePoint->requestPropertyRepresentableQueryItem($this->createTargetIdTreePath());
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\ToOneRelation::createColumnComparable()
+	 * @see \n2n\impl\persistence\orm\property\relation\ToOneRelation::createColumnComparable()
 	 */
 	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
 		return new IdColumnComparableDecorator(
@@ -57,7 +57,7 @@ class PropertyMappedOneToOneRelation extends MappedRelation implements ToOneRela
 				$this->targetEntityModel);
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\Relation::createSelection()
+	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createSelection()
 	 */
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
 		$targetTreePath = $this->createTargetIdTreePath();
@@ -71,7 +71,7 @@ class PropertyMappedOneToOneRelation extends MappedRelation implements ToOneRela
 		return $entitySelection;
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\Relation::buildValueHash()
+	 * @see \n2n\impl\persistence\orm\property\relation\Relation::buildValueHash()
 	 */
 	public function buildValueHash($value, EntityManager $em) {
 		return ToOneValueHasher::createFromEntityModel($this->targetEntityModel)

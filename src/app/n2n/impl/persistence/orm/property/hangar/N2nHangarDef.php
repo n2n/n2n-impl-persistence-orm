@@ -19,21 +19,21 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\hangar;
+namespace n2n\impl\persistence\orm\property\hangar;
 
 use hangar\entity\model\HangarDef;
-use n2n\persistence\orm\property\impl\hangar\relation\ManyToManyPropDef;
-use n2n\persistence\orm\property\impl\hangar\scalar\IntegerPropDef;
-use n2n\persistence\orm\property\impl\hangar\scalar\StringPropDef;
-use n2n\persistence\orm\property\impl\hangar\scalar\BooleanPropDef;
-use n2n\persistence\orm\property\impl\hangar\scalar\TextPropDef;
-use n2n\persistence\orm\property\impl\hangar\scalar\FixedPointPropDef;
-use n2n\persistence\orm\property\impl\hangar\scalar\EnumPropDef;
-use n2n\persistence\orm\property\impl\hangar\scalar\FloatingPointPropDef;
-use n2n\persistence\orm\property\impl\hangar\scalar\BinaryPropDef;
-use n2n\persistence\orm\property\impl\hangar\relation\OneToManyPropDef;
-use n2n\persistence\orm\property\impl\hangar\relation\OneToOnePropDef;
-use n2n\persistence\orm\property\impl\hangar\relation\ManyToOnePropDef;
+use n2n\impl\persistence\orm\property\hangar\relation\ManyToManyPropDef;
+use n2n\impl\persistence\orm\property\hangar\scalar\IntegerPropDef;
+use n2n\impl\persistence\orm\property\hangar\scalar\StringPropDef;
+use n2n\impl\persistence\orm\property\hangar\scalar\BooleanPropDef;
+use n2n\impl\persistence\orm\property\hangar\scalar\TextPropDef;
+use n2n\impl\persistence\orm\property\hangar\scalar\FixedPointPropDef;
+use n2n\impl\persistence\orm\property\hangar\scalar\EnumPropDef;
+use n2n\impl\persistence\orm\property\hangar\scalar\FloatingPointPropDef;
+use n2n\impl\persistence\orm\property\hangar\scalar\BinaryPropDef;
+use n2n\impl\persistence\orm\property\hangar\relation\OneToManyPropDef;
+use n2n\impl\persistence\orm\property\hangar\relation\OneToOnePropDef;
+use n2n\impl\persistence\orm\property\hangar\relation\ManyToOnePropDef;
 
 class N2nHangarDef implements HangarDef {
 	public function getPropDefs() {

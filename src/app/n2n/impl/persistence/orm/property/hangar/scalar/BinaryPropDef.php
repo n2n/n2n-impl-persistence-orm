@@ -19,18 +19,18 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\hangar\scalar;
+namespace n2n\impl\persistence\orm\property\hangar\scalar;
 
 use n2n\util\config\Attributes;
 use hangar\entity\model\DbInfo;
 use n2n\persistence\meta\structure\ColumnFactory;
 use n2n\web\dispatch\mag\MagCollection;
-use n2n\web\dispatch\mag\impl\model\NumericMag;
+use n2n\impl\web\dispatch\mag\model\NumericMag;
 use hangar\entity\model\PropSourceDef;
 use n2n\persistence\meta\structure\common\CommonBinaryColumn;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\ArgUtils;
-use n2n\persistence\orm\property\impl\ScalarEntityProperty;
+use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 
 class BinaryPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_SIZE = 'size';

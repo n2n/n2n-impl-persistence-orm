@@ -19,7 +19,7 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\relation\compare;
+namespace n2n\impl\persistence\orm\property\relation\compare;
 
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\model\EntityModel;
