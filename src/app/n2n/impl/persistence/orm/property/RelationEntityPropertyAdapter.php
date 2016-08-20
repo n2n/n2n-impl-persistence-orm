@@ -19,15 +19,15 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl;
+namespace n2n\impl\persistence\orm\property;
 
-use n2n\persistence\orm\property\impl\relation\Relation;
-use n2n\persistence\orm\property\impl\RelationEntityProperty;
+use n2n\impl\persistence\orm\property\relation\Relation;
+use n2n\impl\persistence\orm\property\RelationEntityProperty;
 use n2n\util\ex\IllegalStateException;
 use n2n\reflection\property\AccessProxy;
 use n2n\reflection\ArgUtils;
-use n2n\persistence\orm\property\impl\relation\MasterRelation;
-use n2n\persistence\orm\property\impl\relation\MappedRelation;
+use n2n\impl\persistence\orm\property\relation\MasterRelation;
+use n2n\impl\persistence\orm\property\relation\MappedRelation;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\property\CascadableEntityProperty;

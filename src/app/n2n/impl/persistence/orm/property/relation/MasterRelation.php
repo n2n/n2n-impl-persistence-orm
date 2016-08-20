@@ -19,10 +19,10 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\relation;
+namespace n2n\impl\persistence\orm\property\relation;
 
 use n2n\persistence\orm\query\QueryState;
-use n2n\persistence\orm\property\impl\relation\RelationAdapter;
+use n2n\impl\persistence\orm\property\relation\RelationAdapter;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\persistence\orm\model\EntityModel;
@@ -32,16 +32,16 @@ abstract class MasterRelation extends RelationAdapter {
 	 * @param EntityModel $entityModel because of possible inheritance
 	 * @param QueryState $queryState
 	 * @param MetaTreePoint $metaTreePoint
-	 * @return \n2n\persistence\orm\property\impl\relation\JoinColumnTreePoint
+	 * @return \n2n\impl\persistence\orm\property\relation\JoinColumnTreePoint
 	 */
 	public abstract function createInverseJoinTreePoint(EntityModel $entityModel, TreePointMeta $targetTreePointMeta, QueryState $queryState);
 	/**
 	 * @param QueryState $queryState
-	 * @return \n2n\persistence\orm\property\impl\relation\selection\ToManyLoader
+	 * @return \n2n\impl\persistence\orm\property\relation\selection\ToManyLoader
 	 */
 	public abstract function createInverseToManyLoader(EntityModel $entityModel, QueryState $queryState);
 	/**
-	 * @return \n2n\persistence\orm\property\impl\relation\compare\JoinTableToManyQueryItemFactory 
+	 * @return \n2n\impl\persistence\orm\property\relation\compare\JoinTableToManyQueryItemFactory 
 	 */
 	public abstract function createInverseJoinTableToManyQueryItemFactory(EntityModel $entityModel);
 }

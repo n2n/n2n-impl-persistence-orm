@@ -19,7 +19,7 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\hangar;
+namespace n2n\impl\persistence\orm\property\hangar;
 
 use hangar\entity\model\HangarPropDef;
 use hangar\entity\model\PropSourceDef;
@@ -31,10 +31,10 @@ use n2n\reflection\annotation\AnnotationSet;
 use n2n\reflection\ArgUtils;
 use n2n\io\orm\ManagedFileEntityProperty;
 use hangar\core\config\ColumnDefaults;
-use n2n\web\dispatch\mag\impl\model\NumericMag;
+use n2n\impl\web\dispatch\mag\model\NumericMag;
 use n2n\persistence\orm\annotation\AnnoManagedFile;
 use n2n\io\managed\FileManager;
-use n2n\web\dispatch\mag\impl\model\ReflectionClassMag;
+use n2n\impl\web\dispatch\mag\model\ReflectionClassMag;
 use n2n\persistence\meta\structure\common\CommonStringColumn;
 use hangar\entity\model\CompatibilityLevel;
 

@@ -19,7 +19,7 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\relation;
+namespace n2n\impl\persistence\orm\property\relation;
 
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\FetchType;
@@ -27,7 +27,7 @@ use n2n\persistence\orm\CascadeType;
 use n2n\persistence\orm\query\from\TreePath;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\property\BasicEntityProperty;
-use n2n\persistence\orm\property\impl\relation\util\ActionMarker;
+use n2n\impl\persistence\orm\property\relation\util\ActionMarker;
 use n2n\persistence\orm\store\action\RemoveAction;
 
 abstract class RelationAdapter implements Relation {

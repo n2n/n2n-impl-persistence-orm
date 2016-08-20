@@ -19,11 +19,11 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\relation\util;
+namespace n2n\impl\persistence\orm\property\relation\util;
 
 use n2n\persistence\orm\property\BasicEntityProperty;
 use n2n\persistence\orm\model\EntityModel;
-use n2n\persistence\orm\property\impl\relation\selection\ArrayObjectProxy;
+use n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy;
 use n2n\reflection\ArgUtils;
 use n2n\util\col\ArrayUtils;
 

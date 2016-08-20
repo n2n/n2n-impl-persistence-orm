@@ -19,21 +19,21 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\relation;
+namespace n2n\impl\persistence\orm\property\relation;
 
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\QueryState;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 use n2n\persistence\orm\FetchType;
-use n2n\persistence\orm\property\impl\relation\selection\ToOneRelationSelection;
+use n2n\impl\persistence\orm\property\relation\selection\ToOneRelationSelection;
 use n2n\persistence\orm\store\action\PersistAction;
-use n2n\persistence\orm\property\impl\relation\util\ToOneValueHasher;
-use n2n\persistence\orm\property\impl\relation\compare\IdColumnComparableDecorator;
+use n2n\impl\persistence\orm\property\relation\util\ToOneValueHasher;
+use n2n\impl\persistence\orm\property\relation\compare\IdColumnComparableDecorator;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\model\EntityModel;
-use n2n\persistence\orm\property\impl\relation\util\ToOneUtils;
+use n2n\impl\persistence\orm\property\relation\util\ToOneUtils;
 
 class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation {
 	private $toOneUtils;
@@ -44,7 +44,7 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 	}
 
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\ToOneRelation::createRepresentingQueryItem()
+	 * @see \n2n\impl\persistence\orm\property\relation\ToOneRelation::createRepresentingQueryItem()
 	 */
 	public function createRepresentingQueryItem(MetaTreePoint $metaTreePoint, QueryState $queryState) {
 		return $metaTreePoint->requestPropertyRepresentableQueryItem($this->createTargetIdTreePath());
@@ -61,7 +61,7 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 				$this->targetEntityModel);
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\Relation::createSelection()
+	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createSelection()
 	 */
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
 		$idSelection = $metaTreePoint->requestPropertySelection($this->createTargetIdTreePath());

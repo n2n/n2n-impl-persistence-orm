@@ -19,17 +19,17 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl;
+namespace n2n\impl\persistence\orm\property;
 
 use n2n\persistence\orm\property\EntityPropertyProvider;
 use n2n\reflection\property\AccessProxy;
 use n2n\persistence\orm\property\ClassSetup;
-use n2n\persistence\orm\property\impl\RelationEntityProperty;
+use n2n\impl\persistence\orm\property\RelationEntityProperty;
 use n2n\persistence\orm\model\EntityModelManager;
 use n2n\persistence\orm\annotation\AnnoOneToOne;
 use n2n\persistence\orm\annotation\AnnoManyToOne;
 use n2n\persistence\orm\annotation\AnnoOneToMany;
-use n2n\persistence\orm\property\impl\relation\RelationFactory;
+use n2n\impl\persistence\orm\property\relation\RelationFactory;
 use n2n\persistence\orm\annotation\AnnoManyToMany;
 use n2n\reflection\property\PropertiesAnalyzer;
 use n2n\reflection\ReflectionUtils;

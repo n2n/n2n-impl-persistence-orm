@@ -19,24 +19,24 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\relation;
+namespace n2n\impl\persistence\orm\property\relation;
 
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\from\MetaTreePoint;
-use n2n\persistence\orm\property\impl\relation\tree\JoinColumnTreePoint;
+use n2n\impl\persistence\orm\property\relation\tree\JoinColumnTreePoint;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 use n2n\persistence\orm\store\action\PersistAction;
-use n2n\persistence\orm\property\impl\relation\selection\JoinColumnToManyLoader;
-use n2n\persistence\orm\property\impl\relation\selection\ToManyRelationSelection;
+use n2n\impl\persistence\orm\property\relation\selection\JoinColumnToManyLoader;
+use n2n\impl\persistence\orm\property\relation\selection\ToManyRelationSelection;
 use n2n\persistence\orm\store\SimpleLoaderUtils;
 use n2n\persistence\orm\FetchType;
 use n2n\util\ex\UnsupportedOperationException;
 use n2n\persistence\orm\query\from\meta\TreePointMeta;
-use n2n\persistence\orm\property\impl\relation\util\OrphanRemover;
-use n2n\persistence\orm\property\impl\relation\util\ToManyValueHasher;
-use n2n\persistence\orm\property\impl\relation\util\ToManyAnalyzer;
-use n2n\persistence\orm\property\impl\relation\compare\IdColumnComparableDecorator;
+use n2n\impl\persistence\orm\property\relation\util\OrphanRemover;
+use n2n\impl\persistence\orm\property\relation\util\ToManyValueHasher;
+use n2n\impl\persistence\orm\property\relation\util\ToManyAnalyzer;
+use n2n\impl\persistence\orm\property\relation\compare\IdColumnComparableDecorator;
 use n2n\util\ex\NotYetImplementedException;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\reflection\ArgUtils;
@@ -79,7 +79,7 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 		return $treePoint;
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\MasterRelation::createInverseJoinTreePoint()
+	 * @see \n2n\impl\persistence\orm\property\relation\MasterRelation::createInverseJoinTreePoint()
 	 */
 	public function createInverseJoinTreePoint(EntityModel $entityModel, TreePointMeta $targetTreePointMeta, QueryState $queryState) {
 		$targetJoinQueryColumn = $targetTreePointMeta->registerColumn($this->targetEntityModel, 
@@ -95,7 +95,7 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 		return $treePoint;
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\Relation::createColumnComparable()
+	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createColumnComparable()
 	 */
 	public function createCustomComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
 		$comparisonStargegy = $metaTreePoint->requestPropertyComparisonStrategy($this->createTargetIdTreePath())
@@ -134,7 +134,7 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 	}
 	
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\Relation::supplyPersistAction()
+	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyPersistAction()
 	 */
 	public function supplyPersistAction($value, $valueHash, PersistAction $persistAction) {
 		$hasher = new ToManyValueHasher($this->targetEntityModel->getIdDef()->getEntityProperty());
@@ -174,13 +174,13 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 		}
 	}
 // 	/* (non-PHPdoc)
-// 	 * @see \n2n\persistence\orm\property\impl\relation\Relation::supplyInverseToManyRemoveAction()
+// 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyInverseToManyRemoveAction()
 // 	 */
 // 	public function supplyInverseToManyRemoveAction($targetValue, $targetValueHash, RemoveAction $targetRemoveAction) {
 // 		throw new UnsupportedOperationException();
 // 	}
 // 	/* (non-PHPdoc)
-// 	 * @see \n2n\persistence\orm\property\impl\relation\Relation::supplyInverseToOneRemoveAction()
+// 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyInverseToOneRemoveAction()
 // 	 */
 // 	public function supplyInverseToOneRemoveAction($targetValue, $targetValueHash, RemoveAction $targetRemoveAction) {
 // 	}
@@ -192,7 +192,7 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 	}
 
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\Relation::createSelection()
+	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createSelection()
 	 */
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
 		$idSelection = $metaTreePoint->requestPropertySelection($this->createIdTreePath());
@@ -209,7 +209,7 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 		return $toManySelection;
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\MasterRelation::createInverseToManyLoader()
+	 * @see \n2n\impl\persistence\orm\property\relation\MasterRelation::createInverseToManyLoader()
 	 */
 	public function createInverseToManyLoader(EntityModel $entityModel, QueryState $queryState) {
 		throw new UnsupportedOperationException();

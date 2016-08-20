@@ -19,7 +19,7 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\hangar\scalar;
+namespace n2n\impl\persistence\orm\property\hangar\scalar;
 
 use hangar\entity\model\HangarPropDef;
 use n2n\util\config\Attributes;
@@ -29,7 +29,7 @@ use n2n\persistence\meta\structure\ColumnFactory;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
 use n2n\reflection\ArgUtils;
-use n2n\persistence\orm\property\impl\ScalarEntityProperty;
+use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use hangar\core\config\ColumnDefaults;
 use hangar\entity\model\CompatibilityLevel;
 
@@ -42,7 +42,7 @@ abstract class ScalarPropDefAdapter implements HangarPropDef {
 	}
 	
 	public function getEntityPropertyClass() {
-		return new \ReflectionClass('n2n\persistence\orm\property\impl\ScalarEntityProperty');
+		return new \ReflectionClass('n2n\impl\persistence\orm\property\ScalarEntityProperty');
 	}
 	
 	public function applyDbMeta(DbInfo $dbInfo, PropSourceDef $propSourceDef, EntityProperty $entityProperty,

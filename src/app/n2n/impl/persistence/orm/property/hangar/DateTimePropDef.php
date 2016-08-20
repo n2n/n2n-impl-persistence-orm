@@ -19,7 +19,7 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\hangar;
+namespace n2n\impl\persistence\orm\property\hangar;
 
 use hangar\entity\model\HangarPropDef;
 use hangar\entity\model\PropSourceDef;
@@ -29,9 +29,9 @@ use hangar\entity\model\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
 use n2n\reflection\ArgUtils;
-use n2n\persistence\orm\property\impl\DateTimeEntityProperty;
+use n2n\impl\persistence\orm\property\DateTimeEntityProperty;
 use hangar\core\config\ColumnDefaults;
-use n2n\persistence\meta\impl\mysql\MysqlDateTimeColumn;
+use n2n\impl\persistence\meta\mysql\MysqlDateTimeColumn;
 use hangar\entity\model\CompatibilityLevel;
 
 class DateTimePropDef implements HangarPropDef {
@@ -47,7 +47,7 @@ class DateTimePropDef implements HangarPropDef {
 	}
 	
 	public function getEntityPropertyClass() {
-		return new \ReflectionClass('n2n\persistence\orm\property\impl\DateTimeEntityProperty');
+		return new \ReflectionClass('n2n\impl\persistence\orm\property\DateTimeEntityProperty');
 	}
 	
 	public function createMagCollection(PropSourceDef $propSourceDef = null) {

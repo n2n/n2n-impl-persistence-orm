@@ -19,7 +19,7 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\relation\selection;
+namespace n2n\impl\persistence\orm\property\relation\selection;
 
 use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\orm\model\EntityModel;

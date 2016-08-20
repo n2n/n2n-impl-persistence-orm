@@ -19,24 +19,24 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\relation;
+namespace n2n\impl\persistence\orm\property\relation;
 
-use n2n\persistence\orm\property\impl\relation\JoinTableRelation;
+use n2n\impl\persistence\orm\property\relation\JoinTableRelation;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\QueryState;
-use n2n\persistence\orm\property\impl\relation\selection\JoinTableToManyLoader;
+use n2n\impl\persistence\orm\property\relation\selection\JoinTableToManyLoader;
 use n2n\persistence\orm\store\SimpleLoaderUtils;
 use n2n\persistence\orm\FetchType;
-use n2n\persistence\orm\property\impl\relation\selection\ToManyRelationSelection;
+use n2n\impl\persistence\orm\property\relation\selection\ToManyRelationSelection;
 use n2n\persistence\orm\store\action\PersistAction;
-use n2n\persistence\orm\property\impl\relation\util\ToManyValueHasher;
-use n2n\persistence\orm\property\impl\relation\util\ToManyAnalyzer;
-use n2n\persistence\orm\property\impl\relation\compare\JoinTableToManyQueryItemFactory;
-use n2n\persistence\orm\property\impl\relation\compare\ToManyCustomComparable;
+use n2n\impl\persistence\orm\property\relation\util\ToManyValueHasher;
+use n2n\impl\persistence\orm\property\relation\util\ToManyAnalyzer;
+use n2n\impl\persistence\orm\property\relation\compare\JoinTableToManyQueryItemFactory;
+use n2n\impl\persistence\orm\property\relation\compare\ToManyCustomComparable;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\model\EntityModel;
-use n2n\persistence\orm\property\impl\relation\util\ToManyUtils;
+use n2n\impl\persistence\orm\property\relation\util\ToManyUtils;
 use n2n\persistence\orm\EntityManager;
 
 class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelation {
@@ -65,7 +65,7 @@ class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelatio
 	}
 	
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\Relation::createSelection()
+	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createSelection()
 	 */
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
 		$idSelection = $metaTreePoint->requestPropertySelection($this->createIdTreePath());
@@ -82,13 +82,13 @@ class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelatio
 		return $toManySelection;
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\Relation::prepareSupplyJob()
+	 * @see \n2n\impl\persistence\orm\property\relation\Relation::prepareSupplyJob()
 	 */
 	public function prepareSupplyJob($value, $oldValueHash, SupplyJob $supplyJob) {
 		$this->toManyUtils->prepareSupplyJob($value, $oldValueHash, $supplyJob);
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\impl\relation\Relation::supplyPersistAction()
+	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyPersistAction()
 	 */
 	public function supplyPersistAction($value, $valueHash, PersistAction $persistAction) {
 		$targetIdProperty = $this->targetEntityModel->getIdDef()->getEntityProperty();

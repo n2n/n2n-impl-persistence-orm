@@ -19,7 +19,7 @@
  * Bert Hofmänner.......: Idea, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\persistence\orm\property\impl\hangar\relation;
+namespace n2n\impl\persistence\orm\property\hangar\relation;
 
 use hangar\entity\model\HangarPropDef;
 use hangar\entity\model\PropSourceDef;
@@ -32,12 +32,12 @@ use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
 use n2n\persistence\orm\annotation\AnnoManyToMany;
 use n2n\reflection\ArgUtils;
-use n2n\persistence\orm\property\impl\RelationEntityProperty;
+use n2n\impl\persistence\orm\property\RelationEntityProperty;
 use n2n\reflection\CastUtils;
-use n2n\persistence\orm\property\impl\relation\JoinTableToManyRelation;
+use n2n\impl\persistence\orm\property\relation\JoinTableToManyRelation;
 use n2n\persistence\meta\structure\IndexType;
 use hangar\core\config\ColumnDefaults;
-use n2n\persistence\orm\property\impl\ToManyEntityProperty;
+use n2n\impl\persistence\orm\property\ToManyEntityProperty;
 use hangar\entity\model\CompatibilityLevel;
 
 class ManyToManyPropDef implements HangarPropDef {
@@ -54,7 +54,7 @@ class ManyToManyPropDef implements HangarPropDef {
 	}
 
 	public function getEntityPropertyClass() {
-		return new \ReflectionClass('n2n\persistence\orm\property\impl\ToManyEntityProperty');
+		return new \ReflectionClass('n2n\impl\persistence\orm\property\ToManyEntityProperty');
 	}
 
 	public function createMagCollection(PropSourceDef $propSourceDef = null) {
