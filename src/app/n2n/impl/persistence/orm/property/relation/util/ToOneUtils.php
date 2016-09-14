@@ -33,7 +33,7 @@ class ToOneUtils {
 		$this->master = (boolean) $master;
 	}
 
-	public function prepareSupplyJob($value, $oldValueHash, SupplyJob $supplyJob) {
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
 		if ($oldValueHash === null || $supplyJob->isInsert()) return;
 	
 		if ($this->master && $supplyJob->isRemove()) {

@@ -35,6 +35,8 @@ use n2n\persistence\orm\store\operation\MergeOperation;
 use n2n\persistence\Pdo;
 use n2n\persistence\orm\store\action\RemoveAction;
 use n2n\persistence\orm\EntityManager;
+use n2n\persistence\orm\store\ValueHash;
+use n2n\persistence\orm\store\CommonValueHash;
 
 class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	public function __construct(AccessProxy $accessProxy, $columnName) {
@@ -77,18 +79,18 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 		return $value;
 	}
 	
-	public function supplyPersistAction($mappedValue, $valueHash, PersistAction $persistAction) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash = null) {
 		$rawValue = $persistAction->getActionQueue()->getEntityManager()->getPdo()->getMetaData()
-				->getDialect()->getOrmDialectConfig()->buildDateTimeRawValue($mappedValue);
+				->getDialect()->getOrmDialectConfig()->buildDateTimeRawValue($value);
 		
 		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $rawValue);
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\EntityProperty::buildValueHash()
+	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
 	 */
-	public function buildValueHash($value, EntityManager $em) {
-		if ($value === null) return null;
-		return $this->valueToRep($value);
+	public function createValueHash($value, EntityManager $em): ValueHash {
+		if ($value === null) return new CommonValueHash(null);
+		return new CommonValueHash($this->valueToRep($value));
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::mergeValue()
@@ -104,7 +106,7 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyRemoveAction()
 	 */
-	public function supplyRemoveAction($value, $valueHash, RemoveAction $removeAction) {
+	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $valueHash = null) {
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::parseValue()

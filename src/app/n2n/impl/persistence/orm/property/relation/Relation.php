@@ -28,6 +28,7 @@ use n2n\persistence\orm\store\action\RemoveAction;
 use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\persistence\orm\EntityManager;
+use n2n\persistence\orm\store\ValueHash;
 
 interface Relation {
 	
@@ -77,21 +78,21 @@ interface Relation {
 	 * @param mixed $oldValueHash
 	 * @param SupplyJob $supplyJob
 	 */
-	public function prepareSupplyJob($value, $oldValueHash, SupplyJob $supplyJob);
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null);
 	
 	/**
 	 * @param mixed $value
 	 * @param mixed $oldValueHash
 	 * @param PersistAction $persistAction
 	 */
-	public function supplyPersistAction($value, $oldValueHash, PersistAction $persistAction);
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $oldValueHash = null);
 	
 	/**
 	 * @param mixed $value
 	 * @param mixed $oldValueHash
 	 * @param RemoveAction $removeAction
 	 */
-	public function supplyRemoveAction($value, $oldValueHash, RemoveAction $removeAction);
+	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash);
 	
-	public function buildValueHash($value, EntityManager $em);
+	public function createValueHash($value, EntityManager $em): ValueHash;
 }

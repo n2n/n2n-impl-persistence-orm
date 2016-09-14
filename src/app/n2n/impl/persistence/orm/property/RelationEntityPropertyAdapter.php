@@ -37,6 +37,7 @@ use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\model\EntityModel;
+use n2n\persistence\orm\store\ValueHash;
 
 abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter implements RelationEntityProperty, 
 		CascadableEntityProperty {
@@ -98,27 +99,37 @@ abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter imple
 	public function createJoinTreePoint(TreePointMeta $treePointMeta, QueryState $queryState) {
 		return $this->getRelation()->createJoinTreePoint($treePointMeta, $queryState);
 	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\persistence\orm\property\CascadableEntityProperty::prepareSupplyJob()
 	 */
-	public function prepareSupplyJob($value, $oldValueHash, SupplyJob $supplyJob) {
-		$this->getRelation()->prepareSupplyJob($value, $oldValueHash, $supplyJob);
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
+		$this->getRelation()->prepareSupplyJob($supplyJob, $value, $oldValueHash);
 	}
-	/* (non-PHPdoc)
+
+	/**
+	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
 	 */
-	public function supplyPersistAction($value, $valueHash, PersistAction $persistAction) {
-		$this->getRelation()->supplyPersistAction($value, $valueHash, $persistAction);
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $oldValueHash = null) {
+		$this->getRelation()->supplyPersistAction($persistAction, $value, $oldValueHash);
 	}
 	
-	public function supplyRemoveAction($value, $valueHash, RemoveAction $removeAction) {
-		$this->getRelation()->supplyRemoveAction($value, $valueHash, $removeAction);
-	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\EntityProperty::buildValueHash()
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\persistence\orm\property\EntityProperty::supplyRemoveAction()
 	 */
-	public function buildValueHash($value, EntityManager $em) {
-		return $this->getRelation()->buildValueHash($value, $em);
+	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
+		$this->getRelation()->supplyRemoveAction($removeAction, $value, $oldValueHash);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
+	 */
+	public function createValueHash($value, EntityManager $em): ValueHash {
+		return $this->getRelation()->createValueHash($value, $em);
 	}
 	
 	public function hasTargetEntityModel(): bool {

@@ -24,6 +24,8 @@ namespace n2n\impl\persistence\orm\property\relation\util;
 use n2n\reflection\ArgUtils;
 use n2n\persistence\orm\property\BasicEntityProperty;
 use n2n\persistence\orm\model\EntityModel;
+use n2n\persistence\orm\store\ValueHash;
+use n2n\persistence\orm\store\CommonValueHash;
 
 class ToOneValueHasher {
 	private $idEntityProperty;
@@ -33,16 +35,41 @@ class ToOneValueHasher {
 	}
 	
 	public function createValueHash($value) {
-		if ($value === null) return null;
+		if ($value === null) return new ToOneValueHash(null);
 		ArgUtils::assertTrue(is_object($value));
 		
 		$value = $this->idEntityProperty->readValue($value);
-		if ($value === null) return null;
+		if ($value === null) return new ToOneValueHash(null);
 		
-		return $this->idEntityProperty->valueToRep($value);
+		return new ToOneValueHash($this->idEntityProperty->valueToRep($value));
 	}
 	
 	public static function createFromEntityModel(EntityModel $entityModel) {
 		return new ToOneValueHasher($entityModel->getIdDef()->getEntityProperty());
+	}
+}
+
+class ToOneValueHash implements ValueHash {
+	private $idRep;
+	
+	public function __construct(string $idRep = null) {
+		$this->idRep = $idRep;
+	}
+	
+	/**
+	 * @return string|null
+	 */
+	public function getIdRep() {
+		return $this->idRep;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\persistence\orm\store\ValueHash::matches()
+	 */
+	public function matches(ValueHash $valueHash): bool {
+		ArgUtils::assertTrue($valueHash instanceof ToOneValueHash);
+		
+		return $this->idRep === $valueHash->getIdRep();
 	}
 }

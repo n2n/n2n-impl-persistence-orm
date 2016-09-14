@@ -29,6 +29,7 @@ use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\property\BasicEntityProperty;
 use n2n\impl\persistence\orm\property\relation\util\ActionMarker;
 use n2n\persistence\orm\store\action\RemoveAction;
+use n2n\persistence\orm\store\ValueHash;
 
 abstract class RelationAdapter implements Relation {
 	protected $entityProperty;
@@ -101,6 +102,6 @@ abstract class RelationAdapter implements Relation {
 		return $this->targetEntityModel->getIdDef()->getEntityProperty();
 	}
 	
-	public function supplyRemoveAction($value, $oldValueHash, RemoveAction $removeAction) {
+	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
 	}
 }

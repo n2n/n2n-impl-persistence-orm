@@ -38,6 +38,8 @@ use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\impl\persistence\orm\property\relation\util\ToManyUtils;
 use n2n\persistence\orm\EntityManager;
+use n2n\persistence\orm\store\ValueHash;
+use n2n\reflection\ArgUtils;
 
 class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelation {
 	private $toManyUtils;
@@ -84,16 +86,19 @@ class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelatio
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::prepareSupplyJob()
 	 */
-	public function prepareSupplyJob($value, $oldValueHash, SupplyJob $supplyJob) {
-		$this->toManyUtils->prepareSupplyJob($value, $oldValueHash, $supplyJob);
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
+		$this->toManyUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyPersistAction()
 	 */
-	public function supplyPersistAction($value, $valueHash, PersistAction $persistAction) {
-		$targetIdProperty = $this->targetEntityModel->getIdDef()->getEntityProperty();
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $oldValueHash = null) {
+		if ($oldValueHash === null) return;
 		
-		if (ToManyValueHasher::checkForUntouchedProxy($value, $valueHash)) return;
+		ArgUtils::assertTrue($oldValueHash instanceof ValueHash);
+		if ($oldValueHash->checkForUntouchedProxy($oldValueHash)) return;
+		
+		$targetIdProperty = $this->targetEntityModel->getIdDef()->getEntityProperty();
 				
 		$toManyAnalyzer = new ToManyAnalyzer($persistAction->getActionQueue());
 		$toManyAnalyzer->analyze($value);
@@ -101,7 +106,7 @@ class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelatio
 		$hasher = new ToManyValueHasher($targetIdProperty);
 		
 		if (!$toManyAnalyzer->hasPendingPersistActions() 
-				&& $hasher->matches($toManyAnalyzer->getEntityIds(), $valueHash)) {
+				&& $hasher->matches($toManyAnalyzer->getEntityIds(), $oldValueHash)) {
 			return;
 		}
 		
@@ -120,7 +125,7 @@ class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelatio
 		}
 	}
 	
-	public function buildValueHash($value, EntityManager $em) {
+	public function createValueHash($value, EntityManager $em): ValueHash {
 		$analyzer = new ToManyValueHasher($this->targetEntityModel->getIdDef()->getEntityProperty());
 		return $analyzer->createValueHash($value);
 	}
