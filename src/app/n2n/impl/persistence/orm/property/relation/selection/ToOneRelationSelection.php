@@ -69,7 +69,7 @@ class ToOneRelationSelection extends RelationSelection implements Selection {
 			$id = $idValueBuilder->buildValue();
 			$persistenceContext = $this->queryState->getPersistenceContext();
 	
-			if (null !== ($entity = $persistenceContext->getManagedEntity($this->entityModel, $id))) {
+			if (null !== ($entity = $persistenceContext->getManagedEntityObj($this->entityModel, $id))) {
 				return $entity;
 			}
 	

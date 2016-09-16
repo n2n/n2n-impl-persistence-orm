@@ -44,7 +44,7 @@ class ToManyAnalyzer {
 		$persistenceContext = $this->actionQueue->getEntityManager()->getPersistenceContext();
 		
 		foreach ($value as $entity) {
-			if (!$persistenceContext->containsManagedEntity($entity)) {
+			if (!$persistenceContext->containsManagedEntityObj($entity)) {
 				continue;
 			}
 						
