@@ -73,7 +73,9 @@ class ToManyValueHasher {
 // 		return $valueHash;
 	}
 	
-	public function extractIdRepsFromEntities($entities) {
+	public function extractIdRepsFromValue($entities) {
+		if ($entities === null) return array();
+		
 		ArgUtils::assertTrue(ArrayUtils::isArrayLike($entities));
 		$entityIdReps = array();
 		foreach ($entities as $key => $entity) {
@@ -184,7 +186,7 @@ class ToManyValueHash implements ValueHash {
 		$toManyValueHash = new ToManyValueHash();
 		$toManyValueHash->arrayObjectProxy = $arrayObjectProxy;
 		$arrayObjectProxy->whenInitialized(function () use ($arrayObjectProxy, $toManyValueHash, $toManyValueHasher) {
-			$toManyValueHash->idReps = $toManyValueHasher->extractIdRepsFromEntities($arrayObjectProxy);
+			$toManyValueHash->idReps = $toManyValueHasher->extractIdRepsFromValue($arrayObjectProxy);
 			$toManyValueHash->arrayObjectProxy = null;
 		});
 		return $toManyValueHash;
@@ -192,7 +194,7 @@ class ToManyValueHash implements ValueHash {
 	
 	public static function createFromValue($value, ToManyValueHasher $toManyValueHasher) {
 		$toManyValueHash = new ToManyValueHash();
-		$toManyValueHash->idReps = $toManyValueHasher->extractIdRepsFromEntities($value);
+		$toManyValueHash->idReps = $toManyValueHasher->extractIdRepsFromValue($value);
 		return $toManyValueHash;
 	}
 	

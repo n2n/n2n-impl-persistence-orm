@@ -75,4 +75,12 @@ class ToManyEntityProperty extends RelationEntityPropertyAdapter implements Cust
 	public function createCustomComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
 		return $this->relation->createCustomComparable($metaTreePoint, $queryState);
 	}
+	
+// 	public function readValue($object) {
+// 		$value = parent::readValue($object);
+// 		if ($value === null && $this->isToMany()) {
+// 			return new \ArrayObject();
+// 		}
+// 		return $value;
+// 	}
 }
