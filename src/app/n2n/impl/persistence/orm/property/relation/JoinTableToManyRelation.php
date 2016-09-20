@@ -40,6 +40,7 @@ use n2n\impl\persistence\orm\property\relation\util\ToManyUtils;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\reflection\ArgUtils;
+use n2n\impl\persistence\orm\property\relation\util\ToManyValueHash;
 
 class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelation {
 	private $toManyUtils;
@@ -93,10 +94,8 @@ class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelatio
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyPersistAction()
 	 */
 	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $oldValueHash = null) {
-		if ($oldValueHash === null) return;
-		
-		ArgUtils::assertTrue($oldValueHash instanceof ValueHash);
-		if ($oldValueHash->checkForUntouchedProxy($oldValueHash)) return;
+		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToManyValueHash);
+		if ($oldValueHash !== null && $oldValueHash->checkForUntouchedProxy($oldValueHash)) return;
 		
 		$targetIdProperty = $this->targetEntityModel->getIdDef()->getEntityProperty();
 				
@@ -105,7 +104,7 @@ class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelatio
 
 		$hasher = new ToManyValueHasher($targetIdProperty);
 		
-		if (!$toManyAnalyzer->hasPendingPersistActions() 
+		if ($oldValueHash !== null && !$toManyAnalyzer->hasPendingPersistActions() 
 				&& $hasher->matches($toManyAnalyzer->getEntityIds(), $oldValueHash)) {
 			return;
 		}
