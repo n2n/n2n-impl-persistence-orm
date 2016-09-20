@@ -43,6 +43,10 @@ use n2n\impl\persistence\orm\property\relation\util\JoinColumnResetAction;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\impl\persistence\orm\property\relation\util\RemoveConstraintMarker;
 use n2n\persistence\orm\EntityManager;
+use n2n\persistence\orm\store\ValueHash;
+use n2n\reflection\ArgUtils;
+use n2n\persistence\orm\store\CommonValueHash;
+use n2n\impl\persistence\orm\property\relation\util\ToOneValueHash;
 
 class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, ActionDependency {
 	private $joinColumnName;
@@ -127,12 +131,15 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 				$this->targetEntityModel->getIdDef()->getEntityProperty(), $this->joinColumnName);
 	}
 	
-	public function prepareSupplyJob($value, $valueHash, SupplyJob $supplyJob) {
-		if ($valueHash === null || $supplyJob->isInsert()) return;
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
+		if ($supplyJob->isInsert()) return;
+		
+		ArgUtils::assertTrue($oldValueHash instanceof ToOneValueHash);
+		if ($oldValueHash->getIdRep() === null) return;
 		
 		if ($supplyJob->isRemove()) {
 			$marker = new RemoveConstraintMarker($supplyJob, $this->targetEntityModel, $this->actionMarker);
-			$marker->releaseByIdRep($valueHash);
+			$marker->releaseByIdRep($oldValueHash->getIdRep());
 		}
 		
 		if ($this->orphanRemoval) {
@@ -142,13 +149,13 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 				$orphanRemover->releaseCandiate($value);
 			}
 			
-			$orphanRemover->removeByIdRep($valueHash);
+			$orphanRemover->removeByIdRep($oldValueHash->getIdRep());
 		}
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyPersistAction()
 	 */
-	public function supplyPersistAction($value, $valueHash, PersistAction $persistAction) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $oldValueHash = null) {
 		if ($value === null) {
 			$persistAction->getMeta()->setRawValue($this->entityModel, $this->joinColumnName, null);
 			return;
@@ -215,7 +222,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 // 	}
 
 	
-	public function buildValueHash($value, EntityManager $em) {
+	public function createValueHash($value, EntityManager $em): ValueHash {
 		return ToOneValueHasher::createFromEntityModel($this->targetEntityModel)
 				->createValueHash($value);
 	}

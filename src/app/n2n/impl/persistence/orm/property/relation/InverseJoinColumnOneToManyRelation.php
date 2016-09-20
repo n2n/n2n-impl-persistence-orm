@@ -44,6 +44,8 @@ use n2n\util\col\ArrayUtils;
 use n2n\persistence\orm\store\action\EntityAction;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\EntityManager;
+use n2n\persistence\orm\store\ValueHash;
+use n2n\impl\persistence\orm\property\relation\util\ToManyValueHash;
 
 class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToManyRelation {
 	private $inverseJoinColumnName;
@@ -112,14 +114,11 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 		throw new UnsupportedOperationException();
 	}
 	
-	public function prepareSupplyJob($value, $oldValueHash, SupplyJob $supplyJob) {
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
 		if (!$this->orphanRemoval || $oldValueHash === null || $supplyJob->isInsert()) return;
 
-		if (ToManyValueHasher::checkForUntouchedProxy($value, $oldValueHash)) return;
-		
-		if (ToManyValueHasher::checkForProxy($oldValueHash)) {
-			throw new NotYetImplementedException('PersistenceContext must be able to store ArrayObjectProxy by valueHash');
-		}
+		ArgUtils::assertTrue($oldValueHash instanceof ToManyValueHash);
+		if ($oldValueHash->checkForUntouchedProxy($value)) return;
 	
 		$orphanRemover = new OrphanRemover($supplyJob, $this->targetEntityModel, $this->actionMarker);
 		
@@ -130,22 +129,22 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 			}
 		}
 			
-		$orphanRemover->removeByIdReps(ToManyValueHasher::extractIdReps($oldValueHash));
+		$orphanRemover->removeByIdReps($oldValueHash->getIdReps(true));
 	}
 	
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyPersistAction()
 	 */
-	public function supplyPersistAction($value, $valueHash, PersistAction $persistAction) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $oldValueHash = null) {
 		$hasher = new ToManyValueHasher($this->targetEntityModel->getIdDef()->getEntityProperty());
 		
-		if (ToManyValueHasher::checkForUntouchedProxy($value, $valueHash)) return;
+		if (ToManyValueHasher::checkForUntouchedProxy($value, $oldValueHash)) return;
 		
 		$toManyAnalyzer = new ToManyAnalyzer($persistAction->getActionQueue());
 		$toManyAnalyzer->analyze($value);
 		
 		if (!$toManyAnalyzer->hasPendingPersistActions()
-				&& $hasher->matches($toManyAnalyzer->getEntityIds(), $valueHash)) {
+				&& $hasher->matches($toManyAnalyzer->getEntityIds(), $oldValueHash)) {
 			return;
 		}
 		
@@ -185,7 +184,7 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 // 	public function supplyInverseToOneRemoveAction($targetValue, $targetValueHash, RemoveAction $targetRemoveAction) {
 // 	}
 	
-	public function buildValueHash($value, EntityManager $em) {
+	public function createValueHash($value, EntityManager $em) {
 		$analyzer = new ToManyValueHasher($this->targetEntityModel->getIdDef()
 				->getEntityProperty());
 		return $analyzer->createValueHash($value);

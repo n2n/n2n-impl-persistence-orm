@@ -22,14 +22,14 @@
 namespace n2n\impl\persistence\orm\property\relation\selection;
 
 use n2n\persistence\orm\property\EntityProperty;
-use n2n\impl\persistence\orm\property\relation\util\ToManyValueHasher;
 use n2n\util\ex\IllegalStateException;
 
 class ArrayObjectProxy extends \ArrayObject {
 	private $loadClosure;
 	private $targetIdEntityProperty;
 	private $id;
-	private $loadedValueHash;
+// 	private $loadedValueHash;
+	private $whenInitializedClosures = array();
 	
 	public function __construct(\Closure $loadClosure, EntityProperty $targetIdEntityProperty) {
 		$this->loadClosure = new \ReflectionFunction($loadClosure);
@@ -41,10 +41,10 @@ class ArrayObjectProxy extends \ArrayObject {
 		return $this->id;
 	}
 	
-	public function getLoadedValueHash() {
-		IllegalStateException::assertTrue($this->loadedValueHash !== null);
-		return $this->loadedValueHash;
-	}
+// 	public function getLoadedValueHash() {
+// 		IllegalStateException::assertTrue($this->loadedValueHash !== null);
+// 		return $this->loadedValueHash;
+// 	}
 	
 	public function isInitialized() {
 		return $this->loadClosure === null;
@@ -54,10 +54,20 @@ class ArrayObjectProxy extends \ArrayObject {
 		if ($this->isInitialized()) return;
 		
 		$entities = $this->loadClosure->invoke();
-		$hasher = new ToManyValueHasher($this->targetIdEntityProperty);
-		$this->loadedValueHash = $hasher->createValueHash($entities);
+// 		$hasher = new ToManyValueHasher($this->targetIdEntityProperty);
+// 		$this->loadedValueHash = $hasher->createValueHash($entities);
 		parent::exchangeArray($entities);
 		$this->loadClosure = null;
+		
+		foreach ($this->whenInitializedClosures as $closure) {
+			$closure($this);
+		}
+		$this->whenInitializedClosures = array();
+	}
+	
+	public function whenInitialized(\Closure $whenInitiliazedClosure) {
+		IllegalStateException::assertTrue(!$this->isInitialized());
+		$this->whenInitializedClosures[] = $whenInitiliazedClosure;
 	}
 
 	public function offsetExists ($index) {

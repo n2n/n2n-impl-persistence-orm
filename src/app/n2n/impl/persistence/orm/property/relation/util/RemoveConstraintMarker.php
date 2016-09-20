@@ -36,7 +36,7 @@ class RemoveConstraintMarker {
 		$this->actionMarker = $actionMarker;
 	}
 	
-	public function releaseByIdRep($idRep) {
+	public function releaseByIdRep(string $idRep) {
 		$removedEntity = $this->supplyJob->getActionQueue()->getEntityManager()->getPersistenceContext()
 				->getRemovedEntityByIdRep($this->targetEntityModel, $idRep);
 		if ($removedEntity === null) return;

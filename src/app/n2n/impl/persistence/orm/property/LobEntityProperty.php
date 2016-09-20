@@ -59,7 +59,7 @@ class LobEntityProperty extends EntityPropertyAdapter {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
 	 */
-	public function supplyPersistAction($value, $valueHash, PersistAction $persistingJob) {
+	public function supplyPersistAction(PersistAction $persistingJob, $value, ValueHash $oldValueHash = null) {
 		
 	}
 	/* (non-PHPdoc)
@@ -69,9 +69,9 @@ class LobEntityProperty extends EntityPropertyAdapter {
 		
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\EntityProperty::buildValueHash()
+	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
 	 */
-	public function buildValueHash($value, EntityManager $em) {
+	public function createValueHash($value, EntityManager $em) {
 		
 	}	
 }

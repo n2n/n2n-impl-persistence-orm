@@ -153,9 +153,9 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	}
 
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\EntityProperty::buildValueHash()
+	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
 	 */
-	public function buildValueHash($value, EntityManager $em) {
+	public function createValueHash($value, EntityManager $em) {
 		if ($value === null) return null;
 		
 		$valueHash = array();

@@ -32,6 +32,7 @@ use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\impl\persistence\orm\property\relation\util\JoinTableAction;
 use n2n\impl\persistence\orm\property\relation\compare\JoinTableToManyQueryItemFactory;
 use n2n\persistence\orm\model\EntityModel;
+use n2n\persistence\orm\store\ValueHash;
 
 abstract class JoinTableRelation extends MasterRelation {
 	protected $joinTableName;
@@ -147,7 +148,7 @@ abstract class JoinTableRelation extends MasterRelation {
 		return $joinTableAction;	
 	}
 
-	public function supplyRemoveAction($value, $valueHash, RemoveAction $removeAction) {
+	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
 		$actionQueue = $removeAction->getActionQueue();
 		
 		$pdo = $actionQueue->getEntityManager()->getPdo();

@@ -23,10 +23,9 @@ namespace n2n\impl\persistence\orm\property\relation\util;
 
 use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\reflection\ArgUtils;
-use n2n\util\ex\NotYetImplementedException;
 use n2n\util\col\ArrayUtils;
-use n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy;
 use n2n\impl\persistence\orm\property\relation\ToManyRelation;
+use n2n\persistence\orm\store\ValueHash;
 
 class ToManyUtils {
 	private $toManyRelation;
@@ -37,26 +36,23 @@ class ToManyUtils {
 		$this->master = (boolean) $master;
 	}
 
-	public function prepareSupplyJob($value, $oldValueHash, SupplyJob $supplyJob) {
-		if ($oldValueHash === null || $supplyJob->isInsert()) return;
-	
-		if (ToManyValueHasher::checkForUntouchedProxy($value, $oldValueHash)) {
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
+		if ($oldValueHash === null && $supplyJob->isInsert()) return;
+		
+		ArgUtils::assertTrue($oldValueHash instanceof ToManyValueHash);
+		
+		if ($oldValueHash->checkForUntouchedProxy($value)) {
 			if (!$supplyJob->isRemove() || !$this->toManyRelation->isOrphanRemoval()) return;
 			
-			ArgUtils::assertTrue($value instanceof ArrayObjectProxy);
-			$value->initialize();
-			$oldValueHash = $value->getLoadedValueHash();
-		} 
-		
-		$valueHash = null;
-		if (ToManyValueHasher::checkForUntouchedProxy($oldValueHash, $valueHash)) {
-			throw new NotYetImplementedException('PersistenceContext must be able to store ArrayObjectProxy by valueHash');
+// 			ArgUtils::assertTrue($value instanceof ArrayObjectProxy);
+// 			$value->initialize();
+// 			$oldValueHash = $value->getLoadedValueHash();
 		}
-	
+		
 		if ($this->master && $supplyJob->isRemove()) {
 			$marker = new RemoveConstraintMarker($supplyJob, $this->toManyRelation->getTargetEntityModel(), 
 					$this->toManyRelation->getActionMarker());
-			$marker->releaseByIdReps(ToManyValueHasher::extractIdReps($oldValueHash));
+			$marker->releaseByIdReps($oldValueHash->getIdReps(true));
 		}
 		
 		if ($this->toManyRelation->isOrphanRemoval()) {
@@ -66,11 +62,13 @@ class ToManyUtils {
 			if (!$supplyJob->isRemove()) {
 				ArgUtils::assertTrue(ArrayUtils::isArrayLike($value));
 				foreach ($value as $entity) {
+					// mark entity as not orphan
 					$orphanRemover->releaseCandiate($entity);
 				}
 			}
 			
-			$orphanRemover->reportCandidateByIdReps(ToManyValueHasher::extractIdReps($oldValueHash));
+			// report possible orphans
+			$orphanRemover->reportCandidateByIdReps($oldValueHash->getIdReps(true));
 		}
 	}
 }

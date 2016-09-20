@@ -33,6 +33,7 @@ use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\query\from\TreePath;
+use n2n\persistence\orm\store\ValueHash;
 
 class PropertyMappedOneToOneRelation extends MappedRelation implements ToOneRelation  {
 	private $toOneUtils;
@@ -71,9 +72,9 @@ class PropertyMappedOneToOneRelation extends MappedRelation implements ToOneRela
 		return $entitySelection;
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\impl\persistence\orm\property\relation\Relation::buildValueHash()
+	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createValueHash()
 	 */
-	public function buildValueHash($value, EntityManager $em) {
+	public function createValueHash($value, EntityManager $em): ValueHash {
 		return ToOneValueHasher::createFromEntityModel($this->targetEntityModel)
 				->createValueHash($value);
 	}
@@ -82,7 +83,7 @@ class PropertyMappedOneToOneRelation extends MappedRelation implements ToOneRela
 	 * @param unknown $valueHash
 	 * @param SupplyJob $supplyJob
 	 */
-	public function prepareSupplyJob($value, $valueHash, SupplyJob $supplyJob) {
-		$this->toOneUtils->prepareSupplyJob($value, $valueHash, $supplyJob);
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
+		$this->toOneUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
 	}
 }

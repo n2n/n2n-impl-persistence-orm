@@ -49,7 +49,7 @@ class OrphanRemover {
 	public function reportCandidateByIdRep($orphanIdRep) {
 		$actionQueue = $this->supplyJob->getActionQueue();
 		$orphanEntity = $actionQueue->getEntityManager()->getPersistenceContext()
-				->getManagedEntityByIdRep($this->targetEntityModel, $orphanIdRep);
+				->getManagedEntityObjByIdRep($this->targetEntityModel, $orphanIdRep);
 		if ($orphanEntity === null) return;
 		
 		$persistAction = $actionQueue->getPersistAction($orphanEntity);

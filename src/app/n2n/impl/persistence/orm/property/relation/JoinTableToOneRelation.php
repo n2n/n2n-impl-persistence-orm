@@ -34,6 +34,10 @@ use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\impl\persistence\orm\property\relation\util\ToOneUtils;
+use n2n\persistence\orm\store\ValueHash;
+use n2n\reflection\ArgUtils;
+use n2n\impl\persistence\orm\property\relation\util\ToOneValueHash;
+use n2n\persistence\orm\EntityManager;
 
 class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation {
 	private $toOneUtils;
@@ -71,13 +75,15 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 		return $toOneRelationSelection;
 	}
 	
-	public function prepareSupplyJob($value, $valueHash, SupplyJob $supplyJob) {
-		$this->toOneUtils->prepareSupplyJob($value, $valueHash, $supplyJob);
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
+		$this->toOneUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
 	}
 	
-	public function supplyPersistAction($value, $valueHash, PersistAction $persistAction) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $oldValueHash = null) {
+		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToOneValueHash);
+		
 		if ($value === null) {
-			if ($valueHash === null) return;
+			if ($oldValueHash === null || $oldValueHash->getEntityIdRep() === null) return;
 						
 			$this->createJoinTableActionFromPersistAction($persistAction);		
 			return;
@@ -89,7 +95,7 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 		
 		if ($targetPersistAction->hasId()) {
 			$targetIdRep = $targetIdProperty->valueToRep($targetPersistAction->getId());
-			if ($targetIdRep === $valueHash) return;
+			if ($oldValueHash !== null && $targetIdRep === $oldValueHash->getEntityIdRep()) return;
 
 			$this->createJoinTableActionFromPersistAction($persistAction)->addInverseJoinIdRep($targetIdRep);
 			return;
@@ -102,7 +108,7 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 		});
 	}
 	
-	public function buildValueHash($value, EntityManager $em) {
+	public function createValueHash($value, EntityManager $em) {
 		return ToOneValueHasher::createFromEntityModel($this->targetEntityModel)
 				->createValueHash($value);
 	}

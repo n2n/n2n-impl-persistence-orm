@@ -27,6 +27,7 @@ use n2n\reflection\ArgUtils;
 use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\persistence\orm\store\action\PersistAction;
 use n2n\persistence\orm\model\EntityModel;
+use n2n\persistence\orm\store\ValueHash;
 
 abstract class MappedRelation extends RelationAdapter {	
 	protected $targetEntityProperty;
@@ -56,6 +57,6 @@ abstract class MappedRelation extends RelationAdapter {
 		return $this->getMasterRelation()->createInverseJoinTreePoint($this->targetEntityModel, $treePointMeta, $queryState);
 	}
 	
-	public function supplyPersistAction($value, $oldValueHash, PersistAction $persistAction) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $oldValueHash = null) {
 	}
 }

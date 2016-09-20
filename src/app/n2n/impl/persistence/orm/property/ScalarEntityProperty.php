@@ -35,6 +35,8 @@ use n2n\persistence\meta\data\QueryItem;
 use n2n\persistence\Pdo;
 use n2n\persistence\orm\EntityManager;
 use n2n\reflection\ArgUtils;
+use n2n\persistence\orm\store\ValueHash;
+use n2n\persistence\orm\store\CommonValueHash;
 
 class ScalarEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	/**
@@ -44,7 +46,7 @@ class ScalarEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 	public function __construct(AccessProxy $accessProxy, $columnName) {
 		$accessProxy->setConstraint(TypeConstraint::createSimple('scalar', true));
 		
-		parent::__construct($accessProxy, $columnName);		
+		parent::__construct($accessProxy, $columnName);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\ColumnComparableEntityProperty::createComparisonStrategy()
@@ -62,45 +64,62 @@ class ScalarEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
 		return new SimpleSelection($this->createQueryColumn($metaTreePoint->getMeta()));
 	}
-	/* (non-PHPdoc)
+
+	/**
+	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::valueToRep()
 	 */
 	public function valueToRep($value): string {
 		ArgUtils::valScalar($value);
 		return (string) $value;
 	}
-	/* (non-PHPdoc)
+	
+	/**
+	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::repToValue()
 	 */
 	public function repToValue(string $rep) {
 		return $rep;
 	}
 	
-	public function supplyPersistAction($mappedValue, $valueHash, PersistAction $persistAction) {
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
+	 */
+	public function supplyPersistAction(PersistAction $persistAction, $mappedValue, ValueHash $oldValueHash = null) {
 		$pdoDataType = null;
 // 		if (is_bool($mappedValue)) {
 // 			$pdoDataType = PDO::PARAM_BOOL;
 // 		}
 		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $mappedValue, $pdoDataType);
 	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\EntityProperty::buildValueHash()
+
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
 	 */
-	public function buildValueHash($value, EntityManager $em) {
-		return $value;
+	public function createValueHash($value, EntityManager $em): ValueHash {
+		return new CommonValueHash($value);
 	}
-	/* (non-PHPdoc)
+
+	/**
+	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::mergeValue()
 	 */
 	public function mergeValue($value, $sameEntity, MergeOperation $mergeOperation) {
 		return $value;
 	}
-	/* (non-PHPdoc)
+
+	/**
+	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyRemoveAction()
 	 */
-	public function supplyRemoveAction($value, $valueHash, RemoveAction $removeAction) {
+	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
 	}
-	/* (non-PHPdoc)
+
+	/**
+	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::parseValue()
 	 */
 	public function parseValue($raw, Pdo $pdo) {

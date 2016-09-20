@@ -37,6 +37,8 @@ use n2n\persistence\orm\criteria\compare\N2nLocaleColumnComparable;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\store\operation\MergeOperation;
 use n2n\persistence\orm\EntityManager;
+use n2n\persistence\orm\store\ValueHash;
+use n2n\persistence\orm\store\CommonValueHash;
 
 class N2nLocaleEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	public function __construct(AccessProxy $accessProxy, $columnName) {
@@ -45,7 +47,7 @@ class N2nLocaleEntityProperty extends ColumnPropertyAdapter implements BasicEnti
 		parent::__construct($accessProxy, $columnName);
 	}
 	
-	public function supplyPersistAction($value, $valueHash, PersistAction $persistingJob) {
+	public function supplyPersistAction(PersistAction $persistingJob, $value, ValueHash $oldValueHash = null) {
 		$rawValue = null;
 
 		if ($value instanceof N2nLocale) {
@@ -57,7 +59,7 @@ class N2nLocaleEntityProperty extends ColumnPropertyAdapter implements BasicEnti
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyRemoveAction()
 	 */
-	public function supplyRemoveAction($value, $valueHash, RemoveAction $removeAction) {
+	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
 	}
 	
 	public static function areConstraintsTypical(TypeConstraint $constraints = null) {
@@ -127,10 +129,10 @@ class N2nLocaleEntityProperty extends ColumnPropertyAdapter implements BasicEnti
 		return $value;
 	}
 	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\EntityProperty::buildValueHash()
+	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
 	 */
-	public function buildValueHash($value, EntityManager $em) {
-		if ($value === null) return null;
-		return $value->getId();
+	public function createValueHash($value, EntityManager $em): ValueHash {
+		if ($value === null) return new CommonValueHash(null);
+		return new CommonValueHash($value->getId());
 	}
 }

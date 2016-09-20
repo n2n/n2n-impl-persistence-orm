@@ -28,16 +28,12 @@ use n2n\impl\persistence\orm\property\relation\selection\ToManyRelationSelection
 use n2n\persistence\orm\query\from\TreePath;
 use n2n\impl\persistence\orm\property\relation\util\ToManyValueHasher;
 use n2n\impl\persistence\orm\property\relation\compare\ToManyCustomComparable;
-use n2n\impl\persistence\orm\property\relation\util\OrphanRemover;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
-use n2n\util\ex\NotYetImplementedException;
-use n2n\reflection\ArgUtils;
-use n2n\util\col\ArrayUtils;
-use n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy;
 use n2n\impl\persistence\orm\property\relation\util\ToManyUtils;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\model\EntityModel;
+use n2n\persistence\orm\store\ValueHash;
 
 class PropertyMappedToManyRelation extends MappedRelation implements ToManyRelation {
 	private $toManyUtils;
@@ -78,13 +74,13 @@ class PropertyMappedToManyRelation extends MappedRelation implements ToManyRelat
 		return $toManySelection;
 	}
 
-	public function buildValueHash($value, EntityManager $em) {
+	public function createValueHash($value, EntityManager $em): ValueHash {
 		return ToManyValueHasher::createFromEntityModel($this->targetEntityModel)
 				->createValueHash($value);
 	}
 
-	public function prepareSupplyJob($value, $oldValueHash, SupplyJob $supplyJob) {
-		$this->toManyUtils->prepareSupplyJob($value, $oldValueHash, $supplyJob);
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
+		$this->toManyUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
 // 		if (!$this->orphanRemoval || $supplyJob->isInsert()) return;
 	
 // 		if (ToManyValueHasher::checkForUntouchedProxy($value, $oldValueHash)) {
