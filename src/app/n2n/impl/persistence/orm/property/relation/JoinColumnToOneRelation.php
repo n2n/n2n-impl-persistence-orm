@@ -45,7 +45,6 @@ use n2n\impl\persistence\orm\property\relation\util\RemoveConstraintMarker;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\reflection\ArgUtils;
-use n2n\persistence\orm\store\CommonValueHash;
 use n2n\impl\persistence\orm\property\relation\util\ToOneValueHash;
 
 class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, ActionDependency {
@@ -149,7 +148,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 				$orphanRemover->releaseCandiate($value);
 			}
 			
-			$orphanRemover->removeByIdRep($oldValueHash->getIdRep());
+			$orphanRemover->reportCandidateByIdRep($oldValueHash->getIdRep());
 		}
 	}
 	/* (non-PHPdoc)
