@@ -23,6 +23,8 @@ namespace n2n\impl\persistence\orm\property\relation\util;
 
 use n2n\impl\persistence\orm\property\relation\ToOneRelation;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
+use n2n\persistence\orm\store\ValueHash;
+use n2n\reflection\ArgUtils;
 
 class ToOneUtils {
 	private $toOneRelation;
@@ -36,21 +38,24 @@ class ToOneUtils {
 	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
 		if ($oldValueHash === null || $supplyJob->isInsert()) return;
 	
+		ArgUtils::assertTrue($oldValueHash instanceof ToOneValueHash);
+		
 		if ($this->master && $supplyJob->isRemove()) {
 			$marker = new RemoveConstraintMarker($supplyJob->getActionQueue(), 
 					$this->toOneRelation->getTargetEntityModel(),
-					$this->actionMarker);
-			$marker->releaseByIdRep($oldValueHash);
+					$this->toOneRelation->getActionMarker());
+			$marker->releaseByIdRep($oldValueHash->getIdRep());
 		}
 	
 		if ($this->toOneRelation->isOrphanRemoval()) {
-			$orphanRemover = new OrphanRemover($supplyJob, $this->toOneRelation->getTargetEntityModel(), $this->actionMarker);
+			$orphanRemover = new OrphanRemover($supplyJob, $this->toOneRelation->getTargetEntityModel(), 
+					$this->toOneRelation->getActionMarker());
 	
 			if ($value !== null && !$supplyJob->isRemove()) {
 				$orphanRemover->releaseCandiate($value);
 			}
 	
-			$orphanRemover->removeByIdRep($oldValueHash);
+			$orphanRemover->reportCandidateByIdRep($oldValueHash->getIdRep());
 		}
 	}
 }
