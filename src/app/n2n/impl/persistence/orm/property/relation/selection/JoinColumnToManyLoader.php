@@ -23,7 +23,7 @@ namespace n2n\impl\persistence\orm\property\relation\selection;
 
 use n2n\persistence\orm\store\SimpleLoaderUtils;
 use n2n\persistence\orm\property\BasicEntityProperty;
-use n2n\persistence\orm\query\select\EntitySelection;
+use n2n\persistence\orm\query\select\EntityObjSelection;
 use n2n\persistence\meta\data\QueryComparator;
 
 class JoinColumnToManyLoader extends ToManyLoaderAdapter {
@@ -40,7 +40,7 @@ class JoinColumnToManyLoader extends ToManyLoaderAdapter {
 	
 	public function loadEntities($relatedId) {
 		$this->utils->initialize();
-		$this->utils->setSelection(new EntitySelection($this->utils->entityModel, 
+		$this->utils->setSelection(new EntityObjSelection($this->utils->entityModel, 
 				$this->utils->queryState, $this->utils->metaTreePoint));
 		
 		$relatedIdQueryColumn = $this->utils->metaTreePoint->getMeta()->registerColumn(
