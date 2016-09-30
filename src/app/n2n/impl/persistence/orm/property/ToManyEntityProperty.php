@@ -55,6 +55,7 @@ class ToManyEntityProperty extends RelationEntityPropertyAdapter implements Cust
 			$cascadeOperation->cascade($entity);
 		}
 	}
+	
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::mergeValue()
 	 */
