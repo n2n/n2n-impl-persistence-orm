@@ -23,6 +23,7 @@ namespace n2n\impl\persistence\orm\property\relation\util;
 
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
+use n2n\persistence\orm\store\operation\RemoveOperation;
 
 class OrphanRemover {
 	private $supplyJob;
@@ -60,7 +61,8 @@ class OrphanRemover {
 				$targetPersistAction) {
 			if ($that->actionMarker->isOrphanUsed($targetPersistAction) || $targetPersistAction->isDisabled()) return;
 			
-			$targetPersistAction->getActionQueue()->getOrCreateRemoveAction($targetOrphanEntity);
+			$removeOperation = new RemoveOperation($targetPersistAction->getActionQueue());
+			$removeOperation->cascade($targetOrphanEntity);
 		});
 		$this->supplyJob->executeOnReset(function () use ($that, $targetPersistAction) {
 			$this->actionMarker->resetOrphan($targetPersistAction);
