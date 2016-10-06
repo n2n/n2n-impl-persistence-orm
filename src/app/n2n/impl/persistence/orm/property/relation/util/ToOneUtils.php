@@ -36,9 +36,7 @@ class ToOneUtils {
 	}
 
 	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
-		if ($oldValueHash === null || $supplyJob->isInsert()) return;
-	
-		ArgUtils::assertTrue($oldValueHash instanceof ToOneValueHash);
+		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToOneValueHash);
 		
 		if ($this->master && $supplyJob->isRemove()) {
 			$marker = new RemoveConstraintMarker($supplyJob->getActionQueue(), 
@@ -46,7 +44,7 @@ class ToOneUtils {
 					$this->toOneRelation->getActionMarker());
 			$marker->releaseByIdRep($oldValueHash->getIdRep());
 		}
-	
+		
 		if ($this->toOneRelation->isOrphanRemoval()) {
 			$orphanRemover = new OrphanRemover($supplyJob, $this->toOneRelation->getTargetEntityModel(), 
 					$this->toOneRelation->getActionMarker());
@@ -55,7 +53,9 @@ class ToOneUtils {
 				$orphanRemover->releaseCandiate($value);
 			}
 	
-			$orphanRemover->reportCandidateByIdRep($oldValueHash->getIdRep());
+			if ($oldValueHash !== null) {
+				$orphanRemover->reportCandidateByIdRep($oldValueHash->getIdRep());
+			}
 		}
 	}
 }

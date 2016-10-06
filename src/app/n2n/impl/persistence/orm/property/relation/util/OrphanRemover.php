@@ -48,21 +48,22 @@ class OrphanRemover {
 	 */
 	public function reportCandidateByIdRep($orphanIdRep) {
 		$actionQueue = $this->supplyJob->getActionQueue();
-		$orphanEntity = $actionQueue->getEntityManager()->getPersistenceContext()
+		$targetOrphanEntity = $actionQueue->getEntityManager()->getPersistenceContext()
 				->getManagedEntityObjByIdRep($this->targetEntityModel, $orphanIdRep);
-		if ($orphanEntity === null) return;
+		if ($targetOrphanEntity === null) return;
 		
-		$persistAction = $actionQueue->getPersistAction($orphanEntity);
-		if (!$this->actionMarker->reportOrphanCandidate($persistAction)) return;
+		$targetPersistAction = $actionQueue->getPersistAction($targetOrphanEntity);
+		if (!$this->actionMarker->reportOrphanCandidate($targetPersistAction)) return;
 		
 		$that = $this;
-		$this->supplyJob->executeWhenInitialized(function () use ($that, $orphanEntity, $persistAction) {
-			if ($that->actionMarker->isOrphanUsed($persistAction)) return;
+		$this->supplyJob->getActionQueue()->executeAtPrepareCycleEnd(function () use ($that, $targetOrphanEntity, 
+				$targetPersistAction) {
+			if ($that->actionMarker->isOrphanUsed($targetPersistAction) || $targetPersistAction->isDisabled()) return;
 			
-			$persistAction->getActionQueue()->getOrCreateRemoveAction($orphanEntity);
+			$targetPersistAction->getActionQueue()->getOrCreateRemoveAction($targetOrphanEntity);
 		});
-		$this->supplyJob->executeOnReset(function () use ($that, $persistAction) {
-			$this->actionMarker->resetOrphan($persistAction);
+		$this->supplyJob->executeOnReset(function () use ($that, $targetPersistAction) {
+			$this->actionMarker->resetOrphan($targetPersistAction);
 		});
 	}
 

@@ -37,11 +37,9 @@ class ToManyUtils {
 	}
 
 	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
-		if ($oldValueHash === null && $supplyJob->isInsert()) return;
+		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToManyValueHash);
 		
-		ArgUtils::assertTrue($oldValueHash instanceof ToManyValueHash);
-		
-		if ($oldValueHash->checkForUntouchedProxy($value)) {
+		if ($oldValueHash !== null && $oldValueHash->checkForUntouchedProxy($value)) {
 			if (!$supplyJob->isRemove() || !$this->toManyRelation->isOrphanRemoval()) return;
 			
 // 			ArgUtils::assertTrue($value instanceof ArrayObjectProxy);
@@ -59,7 +57,7 @@ class ToManyUtils {
 			$orphanRemover = new OrphanRemover($supplyJob, $this->toManyRelation->getTargetEntityModel(), 
 					$this->toManyRelation->getActionMarker());
 			
-			if (!$supplyJob->isRemove()) {
+			if ($value !== null && !$supplyJob->isRemove()) {
 				ArgUtils::assertTrue(ArrayUtils::isArrayLike($value));
 				foreach ($value as $entity) {
 					// mark entity as not orphan
@@ -68,7 +66,9 @@ class ToManyUtils {
 			}
 			
 			// report possible orphans
-			$orphanRemover->reportCandidateByIdReps($oldValueHash->getIdReps(true));
+			if ($oldValueHash !== null) {
+				$orphanRemover->reportCandidateByIdReps($oldValueHash->getIdReps(true));
+			}
 		}
 	}
 }
