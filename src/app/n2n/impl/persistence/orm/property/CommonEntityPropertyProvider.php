@@ -133,7 +133,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 				break;
 			case 'n2n\io\managed\File':
 				$classSetup->provideEntityProperty(new FileEntityProperty($propertyAccessProxy,
-						$classSetup->requestColumn($propertyName)));
+						$classSetup->requestColumn($propertyName), null));
 				break;
 		}
 	}
