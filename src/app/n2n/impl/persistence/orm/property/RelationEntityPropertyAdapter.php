@@ -72,7 +72,7 @@ abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter imple
 	 */
 	public function getRelation(): Relation {
 		if ($this->relation === null) {
-			throw new IllegalStateException('No relation assigned.');
+			throw new IllegalStateException('No relation assigned for ' . $this->__toString());
 		}
 		
 		return $this->relation;
