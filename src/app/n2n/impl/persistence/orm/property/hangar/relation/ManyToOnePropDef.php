@@ -113,7 +113,7 @@ class ManyToOnePropDef implements HangarPropDef {
 		ArgUtils::assertTrue($entityProperty instanceof ToOneEntityProperty);
 		
 		$relation = $entityProperty->getRelation();
-		test(($propSourceDef->getPhpProperty()->getName()));
+// 		test(($propSourceDef->getPhpProperty()->getName()));
 		ArgUtils::assertTrue($relation instanceof JoinColumnToOneRelation);
 		
 		$joinColumnName = $relation->getJoinColumnName(); 
