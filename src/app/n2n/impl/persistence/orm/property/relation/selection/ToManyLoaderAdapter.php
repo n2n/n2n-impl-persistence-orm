@@ -24,6 +24,8 @@ namespace n2n\impl\persistence\orm\property\relation\selection;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\meta\data\SelectStatementBuilder;
 use n2n\persistence\orm\query\from\TreePath;
+use n2n\persistence\orm\CorruptedDataException;
+use n2n\persistence\orm\store\SimpleLoaderUtils;
 
 abstract class ToManyLoaderAdapter implements ToManyLoader {
 	private $orderDirectives = array();
@@ -37,5 +39,18 @@ abstract class ToManyLoaderAdapter implements ToManyLoader {
 			$queryItem = $metaTreePoint->requestPropertyRepresentableQueryItem(new TreePath($orderDirective->propertyNames));
 			$selectBuilder->addOrderBy($queryItem, $orderDirective->direction);
 		}	
+	}
+	
+	protected function fetchArray(SimpleLoaderUtils $utils) {
+		$entityObjs = $utils->createQuery()->fetchArray();
+		
+		foreach ($entityObjs as $entityObj) {
+			if ($entityObj === null) {
+				throw new CorruptedDataException('Database contains entries of entity '
+						. $utils->entityModel->getClass()->getName() . ' with id null.');
+			}
+		}
+		
+		return $entityObjs;
 	}
 }
