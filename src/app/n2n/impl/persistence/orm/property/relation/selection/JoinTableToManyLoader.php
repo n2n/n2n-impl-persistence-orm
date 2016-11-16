@@ -69,6 +69,6 @@ class JoinTableToManyLoader extends ToManyLoaderAdapter {
 		
 		$this->applyOrderDirectives($selectBuilder, $this->utils->metaTreePoint);
 		
-		return $this->utils->createQuery()->fetchArray();
+		return $this->fetchArray($this->utils);
 	}
 }

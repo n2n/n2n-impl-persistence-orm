@@ -54,7 +54,8 @@ class PropertyMappedToManyRelation extends MappedRelation implements ToManyRelat
 	}
 	
 	public function createCustomComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
-		$toManyQueryItemFactory = $this->getMasterRelation()->createInverseJoinTableToManyQueryItemFactory();
+		$toManyQueryItemFactory = $this->getMasterRelation()->createInverseJoinTableToManyQueryItemFactory(
+				$this->getTargetEntityModel());
 		
 		return new ToManyCustomComparable($metaTreePoint, $this->targetEntityModel,
 				$this->createTargetIdTreePath(), $toManyQueryItemFactory, $queryState);
