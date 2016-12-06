@@ -52,7 +52,7 @@ class JoinTableAction extends ActionAdapter {
 	}
 
 	public function addInverseJoinIdRaw($inverseJoinIdRaw) {
-		$this->inverseJoinIdRaws[] = $inverseJoinIdRaw;
+		$this->inverseJoinIdRaws[$inverseJoinIdRaw] = $inverseJoinIdRaw;
 	}
 
 	protected function exec() {
