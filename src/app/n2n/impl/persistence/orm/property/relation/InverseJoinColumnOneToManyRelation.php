@@ -37,11 +37,9 @@ use n2n\impl\persistence\orm\property\relation\util\OrphanRemover;
 use n2n\impl\persistence\orm\property\relation\util\ToManyValueHasher;
 use n2n\impl\persistence\orm\property\relation\util\ToManyAnalyzer;
 use n2n\impl\persistence\orm\property\relation\compare\IdColumnComparableDecorator;
-use n2n\util\ex\NotYetImplementedException;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\reflection\ArgUtils;
 use n2n\util\col\ArrayUtils;
-use n2n\persistence\orm\store\action\EntityAction;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\store\ValueHash;
@@ -185,7 +183,7 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 // 	public function supplyInverseToOneRemoveAction($targetValue, $targetValueHash, RemoveAction $targetRemoveAction) {
 // 	}
 	
-	public function createValueHash($value, EntityManager $em) {
+	public function createValueHash($value, EntityManager $em): ValueHash {
 		$analyzer = new ToManyValueHasher($this->targetEntityModel->getIdDef()
 				->getEntityProperty());
 		return $analyzer->createValueHash($value);
