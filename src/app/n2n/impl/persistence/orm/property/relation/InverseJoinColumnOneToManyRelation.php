@@ -103,7 +103,6 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 		
 		IllegalStateException::assertTrue($comparisonStargegy->getType() == ComparisonStrategy::TYPE_COLUMN);
 		
-		$meta = $metaTreePoint->getMeta();
 		return new IdColumnComparableDecorator($comparisonStargegy->getColumnComparable(),
 				$this->targetEntityModel);
 	}
@@ -127,7 +126,7 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 			}
 		}
 			
-		$orphanRemover->removeByIdReps($oldValueHash->getIdReps(true));
+		$orphanRemover->reportCandidateByIdReps($oldValueHash->getIdReps(true));
 	}
 	
 	/* (non-PHPdoc)
