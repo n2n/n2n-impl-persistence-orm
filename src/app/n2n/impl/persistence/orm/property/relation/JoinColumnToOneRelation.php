@@ -163,7 +163,15 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 		$actionQueue = $persistAction->getActionQueue();
 		$pdo = $actionQueue->getEntityManager()->getPdo();
 		$targetPersistAction = $persistAction->getActionQueue()->getPersistAction($value);
-		
+
+		try {
+			$targetPersistAction = $persistAction->getActionQueue()->getPersistAction($value);
+		} catch (PersistenceOperationException $e) {
+			throw new PersistenceOperationException($this->entityProperty->toPropertyString() . ' of entity obj '
+				. EntityInfo::buildEntityString($persistAction->getEntityModel(), $persistAction->getId())
+				. ' contains value that can not be persisted.', 0, $e, 3);
+		}
+
 		if ($targetPersistAction->hasId()) {
 			$persistAction->getMeta()->setRawValue($this->entityModel, $this->joinColumnName, 
 					$this->getTargetIdEntityProperty()->buildRaw($targetPersistAction->getId(), $pdo));
