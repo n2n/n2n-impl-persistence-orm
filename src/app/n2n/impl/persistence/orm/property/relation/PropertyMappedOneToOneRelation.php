@@ -21,6 +21,7 @@
  */
 namespace n2n\impl\persistence\orm\property\relation;
 
+use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\FetchType;
@@ -34,11 +35,12 @@ use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\query\from\TreePath;
 use n2n\persistence\orm\store\ValueHash;
+use n2n\util\ex\IllegalStateException;
 
 class PropertyMappedOneToOneRelation extends MappedRelation implements ToOneRelation  {
 	private $toOneUtils;
-	
-	public function __construct(EntityProperty $entityProperty, EntityModel $targetEntityModel, 
+
+	public function __construct(EntityProperty $entityProperty, EntityModel $targetEntityModel,
 			EntityProperty $targetEntityProperty) {
 		parent::__construct($entityProperty, $targetEntityModel, $targetEntityProperty);
 		$this->toOneUtils = new ToOneUtils($this, false);
@@ -53,20 +55,22 @@ class PropertyMappedOneToOneRelation extends MappedRelation implements ToOneRela
 	 * @see \n2n\impl\persistence\orm\property\relation\ToOneRelation::createColumnComparable()
 	 */
 	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
-		return new IdColumnComparableDecorator(
-				$metaTreePoint->requestPropertyComparisonStrategy($this->createTargetIdTreePath()), 
-				$this->targetEntityModel);
+		$comparisonStrategy = $metaTreePoint->requestPropertyComparisonStrategy($this->createTargetIdTreePath());
+
+		IllegalStateException::assertTrue($comparisonStrategy->getType() == ComparisonStrategy::TYPE_COLUMN);
+
+		return new IdColumnComparableDecorator($comparisonStrategy->getColumnComparable(), $this->targetEntityModel);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createSelection()
 	 */
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
 		$targetTreePath = $this->createTargetIdTreePath();
-		
+
 		$idSelection = $metaTreePoint->requestCustomPropertyJoinTreePoint($this->entityProperty, false)
-				->requestPropertySelection(new TreePath(array($this->targetEntityModel->getIdDef()
-						->getPropertyName())));
-	
+			->requestPropertySelection(new TreePath(array($this->targetEntityModel->getIdDef()
+				->getPropertyName())));
+
 		$entitySelection = new ToOneRelationSelection($this->targetEntityModel, $idSelection, $queryState);
 		$entitySelection->setLazy($this->fetchType == FetchType::LAZY);
 		return $entitySelection;
@@ -76,7 +80,7 @@ class PropertyMappedOneToOneRelation extends MappedRelation implements ToOneRela
 	 */
 	public function createValueHash($value, EntityManager $em): ValueHash {
 		return ToOneValueHasher::createFromEntityModel($this->targetEntityModel)
-				->createValueHash($value);
+			->createValueHash($value);
 	}
 	/**
 	 * @param unknown $value
