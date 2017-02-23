@@ -48,7 +48,7 @@ class ToOneUtils {
 		if ($this->toOneRelation->isOrphanRemoval()) {
 			$orphanRemover = new OrphanRemover($supplyJob, $this->toOneRelation->getTargetEntityModel(), 
 					$this->toOneRelation->getActionMarker());
-	
+			
 			if ($value !== null && !$supplyJob->isRemove()) {
 				$orphanRemover->releaseCandiate($value);
 			}
@@ -59,3 +59,23 @@ class ToOneUtils {
 		}
 	}
 }
+
+// if ($supplyJob->isInsert()) return;
+
+// ArgUtils::assertTrue($oldValueHash instanceof ToOneValueHash);
+// if ($oldValueHash->getIdRep() === null) return;
+
+// if ($supplyJob->isRemove()) {
+// 	$marker = new RemoveConstraintMarker($supplyJob, $this->targetEntityModel, $this->actionMarker);
+// 	$marker->releaseByIdRep($oldValueHash->getIdRep());
+// }
+
+// if ($this->orphanRemoval) {
+// 	$orphanRemover = new OrphanRemover($supplyJob, $this->targetEntityModel, $this->actionMarker);
+		
+// 	if ($value !== null && !$supplyJob->isRemove()) {
+// 		$orphanRemover->releaseCandiate($value);
+// 	}
+		
+// 	$orphanRemover->reportCandidateByIdRep($oldValueHash->getIdRep());
+// }

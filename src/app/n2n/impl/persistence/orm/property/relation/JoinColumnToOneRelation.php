@@ -33,7 +33,6 @@ use n2n\persistence\orm\store\action\PersistAction;
 use n2n\persistence\orm\store\action\RemoveAction;
 use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\impl\persistence\orm\property\relation\util\ToOneValueHasher;
-use n2n\impl\persistence\orm\property\relation\util\OrphanRemover;
 use n2n\impl\persistence\orm\property\relation\compare\InverseJoinColumnToManyQueryItemFactory;
 use n2n\impl\persistence\orm\property\relation\compare\IdColumnComparableDecorator;
 use n2n\persistence\orm\property\EntityProperty;
@@ -41,18 +40,21 @@ use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\model\ActionDependency;
 use n2n\impl\persistence\orm\property\relation\util\JoinColumnResetAction;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
-use n2n\impl\persistence\orm\property\relation\util\RemoveConstraintMarker;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\store\ValueHash;
-use n2n\reflection\ArgUtils;
-use n2n\impl\persistence\orm\property\relation\util\ToOneValueHash;
+use n2n\impl\persistence\orm\property\relation\util\ToOneUtils;
+use n2n\persistence\orm\store\PersistenceOperationException;
+use n2n\persistence\orm\store\EntityInfo;
 
 class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, ActionDependency {
 	private $joinColumnName;
+	private $toOneUtils;
 	
 	public function __construct(EntityProperty $entityProperty, EntityModel $targetEntityModel) {
 		parent::__construct($entityProperty, $targetEntityModel);
 		$targetEntityModel->registerActionDependency($this);
+		
+		$this->toOneUtils = new ToOneUtils($this, true);
 	}
 	
 	public function setJoinColumnName($joinColumnName) {
@@ -131,25 +133,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 	}
 	
 	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
-		if ($supplyJob->isInsert()) return;
-		
-		ArgUtils::assertTrue($oldValueHash instanceof ToOneValueHash);
-		if ($oldValueHash->getIdRep() === null) return;
-		
-		if ($supplyJob->isRemove()) {
-			$marker = new RemoveConstraintMarker($supplyJob, $this->targetEntityModel, $this->actionMarker);
-			$marker->releaseByIdRep($oldValueHash->getIdRep());
-		}
-		
-		if ($this->orphanRemoval) {
-			$orphanRemover = new OrphanRemover($supplyJob, $this->targetEntityModel, $this->actionMarker);
-			
-			if ($value !== null && !$supplyJob->isRemove()) {
-				$orphanRemover->releaseCandiate($value);
-			}
-			
-			$orphanRemover->reportCandidateByIdRep($oldValueHash->getIdRep());
-		}
+		$this->toOneUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyPersistAction()
