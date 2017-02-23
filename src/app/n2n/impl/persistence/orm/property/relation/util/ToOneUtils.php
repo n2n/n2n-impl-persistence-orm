@@ -38,11 +38,20 @@ class ToOneUtils {
 	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
 		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToOneValueHash);
 		
+// 		if ($oldValueHash !== null && $oldValueHash->checkForUntouchedProxy($supplyJob->getActionQueue()->getEntityManager(), $value)) {
+// 			if (!$supplyJob->isRemove() || !$this->toOneRelation->isOrphanRemoval()) return;
+				
+			
+// 		}
+		
 		if ($this->master && $supplyJob->isRemove()) {
-			$marker = new RemoveConstraintMarker($supplyJob->getActionQueue(), 
+			$marker = new RemoveConstraintMarker($supplyJob, 
 					$this->toOneRelation->getTargetEntityModel(),
 					$this->toOneRelation->getActionMarker());
-			$marker->releaseByIdRep($oldValueHash->getIdRep());
+			if (null !== ($idRep = $oldValueHash->getIdRep())) {
+				$marker->releaseByIdRep($idRep);
+			}
+			
 		}
 		
 		if ($this->toOneRelation->isOrphanRemoval()) {

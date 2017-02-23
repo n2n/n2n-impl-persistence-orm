@@ -24,6 +24,7 @@ namespace n2n\impl\persistence\orm\property\relation\util;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\persistence\orm\store\operation\RemoveOperation;
+use n2n\persistence\orm\OrmUtils;
 
 class OrphanRemover {
 	private $supplyJob;
@@ -49,10 +50,12 @@ class OrphanRemover {
 	 */
 	public function reportCandidateByIdRep($orphanIdRep) {
 		$actionQueue = $this->supplyJob->getActionQueue();
-		$targetOrphanEntity = $actionQueue->getEntityManager()->getPersistenceContext()
+		$em = $actionQueue->getEntityManager();
+		$targetOrphanEntity = $em->getPersistenceContext()
 				->getManagedEntityObjByIdRep($this->targetEntityModel, $orphanIdRep);
 		if ($targetOrphanEntity === null) return;
 		
+		OrmUtils::initializeProxy($em, $targetOrphanEntity);
 		$targetPersistAction = $actionQueue->getPersistAction($targetOrphanEntity);
 		if (!$this->actionMarker->reportOrphanCandidate($targetPersistAction)) return;
 		

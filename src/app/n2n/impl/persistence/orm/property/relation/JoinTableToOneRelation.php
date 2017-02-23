@@ -91,7 +91,7 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 		
 		$targetIdProperty = $this->targetEntityModel->getIdDef()->getEntityProperty();
 		$actionQueue = $persistAction->getActionQueue();
-		$targetPersistAction = $actionQueue->getOrCreatePersistAction($value);
+		$targetPersistAction = $actionQueue->getPersistAction($value);
 		
 		if ($targetPersistAction->hasId()) {
 			$targetIdRep = $targetIdProperty->valueToRep($targetPersistAction->getId());
