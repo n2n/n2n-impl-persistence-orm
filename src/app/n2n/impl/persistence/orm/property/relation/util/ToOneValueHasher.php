@@ -25,6 +25,7 @@ use n2n\reflection\ArgUtils;
 use n2n\persistence\orm\property\BasicEntityProperty;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\store\ValueHash;
+use n2n\persistence\orm\proxy\EntityProxy;
 
 class ToOneValueHasher {
 	private $idEntityProperty;
@@ -70,5 +71,11 @@ class ToOneValueHash implements ValueHash {
 		ArgUtils::assertTrue($valueHash instanceof ToOneValueHash);
 		
 		return $this->idRep === $valueHash->getIdRep();
+	}
+	
+	public function checkForUntouchedProxy($entityObj) {
+		if ($entityObj instanceof EntityProxy) {
+			
+		}
 	}
 }
