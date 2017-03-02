@@ -34,7 +34,7 @@ use hangar\core\config\ColumnDefaults;
 use n2n\impl\web\dispatch\mag\model\NumericMag;
 use n2n\persistence\orm\annotation\AnnoManagedFile;
 use n2n\io\managed\FileManager;
-use n2n\impl\web\dispatch\mag\model\ReflectionClassMag;
+use n2n\impl\web\dispatch\mag\model\ClassNameMag;
 use n2n\persistence\meta\structure\common\CommonStringColumn;
 use hangar\entity\model\CompatibilityLevel;
 
@@ -68,7 +68,7 @@ class ManagedFilePropDef implements HangarPropDef {
 		}
 		
 		$magCollection->addMag(new NumericMag(self::PROP_NAME_LENGTH, 'Length', $size, true));
-		$magCollection->addMag(new ReflectionClassMag(self::PROP_NAME_FILE_MANAGER, 'FileManager (Lookup Id)', 
+		$magCollection->addMag(new ClassNameMag(self::PROP_NAME_FILE_MANAGER, 'FileManager (Lookup Id)', 
 				new \ReflectionClass(FileManager::class), $fileManagerLookupId));
 		
 		return $magCollection;
