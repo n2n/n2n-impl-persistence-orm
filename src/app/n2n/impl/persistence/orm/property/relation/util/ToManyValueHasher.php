@@ -72,7 +72,7 @@ class ToManyValueHasher {
 // 		return $valueHash;
 	}
 	
-	public function extractIdRepsFromValue($entities) {
+	public function extractIdRepsMapFromValue($entities) {
 		if ($entities === null) return array();
 		
 		ArgUtils::assertTrue(ArrayUtils::isArrayLike($entities));
@@ -120,30 +120,30 @@ class ToManyValueHasher {
 		return empty($vhIdReps);
 	}
 
-	public function findOrphanIdReps(array $entityIds, $valueHash) {
-		$vhIdReps = self::extractIdReps($valueHash);
+// 	public function findOrphanIdReps(array $entityIds, $valueHash) {
+// 		$vhIdReps = self::extractIdReps($valueHash);
 		
-		foreach ($entityIds as $entityId) {
-			$entityIdRep = $this->targetIdProperty->valueToRep($entityId);
-			if (isset($vhIdReps[$entityIdRep])) { 
-				unset($vhIdReps[$entityIdRep]);
-			}
-		}
+// 		foreach ($entityIds as $entityId) {
+// 			$entityIdRep = $this->targetIdProperty->valueToRep($entityId);
+// 			if (isset($vhIdReps[$entityIdRep])) { 
+// 				unset($vhIdReps[$entityIdRep]);
+// 			}
+// 		}
 
-		return $vhIdReps;
-	}
+// 		return $vhIdReps;
+// 	}
 }
 
 
 class ToManyValueHash implements ValueHash {
 	protected $arrayObjectProxy;
-	protected $idReps;
+	protected $idRepsMap;
 	
 	protected function __construct() {
 	}
 	
 	public function isInitialized() {
-		return $this->idReps !== null;
+		return $this->idRepsMap !== null;
 	}
 	
 	public function initialize() {
@@ -155,15 +155,24 @@ class ToManyValueHash implements ValueHash {
 		throw new IllegalStateException('No uninitialized ArrayObjectProxy found.');
 	}
 	
-	public function getIdReps(bool $initialize = false) {
+	public function getIdRepsMap(bool $initialize = false) {
 		if ($this->isInitialized()) {
-			return $this->idReps;
+			return $this->idRepsMap;
 		} else if ($initialize) {
 			$this->initialize();
-			return $this->idReps;
+			return $this->idRepsMap;
 		}
 		
 		throw new IllegalStateException('ArrayObjectProxy not initialized.');
+	}
+	
+	public function getIdReps(bool $initialize = false) {
+		$idReps = array();
+		foreach ($this->getIdRepsMap($initialize) as $key => $idRep) {
+			if ($idRep === null) continue;
+			$idReps[$key] = $idRep;
+		}
+		return $idReps;
 	}
 	
 	/**
@@ -173,7 +182,7 @@ class ToManyValueHash implements ValueHash {
 	public function matches(ValueHash $valueHash): bool {
 		ArgUtils::assertTrue($valueHash instanceof ToManyValueHash);
 		
-		return $this->idReps === $valueHash->idReps
+		return $this->idRepsMap === $valueHash->idRepsMap
 				&& $this->arrayObjectProxy === $valueHash->arrayObjectProxy;
 	}
 	
@@ -185,7 +194,7 @@ class ToManyValueHash implements ValueHash {
 		$toManyValueHash = new ToManyValueHash();
 		$toManyValueHash->arrayObjectProxy = $arrayObjectProxy;
 		$arrayObjectProxy->whenInitialized(function () use ($arrayObjectProxy, $toManyValueHash, $toManyValueHasher) {
-			$toManyValueHash->idReps = $toManyValueHasher->extractIdRepsFromValue($arrayObjectProxy);
+			$toManyValueHash->idRepsMap = $toManyValueHasher->extractIdRepsMapFromValue($arrayObjectProxy);
 			$toManyValueHash->arrayObjectProxy = null;
 		});
 		return $toManyValueHash;
@@ -193,7 +202,7 @@ class ToManyValueHash implements ValueHash {
 	
 	public static function createFromValue($value, ToManyValueHasher $toManyValueHasher) {
 		$toManyValueHash = new ToManyValueHash();
-		$toManyValueHash->idReps = $toManyValueHasher->extractIdRepsFromValue($value);
+		$toManyValueHash->idRepsMap = $toManyValueHasher->extractIdRepsMapFromValue($value);
 		return $toManyValueHash;
 	}
 	
