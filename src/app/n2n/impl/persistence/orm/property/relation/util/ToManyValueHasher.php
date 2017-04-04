@@ -109,7 +109,7 @@ class ToManyValueHasher {
 // 	}
 	
 	public function matches(array $entityIds, ToManyValueHash $valueHash) {
-		$vhIdReps = $valueHash->getIdReps();
+		$vhIdReps = $valueHash->getIdReps(true);
 		
 		foreach ($entityIds as $entityId) {
 			$entityIdRep = $this->targetIdProperty->valueToRep($entityId);

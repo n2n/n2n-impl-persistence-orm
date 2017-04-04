@@ -134,7 +134,7 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 	 */
 	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $oldValueHash = null) {
 		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToManyValueHash);
-		if ($oldValueHash !== null && $oldValueHash->checkForUntouchedProxy($oldValueHash)) return;
+		if ($oldValueHash !== null && $oldValueHash->checkForUntouchedProxy($value)) return;
 		
 		$toManyAnalyzer = new ToManyAnalyzer($persistAction->getActionQueue());
 		$toManyAnalyzer->analyze($value);

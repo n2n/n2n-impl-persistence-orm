@@ -95,7 +95,7 @@ class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelatio
 	 */
 	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $oldValueHash = null) {
 		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToManyValueHash);
-		if ($oldValueHash !== null && $oldValueHash->checkForUntouchedProxy($oldValueHash)) return;
+		if ($oldValueHash !== null && $oldValueHash->checkForUntouchedProxy($value)) return;
 		
 		$targetIdProperty = $this->targetEntityModel->getIdDef()->getEntityProperty();
 				
