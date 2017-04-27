@@ -72,8 +72,11 @@ class OrphanRemover {
 		});
 	}
 
-	public function releaseCandiate($entity) {
+	public function releaseCandiate($entityObj) {
+		$actionQueue = $this->supplyJob->getActionQueue();
+		$em = $actionQueue->getEntityManager();
+		OrmUtils::initializeProxy($em, $entityObj);
 		$this->actionMarker->useOrphan($this->supplyJob->getActionQueue()
-				->getPersistAction($entity));
+				->getPersistAction($entityObj));
 	}
 }
