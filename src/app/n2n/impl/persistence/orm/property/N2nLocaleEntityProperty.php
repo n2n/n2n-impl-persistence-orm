@@ -47,7 +47,7 @@ class N2nLocaleEntityProperty extends ColumnPropertyAdapter implements BasicEnti
 		parent::__construct($accessProxy, $columnName);
 	}
 	
-	public function supplyPersistAction(PersistAction $persistingJob, $value, ValueHash $oldValueHash = null) {
+	public function supplyPersistAction(PersistAction $persistingJob, $value, ValueHash $valueHash, ValueHash $oldValueHash = null) {
 		$rawValue = null;
 
 		if ($value instanceof N2nLocale) {

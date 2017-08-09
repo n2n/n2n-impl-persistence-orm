@@ -79,7 +79,7 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 		$this->toOneUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
 	}
 	
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $oldValueHash = null) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ValueHash $oldValueHash = null) {
 		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToOneValueHash);
 		
 		if ($value === null) {
