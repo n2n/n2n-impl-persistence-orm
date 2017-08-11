@@ -112,7 +112,7 @@ abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter imple
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
 	 */
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $oldValueHash = null) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ValueHash $oldValueHash = null) {
 		$this->getRelation()->supplyPersistAction($persistAction, $value, $oldValueHash);
 	}
 	

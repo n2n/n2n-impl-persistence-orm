@@ -45,7 +45,7 @@ class BooleanPropDef extends ScalarPropDefAdapter {
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->setReturnTypeName();
 		$propSourceDef->setSetterTypeName();
-		$propSourceDef->setBoolean(false);
+		$propSourceDef->setBoolean(true);
 	}
 	
 	/**
