@@ -37,6 +37,7 @@ use n2n\persistence\orm\store\action\RemoveAction;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\store\CommonValueHash;
+use n2n\core\N2N;
 
 class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	public function __construct(AccessProxy $accessProxy, $columnName) {
@@ -67,6 +68,7 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 	 */
 	public function valueToRep($value): string {
 		ArgUtils::assertTrue($value instanceof \DateTime);
+		
 		return $value->getTimestamp();
 	}
 	/* (non-PHPdoc)
@@ -80,8 +82,7 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 	}
 	
 	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ValueHash $oldValueHash = null) {
-		$rawValue = $persistAction->getActionQueue()->getEntityManager()->getPdo()->getMetaData()
-				->getDialect()->getOrmDialectConfig()->buildDateTimeRawValue($value);
+		$rawValue = $this->buildRaw($value, $persistAction->getActionQueue()->getEntityManager()->getPdo());
 		
 		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $rawValue);
 	}
@@ -112,18 +113,19 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::parseValue()
 	 */
 	public function parseValue($raw, Pdo $pdo) {
-		return $raw;
+		return $pdo->getMetaData()->getDialect()->getOrmDialectConfig()->parseDateTime($raw);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::buildRaw()
 	 */
 	public function buildRaw($value, Pdo $pdo) {
-		return $value;
+		return $pdo->getMetaData()->getDialect()->getOrmDialectConfig()->buildDateTimeRawValue($value);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::createSelectionFromQueryItem()
 	 */
 	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
-		return new DateTimeSelection($queryItem, $queryState);
+		return new DateTimeSelection($queryItem, $queryState->getEntityManager()->getPdo()->getMetaData()
+				->getDialect()->getOrmDialectConfig());
 	}
 }
