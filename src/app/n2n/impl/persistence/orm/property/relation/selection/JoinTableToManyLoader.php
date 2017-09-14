@@ -70,7 +70,9 @@ class JoinTableToManyLoader extends ToManyLoaderAdapter {
 				$relatedIdColumnComparator->buildCounterpartQueryItemFromValue(
 						QueryComparator::OPERATOR_EQUAL, $relatedId));
 		
-		$this->applyOrderDirectives($selectBuilder, $this->utils->metaTreePoint);
+		foreach ($orderQueryDirectives as $orderQueryDirective) {
+			$orderQueryDirective->apply($selectBuilder);
+		}
 		
 		return $this->fetchArray($this->utils);
 	}
