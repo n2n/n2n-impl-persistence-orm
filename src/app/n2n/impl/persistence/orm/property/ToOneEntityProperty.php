@@ -30,6 +30,7 @@ use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\store\operation\MergeOperation;
 use n2n\persistence\orm\CascadeType;
 use n2n\persistence\orm\store\operation\CascadeOperation;
+use n2n\persistence\orm\model\EntityPropertyCollection;
 
 class ToOneEntityProperty extends RelationEntityPropertyAdapter implements ColumnComparableEntityProperty, 
 		QueryItemRepresentableEntityProperty {
@@ -70,5 +71,12 @@ class ToOneEntityProperty extends RelationEntityPropertyAdapter implements Colum
 		
 		return $value;
 	}
-
+	
+	public function hasEmbeddedEntityPropertyCollection(): bool {
+		return true;
+	}
+	
+	public function getEmbeddedEntityPropertyCollection(): EntityPropertyCollection {
+		return $this->relation->getTargetEntityModel();
+	}
 }
