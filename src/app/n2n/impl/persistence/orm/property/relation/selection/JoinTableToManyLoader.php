@@ -59,6 +59,9 @@ class JoinTableToManyLoader extends ToManyLoaderAdapter {
 		$relatedIdColumnComparator = $this->relatedIdEntityProperty->createColumnComparableFromQueryItem(
 				new QueryColumn($this->relatedIdJoinColumnName, $joinTableAlias), $this->utils->queryState);
 		
+		
+		$orderQueryDirectives = $this->applyOrderDirectives($this->utils->metaTreePoint);
+		
 		$selectBuilder = $this->utils->build();
 		$selectBuilder->addJoin(JoinType::INNER, new QueryTable($this->joinTableName), $joinTableAlias)
 				->match($idQueryColumn, QueryComparator::OPERATOR_EQUAL, $joinQueryColumn);

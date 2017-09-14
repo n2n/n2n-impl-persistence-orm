@@ -48,14 +48,19 @@ class JoinColumnToManyLoader extends ToManyLoaderAdapter {
 		$relatedIdColumnComparator = $this->relatedIdEntityProperty->createColumnComparableFromQueryItem(
 				$relatedIdQueryColumn, $this->utils->queryState);
 		
+		$orderQueryDirectives = $this->applyOrderDirectives($this->utils->metaTreePoint);
+		
 		$selectBuilder = $this->utils->build();
+		
 		$selectBuilder->getWhereComparator()->match(
 				$relatedIdColumnComparator->buildQueryItem(QueryComparator::OPERATOR_EQUAL),
 				QueryComparator::OPERATOR_EQUAL,
 				$relatedIdColumnComparator->buildCounterpartQueryItemFromValue(
 						QueryComparator::OPERATOR_EQUAL, $relatedId));
 		
-		$this->applyOrderDirectives($selectBuilder, $this->utils->metaTreePoint);
+		foreach ($orderQueryDirectives as $orderQueryDirective) {
+			$orderQueryDirective->apply($selectBuilder);
+		}
 		
 		return $this->fetchArray($this->utils);
 	}
