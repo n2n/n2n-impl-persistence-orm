@@ -26,19 +26,31 @@ use n2n\persistence\meta\data\SelectStatementBuilder;
 use n2n\persistence\orm\query\from\TreePath;
 use n2n\persistence\orm\CorruptedDataException;
 use n2n\persistence\orm\store\SimpleLoaderUtils;
+use n2n\persistence\meta\data\QueryItem;
 
 abstract class ToManyLoaderAdapter implements ToManyLoader {
 	private $orderDirectives = array();
 	
+	/**
+	 * 
+	 * @param \n2n\impl\persistence\orm\property\relation\util\OrderDirective $orderDirectives
+	 */
 	public function setOrderDirectives(array $orderDirectives) {
 		$this->orderDirectives = $orderDirectives;
 	}
 	
-	protected function applyOrderDirectives(SelectStatementBuilder $selectBuilder, MetaTreePoint $metaTreePoint) {
+	/**
+	 * @param MetaTreePoint $metaTreePoint
+	 * @return \n2n\impl\persistence\orm\property\relation\selection\OrderQueryDirective[]
+	 */
+	protected function applyOrderDirectives(MetaTreePoint $metaTreePoint) {
+		$directives = array();
 		foreach ($this->orderDirectives as $orderDirective) {
 			$queryItem = $metaTreePoint->requestPropertyRepresentableQueryItem(new TreePath($orderDirective->propertyNames));
-			$selectBuilder->addOrderBy($queryItem, $orderDirective->direction);
+			
+			$directives[] = new OrderQueryDirective($queryItem, $orderDirective->direction);
 		}	
+		return $directives;
 	}
 	
 	protected function fetchArray(SimpleLoaderUtils $utils) {
@@ -52,5 +64,19 @@ abstract class ToManyLoaderAdapter implements ToManyLoader {
 		}
 		
 		return $entityObjs;
+	}
+}
+
+class OrderQueryDirective {
+	private $queryItem;
+	private $direction;
+	
+	public function __construct(QueryItem $queryItem, string $direction) {
+		$this->queryItem = $queryItem;
+		$this->direction = $direction;
+	}		
+	
+	public function apply(SelectStatementBuilder $selectBuilder) {
+		$selectBuilder->addOrderBy($this->queryItem, $this->direction);
 	}
 }
