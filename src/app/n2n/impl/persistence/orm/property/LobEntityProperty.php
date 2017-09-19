@@ -31,6 +31,7 @@ use n2n\util\ex\NotYetImplementedException;
 use n2n\persistence\orm\store\action\PersistAction;
 use n2n\persistence\orm\store\action\RemoveAction;
 use n2n\persistence\orm\EntityManager;
+use n2n\persistence\orm\store\ValueHash;
 
 class LobEntityProperty extends EntityPropertyAdapter {
 	private $columnName;

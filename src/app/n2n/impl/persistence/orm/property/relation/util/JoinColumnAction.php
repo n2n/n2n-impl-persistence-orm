@@ -21,45 +21,46 @@
  */
 namespace n2n\impl\persistence\orm\property\relation\util;
 
-use n2n\persistence\orm\store\action\ActionAdapter;
-use n2n\persistence\meta\data\QueryColumn;
-use n2n\persistence\meta\data\QueryPlaceMarker;
-use n2n\persistence\meta\data\QueryComparator;
+// @todo remove
+// use n2n\persistence\orm\store\action\ActionAdapter;
+// use n2n\persistence\meta\data\QueryColumn;
+// use n2n\persistence\meta\data\QueryPlaceMarker;
+// use n2n\persistence\meta\data\QueryComparator;
 
-class JoinColumnAction extends ActionAdapter {
-	private $pdo;
-	private $tableName;
-	private $idColumnName;
-	private $joinColumnName;
+// class JoinColumnAction extends ActionAdapter {
+// 	private $pdo;
+// 	private $tableName;
+// 	private $idColumnName;
+// 	private $joinColumnName;
 	
-	private $idRaw;
-	private $joinIdRaw;
+// 	private $idRaw;
+// 	private $joinIdRaw;
 	
-	public function __construct(Pdo $pdo, $tableName, $idColumnName, $joinColumnName) {
-		$this->pdo = $pdo;
-		$this->tableName = $tableName;
-		$this->idColumnName = $idColumnName;
-		$this->joinColumnName = $joinColumnName;
-	}
+// 	public function __construct(Pdo $pdo, $tableName, $idColumnName, $joinColumnName) {
+// 		$this->pdo = $pdo;
+// 		$this->tableName = $tableName;
+// 		$this->idColumnName = $idColumnName;
+// 		$this->joinColumnName = $joinColumnName;
+// 	}
 	
-	public function setIdRaw($idRaw) {
-		$this->idRaw = $idRaw;
-	}
+// 	public function setIdRaw($idRaw) {
+// 		$this->idRaw = $idRaw;
+// 	}
 	
-	public function setJoinIdRaw($joinIdRaw) {
-		$this->joinIdRaw = $joinIdRaw;
-	}
+// 	public function setJoinIdRaw($joinIdRaw) {
+// 		$this->joinIdRaw = $joinIdRaw;
+// 	}
 
-	protected function exec() {
-		$metaData = $this->pdo->getMetaData();
+// 	protected function exec() {
+// 		$metaData = $this->pdo->getMetaData();
 	
-		$updateBuilder = $metaData->createUpdateStatementBuilder();
-		$updateBuilder->setTable($this->tableName);
-		$updateBuilder->addColumn(new QueryColumn($this->joinColumnName), new QueryPlaceMarker());
-		$updateBuilder->getWhereComparator()->match(new QueryColumn($this->idColumnName), 
-				QueryComparator::OPERATOR_EQUAL, new QueryPlaceMarker());
+// 		$updateBuilder = $metaData->createUpdateStatementBuilder();
+// 		$updateBuilder->setTable($this->tableName);
+// 		$updateBuilder->addColumn(new QueryColumn($this->joinColumnName), new QueryPlaceMarker());
+// 		$updateBuilder->getWhereComparator()->match(new QueryColumn($this->idColumnName), 
+// 				QueryComparator::OPERATOR_EQUAL, new QueryPlaceMarker());
 	
-		$updateStmt = $this->pdo->prepare($updateBuilder->toSqlString());
-		$updateStmt->execute(array($this->joinIdRaw, $this->idRaw));
-	}
-}
+// 		$updateStmt = $this->pdo->prepare($updateBuilder->toSqlString());
+// 		$updateStmt->execute(array($this->joinIdRaw, $this->idRaw));
+// 	}
+// }
