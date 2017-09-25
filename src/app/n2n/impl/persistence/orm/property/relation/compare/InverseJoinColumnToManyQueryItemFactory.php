@@ -26,9 +26,9 @@ use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\from\Tree;
 use n2n\util\ex\IllegalStateException;
-use n2n\persistence\orm\criteria\compare\CriteriaComparator;
 use n2n\persistence\meta\data\QueryPartGroup;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
+use n2n\persistence\meta\data\QueryComparator;
 
 class InverseJoinColumnToManyQueryItemFactory implements ToManyQueryItemFactory {
 	private $targetEntityModel;
@@ -41,7 +41,7 @@ class InverseJoinColumnToManyQueryItemFactory implements ToManyQueryItemFactory 
 	
 	public function createQueryItem(ColumnComparable $idColumnComparable, QueryState $queryState) {
 		$subTree = new Tree($queryState);
-		$subMetaTreePoint = $subTree->createBaseTreePoint($this->targetEntityModel, 'e');
+		$subMetaTreePoint = $subTree->createBaseTreePoint($this->targetEntityModel/*, 'e'*/);
 		$inverseJoinQueryColumn = $subMetaTreePoint->getMeta()->registerColumn(
 				$this->targetEntityModel, $this->inverseJoinColumnName);
 
@@ -51,10 +51,10 @@ class InverseJoinColumnToManyQueryItemFactory implements ToManyQueryItemFactory 
 		$subSelectBuilder = $this->em->getPdo()->getMetaData()->createSelectStatementBuilder();
 		
 		$subSelectBuilder->addSelectColumn($comparationStrategy->getColumnComparable()
-				->buildQueryItem(CriteriaComparator::OPERATOR_EQUAL));
+				->buildQueryItem(QueryComparator::OPERATOR_EQUAL));
 		$subSelectBuilder->getWhereComparator()->match($inverseJoinQueryColumn,
-				CriteriaComparator::OPERATOR_EQUAL,
-				$idColumnComparable->buildQueryItem(CriteriaComparator::OPERATOR_EQUAL));
+				QueryComparator::OPERATOR_EQUAL,
+				$idColumnComparable->buildQueryItem(QueryComparator::OPERATOR_EQUAL));
 
 		return new QueryPartGroup($subSelectBuilder->toQueryResult());
 	}

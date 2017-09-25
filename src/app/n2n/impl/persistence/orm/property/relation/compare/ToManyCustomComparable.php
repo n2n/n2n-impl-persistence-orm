@@ -36,6 +36,13 @@ use n2n\persistence\meta\data\QueryComparator;
 use n2n\persistence\orm\criteria\CriteriaConflictException;
 use n2n\reflection\property\ValueIncompatibleWithConstraintsException;
 use n2n\persistence\orm\criteria\compare\QueryComparatorBuilder;
+use n2n\persistence\orm\query\QueryModel;
+use n2n\persistence\orm\query\from\Tree;
+use n2n\persistence\meta\data\Comparison;
+use n2n\persistence\orm\criteria\compare\ColumnComparable;
+use n2n\persistence\orm\query\QueryItemSelect;
+use n2n\persistence\orm\criteria\item\ConstantQueryPoint;
+use n2n\persistence\meta\data\QueryItem;
 
 class ToManyCustomComparable implements CustomComparable {
 	private $metaTreePoint;
@@ -61,7 +68,8 @@ class ToManyCustomComparable implements CustomComparable {
 	 * @see \n2n\persistence\orm\criteria\compare\ColumnComparable::getAvailableOperators()
 	*/
 	public function getAvailableOperators() {
-		return array(CriteriaComparator::OPERATOR_CONTAINS, CriteriaComparator::OPERATOR_CONTAINS_NOT);
+		return array(CriteriaComparator::OPERATOR_CONTAINS, CriteriaComparator::OPERATOR_CONTAINS_NOT,
+				CriteriaComparator::OPERATOR_CONTAINS_ANY, CriteriaComparator::OPERATOR_CONTAINS_NONE);
 	}
 		
 	private function requestEntityColumnComparable() {
@@ -79,12 +87,12 @@ class ToManyCustomComparable implements CustomComparable {
 				$this->targetEntityModel);
 	}
 	
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\criteria\compare\ColumnComparable::buildQueryItem($operator)
-	*/
-	public function buildQueryItem($operator) {
+// 	/* (non-PHPdoc)
+// 	 * @see \n2n\persistence\orm\criteria\compare\ColumnComparable::buildQueryItem($operator)
+// 	*/
+// 	public function buildQueryItem($operator) {
 		
-	}
+// 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\criteria\compare\ColumnComparable::buildCounterpartQueryItemFromValue()
 	 */
@@ -100,7 +108,9 @@ class ToManyCustomComparable implements CustomComparable {
 	
 	private function validateOperator($operator) {
 		if ($operator == CriteriaComparator::OPERATOR_CONTAINS 
-				|| $operator == CriteriaComparator::OPERATOR_CONTAINS_NOT) return;
+				|| $operator == CriteriaComparator::OPERATOR_CONTAINS_NOT
+				|| $operator == CriteriaComparator::OPERATOR_CONTAINS_ANY
+				|| $operator == CriteriaComparator::OPERATOR_CONTAINS_NONE) return;
 		
 		throw new CriteriaConflictException('Invalid operator \'' . $operator 
 				. '\' for comparison. Available operators: ' . CriteriaComparator::OPERATOR_CONTAINS 
@@ -127,11 +137,35 @@ class ToManyCustomComparable implements CustomComparable {
 			return;
 		}
 		
-		$queryComparator->match(
-				new QueryPlaceMarker($this->queryState->registerPlaceholderValue(
-						$this->parseFieldValue($value)),
-				QueryComparator::OPERATOR_IN, $this->requestToManyQueryItem()));
+		if ($operator == CriteriaComparator::OPERATOR_CONTAINS_NOT) {
+			$queryComparator->match(
+					new QueryPlaceMarker($this->queryState->registerPlaceholderValue(
+							$this->parseFieldValue($value)),
+							QueryComparator::OPERATOR_IN, $this->requestToManyQueryItem()));
+		}
+		
+		$testQueryResult = $this->createTestQueryResult(
+				$entityColumnComparable->buildCounterpartQueryItemFromValue(
+						QueryComparator::OPERATOR_IN, $value));
+		
+		if ($operator == CriteriaComparator::OPERATOR_CONTAINS_ANY) {
+			$queryComparator->test(QueryComparator::OPERATOR_EXISTS, $testQueryResult);
+			return;
+		}
+		
+		if ($operator == CriteriaComparator::OPERATOR_CONTAINS_NONE) {
+			$queryComparator->test(QueryComparator::OPERATOR_NOT_EXISTS, $testQueryResult);
+			return;
+		}
 	}
+	
+	private function requestIdCc(MetaTreePoint $metaTreePoint, TreePath $treePath) {
+		$idComparisonStrategy = $metaTreePoint->requestPropertyComparisonStrategy($treePath);
+		IllegalStateException::assertTrue($idComparisonStrategy->getType() == ComparisonStrategy::TYPE_COLUMN);
+		
+		return $idComparisonStrategy->getColumnComparable();
+	}
+	
 	/**
 	 * @param object $entity
 	 * @return string
@@ -159,8 +193,21 @@ class ToManyCustomComparable implements CustomComparable {
 		
 		$columnComparable = $comparisonStrategy->getColumnComparable();
 		
-		$oppositeOperator = QueryComparatorBuilder::oppositeOperator($operator);
-		if (!$this->typeConstraint->isPassableBy($columnComparable->getTypeConstraint($oppositeOperator))) {
+		$oppositeOperator = null;
+		$testTypeConstraint = null;
+		switch ($operator) {
+			case CriteriaComparator::OPERATOR_CONTAINS_ANY:
+			case CriteriaComparator::OPERATOR_CONTAINS_NONE:
+				$oppositeOperator = CriteriaComparator::OPERATOR_CONTAINS;
+				$testTypeConstraint = TypeConstraint::createArrayLike(null, false, $this->typeConstraint);
+				break;
+			default:
+				$oppositeOperator = QueryComparatorBuilder::oppositeOperator($operator);
+				$testTypeConstraint = $this->typeConstraint;
+			
+		}
+		
+		if (!$testTypeConstraint->isPassableBy($columnComparable->getTypeConstraint($oppositeOperator))) {
 			$arrayTypeConstraint = TypeConstraint::createArrayLike(null, false, $this->typeConstraint);
 			throw new CriteriaConflictException('Incompatible comparison: ' 
 					. $arrayTypeConstraint->__toString() . ' ' . $operator . ' ' 
@@ -176,9 +223,25 @@ class ToManyCustomComparable implements CustomComparable {
 			return;
 		}
 		
-		$queryComparator->match(
-				$columnComparable->buildQueryItem(CriteriaComparator::OPERATOR_NOT_IN),
-				QueryComparator::OPERATOR_NOT_IN, $this->requestToManyQueryItem());
+		if ($operator == CriteriaComparator::OPERATOR_CONTAINS_NOT) {
+			$queryComparator->match(
+					$columnComparable->buildQueryItem(CriteriaComparator::OPERATOR_NOT_IN),
+					QueryComparator::OPERATOR_NOT_IN, $this->requestToManyQueryItem());
+			return;
+		}
+		
+		
+		$testQueryResult = $this->createTestQueryResult($columnComparable->buildQueryItem($oppositeOperator));
+		
+		if ($operator == CriteriaComparator::OPERATOR_CONTAINS_ANY) {
+			$queryComparator->test(QueryComparator::OPERATOR_EXISTS, $testQueryResult);
+			return;
+		}
+		
+		if ($operator == CriteriaComparator::OPERATOR_CONTAINS_NONE) {
+			$queryComparator->test(QueryComparator::OPERATOR_NOT_EXISTS, $testQueryResult);
+			return;
+		}
 	}
 	
 	private function requestToManyQueryItem() {
@@ -192,6 +255,49 @@ class ToManyCustomComparable implements CustomComparable {
 		
 		return $this->toManyQueryItem = $this->toManyQueryItemFactory->createQueryItem(
 				$idComparisonStrategy->getColumnComparable(), $this->queryState);
+	}
+	
+	/**
+	 * 
+	 * @return \n2n\persistence\orm\query\from\TreePath
+	 */
+	private function createIdTreePath() {
+		return new TreePath([$this->metaTreePoint->getMeta()->getEntityModel()->getIdDef()->getPropertyName()]);
+	}
+	
+	private function createTestQueryResult(QueryItem $counterQueryItem) {
+		$entityModel = $this->metaTreePoint->getMeta()->getEntityModel();
+		
+		$idCc = $this->requestIdCc($this->metaTreePoint, $this->createIdTreePath());
+		
+		$tree = new Tree($this->queryState);
+// @todo support inherit access
+// 		$tree->setInheritedQueryPointResolver($inheritedQueryPointResolver);
+		$subMetaTreePoint = $tree->createBaseTreePoint($entityModel);
+		
+		$subIdCc = $this->requestIdCc($subMetaTreePoint, $this->createIdTreePath());
+		$subTargetIdCc = $this->requestIdCc($subMetaTreePoint, $this->targetIdTreePath);
+		
+		$subQueryComparator = new QueryComparator();
+		$subQueryComparator->match(
+				$idCc->buildQueryItem(CriteriaComparator::OPERATOR_EQUAL),
+				QueryComparator::OPERATOR_EQUAL,
+				$subIdCc->buildQueryItem(CriteriaComparator::OPERATOR_EQUAL));
+		$subQueryComparator->match(
+				$subTargetIdCc->buildQueryItem(CriteriaComparator::OPERATOR_IN),
+				QueryComparator::OPERATOR_IN,
+				$counterQueryItem);
+		
+		$subQueryModel = new QueryModel($tree, new QueryItemSelect($this->queryState));
+		$subQueryModel->addUnnamedSelectQueryPoint(new ConstantQueryPoint(1, $this->queryState));
+		$subQueryModel->setWhereQueryComparator($subQueryComparator);
+		
+		
+		$selectBuilder = $this->queryState->getPdo()->getMetaData()->createSelectStatementBuilder();
+		$subQueryModel->apply($selectBuilder);
+		
+		return $selectBuilder->toQueryResult();
+		
 	}
 
 }

@@ -25,8 +25,8 @@ use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\meta\data\QueryColumn;
 use n2n\persistence\meta\data\QueryTable;
-use n2n\persistence\orm\criteria\compare\CriteriaComparator;
 use n2n\persistence\meta\data\QueryPartGroup;
+use n2n\persistence\meta\data\QueryComparator;
 
 class JoinTableToManyQueryItemFactory implements ToManyQueryItemFactory {
 	private $queryState;
@@ -53,8 +53,8 @@ class JoinTableToManyQueryItemFactory implements ToManyQueryItemFactory {
 		$subSelectBuilder->addSelectColumn($inverseJoinQueryColumn);
 		$subSelectBuilder->addFrom(new QueryTable($this->joinTableName), $joinTableAlias);
 		$subSelectBuilder->getWhereComparator()->match($joinQueryColumn,
-				CriteriaComparator::OPERATOR_EQUAL,
-				$idColumnComparable->buildQueryItem(CriteriaComparator::OPERATOR_EQUAL));
+				QueryComparator::OPERATOR_EQUAL,
+				$idColumnComparable->buildQueryItem(QueryComparator::OPERATOR_EQUAL));
 
 		return new QueryPartGroup($subSelectBuilder->toQueryResult());
 	}
