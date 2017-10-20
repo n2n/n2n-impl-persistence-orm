@@ -40,6 +40,7 @@ use n2n\io\orm\FileEntityProperty;
 use n2n\io\orm\ManagedFileEntityProperty;
 use n2n\io\managed\impl\SimpleFileLocator;
 use n2n\io\IoUtils;
+use n2n\util\uri\Url;
 
 class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	const PROP_FILE_NAME_SUFFIX = '.originalName';
@@ -63,6 +64,13 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 				'n2n\persistence\orm\annotation\AnnoN2nLocale'))) {
 			$classSetup->provideEntityProperty(new N2nLocaleEntityProperty($propertyAccessProxy, 
 					$classSetup->requestColumn($propertyName)), array($annoN2nLocale));
+			return;
+		}
+
+		if (null !== ($annoUrlLocale = $annotationSet->getPropertyAnnotation($propertyName,
+				'n2n\persistence\orm\annotation\AnnoUrl'))) {
+			$classSetup->provideEntityProperty(new UrlEntityProperty($propertyAccessProxy,
+				$classSetup->requestColumn($propertyName)), array($annoN2nLocale));
 			return;
 		}
 
@@ -121,7 +129,6 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		
 		$paramClass = ReflectionUtils::extractParameterClass(current($parameters));
 		if ($paramClass === null) return;
-		
 		switch ($paramClass->getName()) {
 			case 'DateTime':
 				$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy,
@@ -134,6 +141,10 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 			case 'n2n\io\managed\File':
 				$classSetup->provideEntityProperty(new FileEntityProperty($propertyAccessProxy,
 						$classSetup->requestColumn($propertyName), null));
+				break;
+			case Url::class:
+				$classSetup->provideEntityProperty(new UrlEntityProperty($propertyAccessProxy,
+						$classSetup->requestColumn($propertyName)));
 				break;
 		}
 	}
