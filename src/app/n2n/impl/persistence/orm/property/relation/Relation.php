@@ -62,7 +62,7 @@ interface Relation {
 	/**
 	 * @param MetaTreePoint $metaTreePoint
 	 * @param QueryState $queryState
-	 * @return \n2n\impl\persistence\orm\property\relation\JoinColumnTreePoint
+	 * @return \n2n\impl\persistence\orm\property\relation\tree\JoinColumnTreePoint
 	 */
 	public function createJoinTreePoint(TreePointMeta $treePointMeta, QueryState $queryState);
 	
