@@ -22,7 +22,6 @@
 namespace n2n\impl\persistence\orm\property\relation;
 
 use n2n\persistence\orm\query\QueryState;
-use n2n\impl\persistence\orm\property\relation\RelationAdapter;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\persistence\orm\model\EntityModel;
@@ -32,7 +31,7 @@ abstract class MasterRelation extends RelationAdapter {
 	 * @param EntityModel $entityModel because of possible inheritance
 	 * @param QueryState $queryState
 	 * @param MetaTreePoint $metaTreePoint
-	 * @return \n2n\impl\persistence\orm\property\relation\JoinColumnTreePoint
+	 * @return \n2n\impl\persistence\orm\property\relation\tree\JoinColumnTreePoint
 	 */
 	public abstract function createInverseJoinTreePoint(EntityModel $entityModel, TreePointMeta $targetTreePointMeta, QueryState $queryState);
 	/**
