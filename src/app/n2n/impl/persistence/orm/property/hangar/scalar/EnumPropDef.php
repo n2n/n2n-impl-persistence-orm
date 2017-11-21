@@ -52,7 +52,7 @@ class EnumPropDef extends ScalarPropDefAdapter {
 			$values = $propSourceDef->getHangarData()->getArray(self::PROP_NAME_VALUES, false);
 		}
 		
-		$optionCollection->addMag(new StringArrayMag(self::PROP_NAME_VALUES, 'Values', $values, true));
+		$optionCollection->addMag(self::PROP_NAME_VALUES, new StringArrayMag('Values', $values, true));
 	
 		return $optionCollection;
 	}

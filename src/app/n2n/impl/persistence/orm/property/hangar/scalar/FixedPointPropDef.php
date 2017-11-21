@@ -61,11 +61,11 @@ class FixedPointPropDef extends ScalarPropDefAdapter {
 					$propSourceDef->getHangarData());		
 		}
 	
-		$optionCollection->addMag(new NumericMag(self::PROP_NAME_NUM_INTEGER_DIGITS,
-				'Num Integer Digits', $numIntegerDigits, true));
+		$optionCollection->addMag(self::PROP_NAME_NUM_INTEGER_DIGITS, 
+				new NumericMag('Num Integer Digits', $numIntegerDigits, true));
 		
-		$optionCollection->addMag(new NumericMag(self::PROP_NAME_NUM_DECIMAL_DIGITS,
-				'Num Decimal Digits', $numDecimalDigits, true));
+		$optionCollection->addMag(self::PROP_NAME_NUM_DECIMAL_DIGITS, 
+				new NumericMag('Num Decimal Digits', $numDecimalDigits, true));
 	
 		return $optionCollection;
 	}

@@ -64,7 +64,7 @@ class OneToManyPropDef implements HangarPropDef {
 
 	public function createMagCollection(PropSourceDef $propSourceDef = null) {
 		$magCollection = new MagCollection();
-		$mag = new OrmRelationColumnOption(self::PROP_NAME_PROPS, true, true);
+		$mag = new OrmRelationColumnOption(true, true);
 		
 		if (null !== $propSourceDef) {
 			$phpAnnotation = $propSourceDef->getPhpPropertyAnno()->getParam('n2n\persistence\orm\annotation\AnnoOneToMany');
@@ -75,7 +75,7 @@ class OneToManyPropDef implements HangarPropDef {
 			}
 		}
 		
-		$magCollection->addMag($mag);
+		$magCollection->addMag(self::PROP_NAME_PROPS, $mag);
 		return $magCollection;
 	}
 

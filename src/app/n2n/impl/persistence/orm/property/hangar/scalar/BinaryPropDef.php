@@ -53,7 +53,7 @@ class BinaryPropDef extends ScalarPropDefAdapter {
 			$size = $propSourceDef->getHangarData()->get(self::PROP_NAME_SIZE, false, $size);
 		}
 		
-		$optionCollection->addMag(new NumericMag(self::PROP_NAME_SIZE, 'Size', $size, true));
+		$optionCollection->addMag(self::PROP_NAME_SIZE, new NumericMag('Size', $size, true));
 		
 		return $optionCollection;
 	}

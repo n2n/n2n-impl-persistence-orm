@@ -67,8 +67,8 @@ class ManagedFilePropDef implements HangarPropDef {
 					->get(self::PROP_NAME_FILE_MANAGER, false, $fileManagerLookupId);
 		}
 		
-		$magCollection->addMag(new NumericMag(self::PROP_NAME_LENGTH, 'Length', $size, true));
-		$magCollection->addMag(new ClassNameMag(self::PROP_NAME_FILE_MANAGER, 'FileManager (Lookup Id)', 
+		$magCollection->addMag(self::PROP_NAME_LENGTH, new NumericMag('Length', $size, true));
+		$magCollection->addMag(self::PROP_NAME_FILE_MANAGER, new ClassNameMag('FileManager (Lookup Id)', 
 				new \ReflectionClass(FileManager::class), $fileManagerLookupId));
 		
 		return $magCollection;

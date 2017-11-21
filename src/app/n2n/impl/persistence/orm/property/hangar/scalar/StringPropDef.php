@@ -51,8 +51,8 @@ class StringPropDef extends ScalarPropDefAdapter {
 			$charset = $propSourceDef->getHangarData()->get(self::PROP_NAME_CHARSET, false, $charset);
 		}
 		
-		$optionCollection->addMag(new NumericMag(self::PROP_NAME_LENGTH, 'Length', $length));
-		$optionCollection->addMag(new StringMag(self::PROP_NAME_CHARSET, 'Charset', $charset));
+		$optionCollection->addMag(self::PROP_NAME_LENGTH, new NumericMag('Length', $length));
+		$optionCollection->addMag(self::PROP_NAME_CHARSET, new StringMag('Charset', $charset));
 	
 		return $optionCollection;
 	}

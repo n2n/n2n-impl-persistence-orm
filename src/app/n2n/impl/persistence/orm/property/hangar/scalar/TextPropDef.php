@@ -53,8 +53,8 @@ class TextPropDef extends ScalarPropDefAdapter {
 			$size = $propSourceDef->getHangarData()->get(self::PROP_NAME_SIZE, false, $size);
 			$charset = $propSourceDef->getHangarData()->get(self::PROP_NAME_CHARSET, false, $charset);
 		}
-		$magCollection->addMag(new NumericMag(self::PROP_NAME_SIZE, 'Size', $size, true));
-		$magCollection->addMag(new StringMag(self::PROP_NAME_CHARSET, 'Charset', $charset));
+		$magCollection->addMag(self::PROP_NAME_SIZE, new NumericMag('Size', $size, true));
+		$magCollection->addMag(self::PROP_NAME_CHARSET, new StringMag('Charset', $charset));
 		
 		return $magCollection;
 	}

@@ -56,9 +56,9 @@ class IntegerPropDef extends ScalarPropDefAdapter {
 			$signed = $propSourceDef->getHangarData()->get(self::PROP_NAME_SIGNED, false, $signed);
 		}
 	
-		$optionCollection->addMag(new EnumMag(self::PROP_NAME_SIZE, 'Size', 
+		$optionCollection->addMag(self::PROP_NAME_SIZE, new EnumMag('Size', 
 				$this->getSizeOptions(), $size));
-		$optionCollection->addMag(new BoolMag(self::PROP_NAME_SIGNED, 'Signed', $signed));
+		$optionCollection->addMag(self::PROP_NAME_SIGNED, new BoolMag('Signed', $signed));
 	
 		return $optionCollection;
 	}

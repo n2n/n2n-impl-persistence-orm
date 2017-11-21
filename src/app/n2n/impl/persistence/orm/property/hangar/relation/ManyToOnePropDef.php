@@ -59,7 +59,7 @@ class ManyToOnePropDef implements HangarPropDef {
 
 	public function createMagCollection(PropSourceDef $propSourceDef = null) {
 		$magCollection = new MagCollection();
-		$mag = new OrmRelationColumnOption(self::PROP_NAME_PROPS, false);
+		$mag = new OrmRelationColumnOption(false);
 		
 		if (null !== $propSourceDef) {
 			$phpAnnotation = $propSourceDef->getPhpPropertyAnno()->getParam(AnnoManyToOne::class);
@@ -70,7 +70,7 @@ class ManyToOnePropDef implements HangarPropDef {
 			}
 		}
 		
-		$magCollection->addMag($mag);
+		$magCollection->addMag(self::PROP_NAME_PROPS, $mag);
 		return $magCollection;
 	}
 
