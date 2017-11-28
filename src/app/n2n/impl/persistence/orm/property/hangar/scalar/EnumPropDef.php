@@ -76,6 +76,6 @@ class EnumPropDef extends ScalarPropDefAdapter {
 	}
 	
 	private function getValues(Attributes $attributes) {
-		return $attributes->get(self::PROP_NAME_VALUES, false, array());
+		return $attributes->getArray(self::PROP_NAME_VALUES, false, array());
 	}
 }
