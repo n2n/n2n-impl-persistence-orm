@@ -38,8 +38,6 @@ use n2n\reflection\property\ValueIncompatibleWithConstraintsException;
 use n2n\persistence\orm\criteria\compare\QueryComparatorBuilder;
 use n2n\persistence\orm\query\QueryModel;
 use n2n\persistence\orm\query\from\Tree;
-use n2n\persistence\meta\data\Comparison;
-use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\query\QueryItemSelect;
 use n2n\persistence\orm\criteria\item\ConstantQueryPoint;
 use n2n\persistence\meta\data\QueryItem;
@@ -78,7 +76,7 @@ class ToManyCustomComparable implements CustomComparable {
 		}
 		
 		$targetIdComparisonStrategy = $this->metaTreePoint->requestPropertyComparisonStrategy(
-				$this->targetIdTreePath);
+				$this->targetIdTreePath->new());
 		IllegalStateException::assertTrue($targetIdComparisonStrategy->getType() 
 				== ComparisonStrategy::TYPE_COLUMN);
 		
@@ -267,7 +265,6 @@ class ToManyCustomComparable implements CustomComparable {
 	
 	private function createTestQueryResult(QueryItem $counterQueryItem) {
 		$entityModel = $this->metaTreePoint->getMeta()->getEntityModel();
-		
 		$idCc = $this->requestIdCc($this->metaTreePoint, $this->createIdTreePath());
 		
 		$tree = new Tree($this->queryState);
@@ -276,7 +273,7 @@ class ToManyCustomComparable implements CustomComparable {
 		$subMetaTreePoint = $tree->createBaseTreePoint($entityModel);
 		
 		$subIdCc = $this->requestIdCc($subMetaTreePoint, $this->createIdTreePath());
-		$subTargetIdCc = $this->requestIdCc($subMetaTreePoint, $this->targetIdTreePath);
+		$subTargetIdCc = $this->requestIdCc($subMetaTreePoint, $this->targetIdTreePath->new());
 		
 		$subQueryComparator = new QueryComparator();
 		$subQueryComparator->match(
