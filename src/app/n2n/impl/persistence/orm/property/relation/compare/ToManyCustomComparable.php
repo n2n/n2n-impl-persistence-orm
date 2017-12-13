@@ -76,9 +76,8 @@ class ToManyCustomComparable implements CustomComparable {
 		}
 		
 		$targetIdComparisonStrategy = $this->metaTreePoint->requestPropertyComparisonStrategy(
-				$this->targetIdTreePath->new());
-		IllegalStateException::assertTrue($targetIdComparisonStrategy->getType() 
-				== ComparisonStrategy::TYPE_COLUMN);
+				$this->targetIdTreePath->copy());
+		IllegalStateException::assertTrue($targetIdComparisonStrategy->getType() == ComparisonStrategy::TYPE_COLUMN);
 		
 		return $this->entityColumnComparable = new IdColumnComparableDecorator(
 				$targetIdComparisonStrategy->getColumnComparable(),
@@ -273,7 +272,7 @@ class ToManyCustomComparable implements CustomComparable {
 		$subMetaTreePoint = $tree->createBaseTreePoint($entityModel);
 		
 		$subIdCc = $this->requestIdCc($subMetaTreePoint, $this->createIdTreePath());
-		$subTargetIdCc = $this->requestIdCc($subMetaTreePoint, $this->targetIdTreePath->new());
+		$subTargetIdCc = $this->requestIdCc($subMetaTreePoint, $this->targetIdTreePath->copy());
 		
 		$subQueryComparator = new QueryComparator();
 		$subQueryComparator->match(
