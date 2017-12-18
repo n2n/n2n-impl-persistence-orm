@@ -21,7 +21,6 @@
  */
 namespace n2n\impl\persistence\orm\property\relation;
 
-use n2n\impl\persistence\orm\property\relation\JoinTableRelation;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\QueryState;
 use n2n\impl\persistence\orm\property\relation\selection\JoinTableToManyLoader;

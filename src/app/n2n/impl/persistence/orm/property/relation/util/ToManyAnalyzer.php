@@ -35,7 +35,7 @@ class ToManyAnalyzer {
 		$this->actionQueue = $actionQueue;
 	}
 	/**
-	 * @param unknown $value
+	 * @param mixed $value
 	 */
 	public function analyze($value) {
 		if ($value === null) return;

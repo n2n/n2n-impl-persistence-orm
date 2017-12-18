@@ -23,7 +23,6 @@ namespace n2n\impl\persistence\orm\property\relation;
 
 use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\persistence\orm\query\QueryState;
-use n2n\impl\persistence\orm\property\relation\Relation;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 
 interface ToOneRelation extends Relation {

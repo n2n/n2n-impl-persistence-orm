@@ -26,13 +26,10 @@ use n2n\util\StringUtils;
 use n2n\io\managed\impl\SimpleFileLocator;
 use n2n\reflection\property\AccessProxy;
 use n2n\persistence\orm\model\EntityModel;
-use n2n\persistence\orm\store\MappingJob;
 use n2n\reflection\property\TypeConstraint;
-use n2n\io\fs\ClonedFile;
-use n2n\persistence\orm\store\RemoveAction;
 use n2n\core\N2N;
 use n2n\persistence\orm\store\action\PersistAction;
-use n2n\persistence\orm\annotation\File as FileAnnotation;
+use n2n\impl\persistence\orm\property\ColumnPropertyAdapter;
 
 class FileProperty extends ColumnPropertyAdapter {
 	private $fileManagerType;

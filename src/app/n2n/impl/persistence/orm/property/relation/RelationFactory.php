@@ -27,7 +27,6 @@ use n2n\persistence\orm\annotation\OrmRelationAnnotation;
 use n2n\persistence\orm\model\EntityModelManager;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\OrmConfigurationException;
-use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\persistence\orm\model\UnknownEntityPropertyException;
 use n2n\impl\persistence\orm\property\relation\util\OrderDirective;
 use n2n\persistence\orm\property\QueryItemRepresentableEntityProperty;
@@ -37,8 +36,6 @@ use n2n\persistence\orm\annotation\AnnoOneToOne;
 use n2n\reflection\ArgUtils;
 use n2n\persistence\orm\annotation\AnnoAssociationOverrides;
 use n2n\reflection\ReflectionUtils;
-use n2n\persistence\orm\annotation\AnnoJoinColumn;
-use n2n\persistence\orm\annotation\AnnoJoinTable;
 use n2n\persistence\orm\FetchType;
 
 class RelationFactory {

@@ -78,7 +78,7 @@ class UrlEntityProperty extends ColumnPropertyAdapter implements BasicEntityProp
 	public function repToValue(string $rep) {
 		try {
 			return Url::create($rep);
-		} catch (InvalidArgumentException $e) {
+		} catch (\InvalidArgumentException $e) {
 			throw new \InvalidArgumentException('tbd', 0, $e);
 		}
 	}

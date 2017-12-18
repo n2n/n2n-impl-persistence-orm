@@ -21,9 +21,9 @@
  */
 namespace n2n\impl\persistence\orm\property\relation;
 
-use n2n\impl\persistence\orm\property\relation\Relation;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\QueryState;
+use n2n\util\ex\UnsupportedOperationException;
 
 interface ToManyRelation extends Relation {
 	/**

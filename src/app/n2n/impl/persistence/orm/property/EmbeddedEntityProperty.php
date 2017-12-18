@@ -42,6 +42,8 @@ use n2n\persistence\orm\query\QueryConflictException;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\meta\data\QueryComparator;
+use n2n\persistence\orm\query\select\Selection;
+use n2n\persistence\meta\data\QueryItem;
 
 class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComparableEntityProperty, 
 		EntityPropertyCollection, JoinableEntityProperty {
@@ -82,14 +84,14 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	 * @see \n2n\persistence\orm\property\CustomComparableEntityProperty::createCustomComparable()
 	 */
 	public function createCustomComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
-		return new EmbeddedCustomComparable($metaTreePoint->requestPropertyJoinTreePoint($this->getName(), false), $this);
+		return new EmbeddedCustomComparable($metaTreePoint->requestPropertyJoinedTreePoint($this->getName(), false), $this);
 	}
 
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::createSelection()
 	 */
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
-		return new EmbeddedSelection($this, $metaTreePoint->requestPropertyJoinTreePoint($this->getName(), false));
+		return new EmbeddedSelection($this, $metaTreePoint->requestPropertyJoinedTreePoint($this->getName(), false));
 	}
 
 	/* (non-PHPdoc)
@@ -213,7 +215,7 @@ class EmbeddedTreePoint extends ExtendableTreePoint implements JoinedTreePoint {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\QueryPoint::requestComparisonStrategy()
 	 */
-	public function requestComparisonStrategy() {
+	public function requestComparisonStrategy(): ComparisonStrategy {
 		if ($this->comparisonStrategy !== null) return $this->comparisonStrategy;
 		return $this->comparisonStrategy = new ComparisonStrategy(null, 
 				$this->embeddedEntityProperty->createCustomComparable($this, $this->queryState));
@@ -221,14 +223,14 @@ class EmbeddedTreePoint extends ExtendableTreePoint implements JoinedTreePoint {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\QueryPoint::requestSelection()
 	 */
-	public function requestSelection() {
+	public function requestSelection(): Selection {
 		if ($this->selection !== null) return $this->selection;
 		return $this->selection = $this->embeddedEntityProperty->createSelection($this, $this->queryState);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\QueryPoint::requestRepresentableQueryItem()
 	 */
-	public function requestRepresentableQueryItem() {
+	public function requestRepresentableQueryItem(): QueryItem {
 		throw new QueryConflictException('Embedded property is not representable by a single query item: ' 
 				. $this->embeddedEntityProperty->toPropertyString());
 	}

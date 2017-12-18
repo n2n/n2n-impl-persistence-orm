@@ -24,7 +24,6 @@ namespace n2n\impl\persistence\orm\property\relation;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\impl\persistence\orm\property\relation\tree\JoinColumnTreePoint;
-use n2n\impl\persistence\orm\property\relation\MasterRelation;
 use n2n\persistence\orm\FetchType;
 use n2n\impl\persistence\orm\property\relation\selection\ToOneRelationSelection;
 use n2n\impl\persistence\orm\property\relation\selection\JoinColumnToManyLoader;

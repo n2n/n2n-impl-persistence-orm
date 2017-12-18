@@ -22,7 +22,6 @@
 namespace n2n\impl\persistence\orm\property;
 
 use n2n\impl\persistence\orm\property\relation\Relation;
-use n2n\impl\persistence\orm\property\RelationEntityProperty;
 use n2n\util\ex\IllegalStateException;
 use n2n\reflection\property\AccessProxy;
 use n2n\reflection\ArgUtils;

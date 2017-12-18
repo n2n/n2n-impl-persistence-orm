@@ -24,7 +24,6 @@ namespace n2n\impl\persistence\orm\property;
 use n2n\persistence\orm\property\EntityPropertyProvider;
 use n2n\reflection\property\AccessProxy;
 use n2n\persistence\orm\property\ClassSetup;
-use n2n\impl\persistence\orm\property\RelationEntityProperty;
 use n2n\persistence\orm\model\EntityModelManager;
 use n2n\persistence\orm\annotation\AnnoOneToOne;
 use n2n\persistence\orm\annotation\AnnoManyToOne;

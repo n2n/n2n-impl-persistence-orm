@@ -83,8 +83,8 @@ class PropertyMappedOneToOneRelation extends MappedRelation implements ToOneRela
 			->createValueHash($value);
 	}
 	/**
-	 * @param unknown $value
-	 * @param unknown $valueHash
+	 * @param mixed $value
+	 * @param ValueHash $oldValueHash
 	 * @param SupplyJob $supplyJob
 	 */
 	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
