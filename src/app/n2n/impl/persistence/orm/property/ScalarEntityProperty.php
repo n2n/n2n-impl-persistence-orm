@@ -87,11 +87,11 @@ class ScalarEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
 	 */
 	public function supplyPersistAction(PersistAction $persistAction, $mappedValue, ValueHash $valueHash, ValueHash $oldValueHash = null) {
-		$pdoDataType = null;
+// 		$pdoDataType = null;
 // 		if (is_bool($mappedValue)) {
 // 			$pdoDataType = PDO::PARAM_BOOL;
 // 		}
-		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $mappedValue, $pdoDataType);
+		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $mappedValue/*, $pdoDataType*/);
 	}
 
 	
