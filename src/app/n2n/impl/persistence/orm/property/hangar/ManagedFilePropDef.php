@@ -97,12 +97,10 @@ class ManagedFilePropDef implements HangarPropDef {
 		$propSourceDef->getHangarData()->setAll(array(
 				self::PROP_NAME_LENGTH => $attributes->get(self::PROP_NAME_LENGTH)));
 	}
+	
 	/**
-	 * Apply to Database
-	 *
-	 * @param string $columnName
-	 * @param ColumnFactory $columnFactory
-	 * @param PropSourceDef $propSourceDef
+	 * {@inheritDoc}
+	 * @see \hangar\entity\model\HangarPropDef::applyDbMeta()
 	 */
 	public function applyDbMeta(DbInfo $dbInfo, PropSourceDef $propSourceDef, EntityProperty $entityProperty, 
 			AnnotationSet $annotationSet) {

@@ -59,12 +59,10 @@ class DateTimePropDef implements HangarPropDef {
 		$propSourceDef->setReturnTypeName('\DateTime');
 		$propSourceDef->setSetterTypeName('\DateTime');
 	}
+	
 	/**
-	 * Apply to Database
-	 *
-	 * @param string $columnName
-	 * @param ColumnFactory $columnFactory
-	 * @param PropSourceDef $propSourceDef
+	 * {@inheritDoc}
+	 * @see \hangar\entity\model\HangarPropDef::applyDbMeta()
 	 */
 	public function applyDbMeta(DbInfo $dbInfo, PropSourceDef $propSourceDef, EntityProperty $entityProperty, 
 			AnnotationSet $annotationSet) {
@@ -75,8 +73,8 @@ class DateTimePropDef implements HangarPropDef {
 	}
 	
 	/**
-	 * @param PropSourceDef $propSourceDef
-	 * @return \n2n\persistence\meta\structure\Column
+	 * {@inheritDoc}
+	 * @see \hangar\entity\model\HangarPropDef::createMetaColumn()
 	 */
 	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef) {
 		ArgUtils::assertTrue($entityProperty instanceof DateTimeEntityProperty);
@@ -84,8 +82,8 @@ class DateTimePropDef implements HangarPropDef {
 	}
 	
 	/**
-	 * @param EntityProperty $entityProperty
-	 * @return int
+	 * {@inheritDoc}
+	 * @see \hangar\entity\model\HangarPropDef::testCompatibility()
 	 */
 	public function testCompatibility(EntityProperty $entityProperty) {
 		if ($entityProperty instanceof DateTimeEntityProperty) return CompatibilityLevel::COMMON;
