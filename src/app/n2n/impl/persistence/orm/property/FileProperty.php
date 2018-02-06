@@ -25,11 +25,18 @@ use n2n\io\managed\FileManager;
 use n2n\util\StringUtils;
 use n2n\io\managed\impl\SimpleFileLocator;
 use n2n\reflection\property\AccessProxy;
+use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\reflection\property\TypeConstraint;
 use n2n\core\N2N;
+use n2n\persistence\orm\query\QueryState;
+use n2n\persistence\orm\query\from\MetaTreePoint;
+use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\store\action\PersistAction;
+use n2n\persistence\orm\store\operation\MergeOperation;
 use n2n\impl\persistence\orm\property\ColumnPropertyAdapter;
+use n2n\persistence\orm\annotation\AnnoFile;
+use n2n\persistence\orm\store\action\RemoveAction;
 
 class FileProperty extends ColumnPropertyAdapter {
 	private $fileManagerType;
@@ -37,7 +44,7 @@ class FileProperty extends ColumnPropertyAdapter {
 	private $fileManager;
 	
 	public function __construct(EntityModel $entityModel, AccessProxy $accessProxy, 
-			$columnName, FileAnnotation $fileAnnotaiton = null) {
+			$columnName, AnnoFile $fileAnnotaiton = null) {
 		parent::__construct($entityModel, $accessProxy, $columnName);
 		
 		if (isset($fileAnnotaiton)) {
@@ -65,9 +72,9 @@ class FileProperty extends ColumnPropertyAdapter {
 		return $this->fileManager = N2N::getLookupManager()->lookup(FileManager::COMMON_PUBLIC);
 	}
 
-	public function mapValue(MappingJob $mappingJob, \ArrayObject $rawDataMap, \ArrayObject $mappedValues) {
-		$mappedValues->offsetSet($this->getName(), $this->getFileManager()->getByQualifiedName($rawDataMap[$this->getColumnName()]));
-	}
+// 	public function mapValue(MappingJob $mappingJob, \ArrayObject $rawDataMap, \ArrayObject $mappedValues) {
+// 		$mappedValues->offsetSet($this->getName(), $this->getFileManager()->getByQualifiedName($rawDataMap[$this->getColumnName()]));
+// 	}
 
 	public function supplyPersistAction($mappedValue, PersistAction $persistingJob) {
 		$columnName = $this->getColumnName();
@@ -125,4 +132,13 @@ class FileProperty extends ColumnPropertyAdapter {
 		return isset($constraints) && !is_null($constraints->getParamClass()) 
 				&& $constraints->getParamClass()->getName() == 'n2n\io\managed\File' && !$constraints->isArray();
 	}
+	public function createValueHash($value, EntityManager $em): ValueHash {
+	}
+
+	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	}
+
+	public function mergeValue($value, $sameEntity, MergeOperation $mergeOperation) {
+	}
+
 }

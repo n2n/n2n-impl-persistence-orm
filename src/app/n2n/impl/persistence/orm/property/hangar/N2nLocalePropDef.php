@@ -61,12 +61,10 @@ class N2nLocalePropDef implements HangarPropDef {
 		$propSourceDef->setReturnTypeName(N2nLocale::class);
 		$propSourceDef->setSetterTypeName(N2nLocale::class);
 	}
+	
 	/**
-	 * Apply to Database
-	 *
-	 * @param string $columnName
-	 * @param ColumnFactory $columnFactory
-	 * @param PropSourceDef $propSourceDef
+	 * {@inheritDoc}
+	 * @see \hangar\entity\model\HangarPropDef::applyDbMeta()
 	 */
 	public function applyDbMeta(DbInfo $dbInfo, PropSourceDef $propSourceDef, EntityProperty $entityProperty, 
 			AnnotationSet $annotationSet) {
