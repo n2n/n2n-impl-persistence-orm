@@ -23,7 +23,6 @@ namespace n2n\impl\persistence\orm\property\hangar\relation;
 
 use hangar\entity\model\HangarPropDef;
 use hangar\entity\model\PropSourceDef;
-use n2n\web\dispatch\mag\MagCollection;
 use hangar\core\option\OrmRelationColumnOption;
 use n2n\util\config\Attributes;
 use hangar\entity\model\DbInfo;
@@ -41,8 +40,6 @@ use n2n\impl\persistence\orm\property\RelationEntityProperty;
 use hangar\entity\model\CompatibilityLevel;
 
 class ManyToOnePropDef implements HangarPropDef {
-	const PROP_NAME_PROPS = 'props';
-	
 	protected $columnDefaults;
 	
 	public function setup(ColumnDefaults $columnDefaults) {
@@ -58,8 +55,7 @@ class ManyToOnePropDef implements HangarPropDef {
 	}
 
 	public function createMagCollection(PropSourceDef $propSourceDef = null) {
-		$magCollection = new MagCollection();
-		$mag = new OrmRelationColumnOption(false);
+		$mag = new OrmRelationColumnOption();
 		
 		if (null !== $propSourceDef) {
 			$phpAnnotation = $propSourceDef->getPhpPropertyAnno()->getParam(AnnoManyToOne::class);
@@ -70,17 +66,14 @@ class ManyToOnePropDef implements HangarPropDef {
 			}
 		}
 		
-		$magCollection->addMag(self::PROP_NAME_PROPS, $mag);
-		return $magCollection;
+		return $mag->getMagCollection();
 	}
 
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
-		$propAttributes = new Attributes($attributes->get(self::PROP_NAME_PROPS, false, array()));
 		$propSourceDef->setBoolean(false);
-		$propSourceDef->getHangarData()->setAll(array(self::PROP_NAME_PROPS 
-				=> $propAttributes->toArray()));
+		$propSourceDef->getHangarData()->setAll($attributes->toArray());
 		
-		$targetEntityTypeName = $propAttributes->get(OrmRelationColumnOption::PROP_NAME_TARGET_ENTITY_CLASS);
+		$targetEntityTypeName = $attributes->get(OrmRelationColumnOption::PROP_NAME_TARGET_ENTITY_CLASS);
 		
 		$propSourceDef->setReturnTypeName($targetEntityTypeName);
 		
@@ -91,10 +84,10 @@ class ManyToOnePropDef implements HangarPropDef {
 		$annoParam->addConstructorParam($targetEntityTypeName . '::getClass()');
 		
 		$cascadeTypeValue = OrmRelationColumnOption::buildCascadeTypeAnnoParam(
-				$propAttributes->get(OrmRelationColumnOption::PROP_NAME_CASCADE_TYPE));
+				$attributes->get(OrmRelationColumnOption::PROP_NAME_CASCADE_TYPE));
 		
 		$fetchType = OrmRelationColumnOption::buildFetchTypeAnnoParam(
-				$propAttributes->getString(OrmRelationColumnOption::PROP_NAME_FETCH_TYPE));
+				$attributes->getString(OrmRelationColumnOption::PROP_NAME_FETCH_TYPE));
 
 		// Pseudo mapped by
 		if (null !== $cascadeTypeValue) {
