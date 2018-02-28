@@ -61,8 +61,8 @@ class StringPropDef extends ScalarPropDefAdapter {
 		$propSourceDef->getHangarData()->setAll(
 				array(self::PROP_NAME_LENGTH => $attributes->get(self::PROP_NAME_LENGTH, false, $this->columnDefaults->getDefaultStringLength()),
 						self::PROP_NAME_CHARSET => $attributes->get(self::PROP_NAME_CHARSET, false, $this->columnDefaults->getDefaultStringCharset())));
-		$propSourceDef->setReturnTypeName();
-		$propSourceDef->setSetterTypeName();
+		$propSourceDef->setReturnTypeName('string');
+		$propSourceDef->setSetterTypeName('string');
 		$propSourceDef->setBoolean(false);
 	}
 	

@@ -63,8 +63,8 @@ class TextPropDef extends ScalarPropDefAdapter {
 		$propSourceDef->setBoolean(false);
 		$propSourceDef->getHangarData()->setAll(array(self::PROP_NAME_SIZE => $attributes->get(self::PROP_NAME_SIZE), 
 				self::PROP_NAME_CHARSET => $attributes->get(self::PROP_NAME_CHARSET, false)));
-		$propSourceDef->setReturnTypeName();
-		$propSourceDef->setSetterTypeName();
+		$propSourceDef->setReturnTypeName('string');
+		$propSourceDef->setSetterTypeName('string');
 	}
 	
 	/**
