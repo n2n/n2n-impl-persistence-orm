@@ -37,6 +37,7 @@ use n2n\io\managed\FileManager;
 use n2n\impl\web\dispatch\mag\model\ClassNameMag;
 use n2n\persistence\meta\structure\common\CommonStringColumn;
 use hangar\entity\model\CompatibilityLevel;
+use n2n\io\managed\File;
 
 class ManagedFilePropDef implements HangarPropDef {
 	const PROP_NAME_LENGTH = 'length';
@@ -76,8 +77,8 @@ class ManagedFilePropDef implements HangarPropDef {
 	
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->setBoolean(false);
-		$propSourceDef->setReturnTypeName('\n2n\io\managed\File');
-		$propSourceDef->setSetterTypeName('\n2n\io\managed\File');
+		$propSourceDef->setReturnTypeName(File::class);
+		$propSourceDef->setSetterTypeName(File::class);
 		
 		$annoManagedFile = $propSourceDef->getPhpPropertyAnno()
 				->getOrCreateParam(AnnoManagedFile::class);

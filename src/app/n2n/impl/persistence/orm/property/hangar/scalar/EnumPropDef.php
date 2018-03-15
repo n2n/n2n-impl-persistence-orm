@@ -60,8 +60,8 @@ class EnumPropDef extends ScalarPropDefAdapter {
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->getHangarData()->setAll(array(self::PROP_NAME_VALUES => 
 				$attributes->get(self::PROP_NAME_VALUES)));
-		$propSourceDef->setReturnTypeName();
-		$propSourceDef->setSetterTypeName();
+		$propSourceDef->setReturnTypeName('string');
+		$propSourceDef->setSetterTypeName('string');
 		$propSourceDef->setBoolean(false);
 	}
 	

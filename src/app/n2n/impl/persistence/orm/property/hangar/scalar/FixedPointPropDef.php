@@ -74,8 +74,8 @@ class FixedPointPropDef extends ScalarPropDefAdapter {
 		$propSourceDef->getHangarData()->setAll(
 				array(self::PROP_NAME_NUM_DECIMAL_DIGITS => $attributes->get(self::PROP_NAME_NUM_DECIMAL_DIGITS),
 						self::PROP_NAME_NUM_INTEGER_DIGITS => $attributes->get(self::PROP_NAME_NUM_DECIMAL_DIGITS)));
-		$propSourceDef->setReturnTypeName();
-		$propSourceDef->setSetterTypeName();
+		$propSourceDef->setReturnTypeName('float');
+		$propSourceDef->setSetterTypeName('float');
 		$propSourceDef->setBoolean(false);
 	}
 	

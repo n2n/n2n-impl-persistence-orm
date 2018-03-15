@@ -68,8 +68,8 @@ class IntegerPropDef extends ScalarPropDefAdapter {
 				self::PROP_NAME_SIZE => $attributes->get(self::PROP_NAME_SIZE),
 				self::PROP_NAME_SIGNED => $attributes->get(self::PROP_NAME_SIGNED)));
 		
-		$propSourceDef->setReturnTypeName();
-		$propSourceDef->setSetterTypeName();
+		$propSourceDef->setReturnTypeName('int');
+		$propSourceDef->setSetterTypeName('int');
 		$propSourceDef->setBoolean(false);
 	}
 	
