@@ -76,6 +76,7 @@ class ManyToOnePropDef implements HangarPropDef {
 		$targetEntityTypeName = $attributes->get(OrmRelationColumnOption::PROP_NAME_TARGET_ENTITY_CLASS);
 		
 		$propSourceDef->setReturnTypeName($targetEntityTypeName);
+		$propSourceDef->setSetterTypeName($targetEntityTypeName);
 		
 		$propertyAnno = $propSourceDef->getPhpPropertyAnno();
 		
