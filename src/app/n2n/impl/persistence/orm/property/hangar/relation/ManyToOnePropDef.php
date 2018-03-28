@@ -23,13 +23,11 @@ namespace n2n\impl\persistence\orm\property\hangar\relation;
 
 use hangar\entity\model\HangarPropDef;
 use hangar\entity\model\PropSourceDef;
-use hangar\core\option\OrmRelationColumnOption;
 use n2n\util\config\Attributes;
 use hangar\entity\model\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
 use n2n\reflection\ArgUtils;
-use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\annotation\AnnoManyToOne;
 use n2n\impl\persistence\orm\property\ToOneEntityProperty;
 use hangar\core\config\ColumnDefaults;
@@ -38,6 +36,8 @@ use n2n\persistence\meta\structure\IndexType;
 use n2n\persistence\meta\structure\Table;
 use n2n\impl\persistence\orm\property\RelationEntityProperty;
 use hangar\entity\model\CompatibilityLevel;
+use hangar\core\option\OrmRelationMagCollection;
+use n2n\reflection\CastUtils;
 
 class ManyToOnePropDef implements HangarPropDef {
 	protected $columnDefaults;
@@ -55,25 +55,25 @@ class ManyToOnePropDef implements HangarPropDef {
 	}
 
 	public function createMagCollection(PropSourceDef $propSourceDef = null) {
-		$mag = new OrmRelationColumnOption();
+		$magCollection = new OrmRelationMagCollection();
 		
 		if (null !== $propSourceDef) {
 			$phpAnnotation = $propSourceDef->getPhpPropertyAnno()->getParam(AnnoManyToOne::class);
 			if (null !== $phpAnnotation) {
 				$annotManyToOne = $phpAnnotation->getAnnotation();
-				IllegalStateException::assertTrue($annotManyToOne instanceof AnnoManyToOne);
-				$mag->setValuesByAnnotation($annotManyToOne);
+				CastUtils::assertTrue($annotManyToOne instanceof AnnoManyToOne);
+				$magCollection->setValuesByAnnotation($annotManyToOne);
 			}
 		}
 		
-		return $mag->getMagCollection();
+		return $magCollection;
 	}
 
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->setBoolean(false);
 		$propSourceDef->getHangarData()->setAll($attributes->toArray());
 		
-		$targetEntityTypeName = $attributes->get(OrmRelationColumnOption::PROP_NAME_TARGET_ENTITY_CLASS);
+		$targetEntityTypeName = $attributes->get(OrmRelationMagCollection::PROP_NAME_TARGET_ENTITY_CLASS);
 		
 		$propSourceDef->setReturnTypeName($targetEntityTypeName);
 		$propSourceDef->setSetterTypeName($targetEntityTypeName);
@@ -84,11 +84,11 @@ class ManyToOnePropDef implements HangarPropDef {
 		$annoParam->setConstructorParams(array());
 		$annoParam->addConstructorParam($targetEntityTypeName . '::getClass()');
 		
-		$cascadeTypeValue = OrmRelationColumnOption::buildCascadeTypeAnnoParam(
-				$attributes->get(OrmRelationColumnOption::PROP_NAME_CASCADE_TYPE));
+		$cascadeTypeValue = OrmRelationMagCollection::buildCascadeTypeAnnoParam(
+				$attributes->get(OrmRelationMagCollection::PROP_NAME_CASCADE_TYPE));
 		
-		$fetchType = OrmRelationColumnOption::buildFetchTypeAnnoParam(
-				$attributes->getString(OrmRelationColumnOption::PROP_NAME_FETCH_TYPE));
+		$fetchType = OrmRelationMagCollection::buildFetchTypeAnnoParam(
+				$attributes->getString(OrmRelationMagCollection::PROP_NAME_FETCH_TYPE));
 
 		// Pseudo mapped by
 		if (null !== $cascadeTypeValue) {
