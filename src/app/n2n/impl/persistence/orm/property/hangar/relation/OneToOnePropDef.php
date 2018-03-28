@@ -23,7 +23,6 @@ namespace n2n\impl\persistence\orm\property\hangar\relation;
 
 use hangar\entity\model\HangarPropDef;
 use hangar\entity\model\PropSourceDef;
-use hangar\core\option\OrmRelationColumnOption;
 use n2n\util\config\Attributes;
 use hangar\entity\model\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
@@ -38,6 +37,7 @@ use n2n\impl\persistence\orm\property\relation\ToOneRelation;
 use n2n\impl\persistence\orm\property\relation\JoinColumnToOneRelation;
 use hangar\core\config\ColumnDefaults;
 use hangar\entity\model\CompatibilityLevel;
+use hangar\core\option\OrmRelationMagCollection;
 
 class OneToOnePropDef implements HangarPropDef {
 	const PROP_NAME_PROPS = 'props';
@@ -57,25 +57,25 @@ class OneToOnePropDef implements HangarPropDef {
 	}
 
 	public function createMagCollection(PropSourceDef $propSourceDef = null) {
-		$mag = new OrmRelationColumnOption(true, true);
+		$magCollection = new OrmRelationMagCollection(true, true);
 		
 		if (null !== $propSourceDef) {
 			$phpAnnotation = $propSourceDef->getPhpPropertyAnno()->getParam(AnnoOneToOne::class);
 			if (null !== $phpAnnotation) {
 				$oneToOne = $phpAnnotation->getAnnotation();
 				IllegalStateException::assertTrue($oneToOne instanceof AnnoOneToOne);
-				$mag->setValuesByAnnotation($oneToOne);
+				$magCollection->setValuesByAnnotation($oneToOne);
 			}
 		}
 		
-		return $mag->getMagCollection();
+		return $magCollection;
 	}
 
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->setBoolean(false);
 		$propSourceDef->getHangarData()->setAll($attributes->toArray());
 		
-		$targetEntityTypeName = $attributes->get(OrmRelationColumnOption::PROP_NAME_TARGET_ENTITY_CLASS);
+		$targetEntityTypeName = $attributes->get(OrmRelationMagCollection::PROP_NAME_TARGET_ENTITY_CLASS);
 		$propSourceDef->setReturnTypeName($targetEntityTypeName);
 		
 		$propertyAnno = $propSourceDef->getPhpPropertyAnno();
@@ -84,20 +84,20 @@ class OneToOnePropDef implements HangarPropDef {
 		$annoParam->setConstructorParams(array());
 		$annoParam->addConstructorParam($targetEntityTypeName . '::getClass()');
 		
-		$cascadeTypeValue = OrmRelationColumnOption::buildCascadeTypeAnnoParam(
-				$attributes->get(OrmRelationColumnOption::PROP_NAME_CASCADE_TYPE));
+		$cascadeTypeValue = OrmRelationMagCollection::buildCascadeTypeAnnoParam(
+				$attributes->get(OrmRelationMagCollection::PROP_NAME_CASCADE_TYPE));
 		
-		$fetchType = OrmRelationColumnOption::buildFetchTypeAnnoParam(
-				$attributes->getString(OrmRelationColumnOption::PROP_NAME_FETCH_TYPE));
+		$fetchType = OrmRelationMagCollection::buildFetchTypeAnnoParam(
+				$attributes->getString(OrmRelationMagCollection::PROP_NAME_FETCH_TYPE));
 		
-		$orphanRemoval = $attributes->get(OrmRelationColumnOption::PROP_NAME_ORPHAN_REMOVAL);
+		$orphanRemoval = $attributes->get(OrmRelationMagCollection::PROP_NAME_ORPHAN_REMOVAL);
 		if (!$orphanRemoval) {
 			$orphanRemoval = null;
 		} else {
 			$orphanRemoval = 'true';
 		}
 		
-		if (null !== ($mappedBy = $attributes->get(OrmRelationColumnOption::PROP_NAME_MAPPED_BY))) {
+		if (null !== ($mappedBy = $attributes->get(OrmRelationMagCollection::PROP_NAME_MAPPED_BY))) {
 			$annoParam->addConstructorParam($mappedBy, true);
 		} else {
 			if (null !== $cascadeTypeValue || null !== $fetchType || null !== $orphanRemoval) {

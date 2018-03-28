@@ -23,10 +23,8 @@ namespace n2n\impl\persistence\orm\property\hangar\relation;
 
 use hangar\entity\model\HangarPropDef;
 use hangar\entity\model\PropSourceDef;
-use hangar\core\option\OrmRelationColumnOption;
 use n2n\util\config\Attributes;
 use hangar\entity\model\DbInfo;
-use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
 use n2n\persistence\orm\annotation\AnnoManyToMany;
@@ -38,6 +36,7 @@ use n2n\persistence\meta\structure\IndexType;
 use hangar\core\config\ColumnDefaults;
 use n2n\impl\persistence\orm\property\ToManyEntityProperty;
 use hangar\entity\model\CompatibilityLevel;
+use hangar\core\option\OrmRelationMagCollection;
 
 class ManyToManyPropDef implements HangarPropDef {
 	protected $columnDefaults;
@@ -55,25 +54,25 @@ class ManyToManyPropDef implements HangarPropDef {
 	}
 
 	public function createMagCollection(PropSourceDef $propSourceDef = null) {
-		$mag = new OrmRelationColumnOption();
+		$magCollection = new OrmRelationMagCollection();
 		
 		if (null !== $propSourceDef) {
 			$phpAnnotation = $propSourceDef->getPhpPropertyAnno()->getParam('n2n\persistence\orm\annotation\AnnoManyToMany');
 			if (null !== $phpAnnotation) {
 				$manyToManyAnno = $phpAnnotation->getAnnotation();
-				IllegalStateException::assertTrue($manyToManyAnno instanceof AnnoManyToMany);
-				$mag->setValuesByAnnotation($manyToManyAnno);
+				CastUtils::assertTrue($manyToManyAnno instanceof AnnoManyToMany);
+				$magCollection->setValuesByAnnotation($manyToManyAnno);
 			}
 		}
 		
-		return $mag->getMagCollection();
+		return $magCollection;
 	}
 
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->setBoolean(false);
 		$propSourceDef->getHangarData()->setAll($attributes->toArray());
 		
-		$targetEntityTypeName = $attributes->get(OrmRelationColumnOption::PROP_NAME_TARGET_ENTITY_CLASS);
+		$targetEntityTypeName = $attributes->get(OrmRelationMagCollection::PROP_NAME_TARGET_ENTITY_CLASS);
 		$propSourceDef->setReturnTypeName($targetEntityTypeName . ' []');
 		
 		$propertyAnno = $propSourceDef->getPhpPropertyAnno();
@@ -81,13 +80,13 @@ class ManyToManyPropDef implements HangarPropDef {
 		$annoParam->setConstructorParams(array());
 		$annoParam->addConstructorParam($targetEntityTypeName . '::getClass()');
 		
-		$cascadeTypeValue = OrmRelationColumnOption::buildCascadeTypeAnnoParam(
-				$attributes->get(OrmRelationColumnOption::PROP_NAME_CASCADE_TYPE));
+		$cascadeTypeValue = OrmRelationMagCollection::buildCascadeTypeAnnoParam(
+				$attributes->get(OrmRelationMagCollection::PROP_NAME_CASCADE_TYPE));
 		
-		$fetchType = OrmRelationColumnOption::buildFetchTypeAnnoParam(
-				$attributes->getString(OrmRelationColumnOption::PROP_NAME_FETCH_TYPE));
+		$fetchType = OrmRelationMagCollection::buildFetchTypeAnnoParam(
+				$attributes->getString(OrmRelationMagCollection::PROP_NAME_FETCH_TYPE));
 		
-		if (null !== ($mappedBy = $attributes->get(OrmRelationColumnOption::PROP_NAME_MAPPED_BY))) {
+		if (null !== ($mappedBy = $attributes->get(OrmRelationMagCollection::PROP_NAME_MAPPED_BY))) {
 			$annoParam->addConstructorParam($mappedBy, true);
 		} else {
 			if (null !== $cascadeTypeValue || null !== $fetchType) {
