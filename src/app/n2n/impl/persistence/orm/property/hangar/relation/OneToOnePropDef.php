@@ -77,6 +77,7 @@ class OneToOnePropDef implements HangarPropDef {
 		
 		$targetEntityTypeName = $attributes->get(OrmRelationMagCollection::PROP_NAME_TARGET_ENTITY_CLASS);
 		$propSourceDef->setReturnTypeName($targetEntityTypeName);
+		$propSourceDef->setSetterTypeName($targetEntityTypeName);
 		
 		$propertyAnno = $propSourceDef->getPhpPropertyAnno();
 		
