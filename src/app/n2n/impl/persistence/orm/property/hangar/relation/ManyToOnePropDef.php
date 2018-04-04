@@ -51,7 +51,7 @@ class ManyToOnePropDef implements HangarPropDef {
 	}
 
 	public function getEntityPropertyClass() {
-		return new \ReflectionClass(ToOneEntityProperty::class);
+		return new \ReflectionClass(ManyToOnePropDef::class);
 	}
 
 	public function createMagCollection(PropSourceDef $propSourceDef = null) {
@@ -107,7 +107,6 @@ class ManyToOnePropDef implements HangarPropDef {
 		ArgUtils::assertTrue($entityProperty instanceof ToOneEntityProperty);
 		
 		$relation = $entityProperty->getRelation();
-// 		test(($propSourceDef->getPhpProperty()->getName()));
 		ArgUtils::assertTrue($relation instanceof JoinColumnToOneRelation);
 		
 		$joinColumnName = $relation->getJoinColumnName(); 
