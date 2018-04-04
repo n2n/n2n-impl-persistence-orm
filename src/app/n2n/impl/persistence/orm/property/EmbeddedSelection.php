@@ -62,9 +62,10 @@ class EmbeddedSelection implements Selection {
 	
 	public function createValueBuilder() {
 		$propertyValueBuilders = array();
-		foreach ($this->embeddedEntityProperty->getEntityProperties() as $propertyName => $entityProperty) {
-			$selection = $this->selectionGroup->getSelectionByKey($entityProperty->toPropertyString());
-			$propertyValueBuilders[$propertyName] = $selection->createValueBuilder();
+		foreach ($this->embeddedEntityProperty->getEntityProperties() as $entityProperty) {
+			$propertyString = $entityProperty->toPropertyString();
+			$selection = $this->selectionGroup->getSelectionByKey($propertyString);
+			$propertyValueBuilders[$propertyString] = $selection->createValueBuilder();
 		}
 		
 		return new EmbeddedValueBuilder($this->embeddedEntityProperty, $propertyValueBuilders);
@@ -85,8 +86,8 @@ class EmbeddedValueBuilder implements ValueBuilder {
 	public function buildValue() {
 		$propertyValues = array();
 		$notNull = false;
-		foreach ($this->propertyValueBuilders as $propertyName => $propertyValueBuilder) {
-			if (null !== ($propertyValues[$propertyName] = $propertyValueBuilder->buildValue())) {
+		foreach ($this->propertyValueBuilders as $propertyString => $propertyValueBuilder) {
+			if (null !== ($propertyValues[$propertyString] = $propertyValueBuilder->buildValue())) {
 				$notNull = true;
 			}
 		}
@@ -94,9 +95,10 @@ class EmbeddedValueBuilder implements ValueBuilder {
 		if (!$notNull) return null;
 		
 		$object = ReflectionUtils::createObject($this->embeddedEntityProperty->getTargetClass());
-		foreach ($this->embeddedEntityProperty->getEntityProperties() as $propertyName => $entityProperty) {
-			IllegalStateException::assertTrue(array_key_exists($propertyName, $propertyValues));
-			$entityProperty->writeValue($object, $propertyValues[$propertyName]);
+		foreach ($this->embeddedEntityProperty->getEntityProperties() as $entityProperty) {
+			$propertyString = $entityProperty->toPropertyString();
+			IllegalStateException::assertTrue(array_key_exists($propertyString, $propertyValues));
+			$entityProperty->writeValue($object, $propertyValues[$propertyString]);
 		}
 		return $object;
 	}
