@@ -159,7 +159,7 @@ class OneToOnePropDef implements HangarPropDef {
 	 */
 	public function testCompatibility(EntityProperty $entityProperty) {
 		if ($entityProperty instanceof ToOneEntityProperty
-				&& $entityProperty->getType() == RelationEntityProperty::TYPE_ONE_TO_MANY) {
+				&& $entityProperty->getType() == RelationEntityProperty::TYPE_ONE_TO_ONE) {
 			return CompatibilityLevel::COMMON;
 		}
 
