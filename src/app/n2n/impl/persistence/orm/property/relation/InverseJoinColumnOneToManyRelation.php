@@ -111,7 +111,7 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 		throw new UnsupportedOperationException();
 	}
 	
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash) {
 		if (!$this->orphanRemoval || $oldValueHash === null || $supplyJob->isInsert()) return;
 
 		ArgUtils::assertTrue($oldValueHash instanceof ToManyValueHash);
@@ -132,7 +132,8 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyPersistAction()
 	 */
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $oldValueHash = null) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, 
+			?ValueHash $oldValueHash) {
 		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToManyValueHash);
 		if ($oldValueHash !== null && $oldValueHash->checkForUntouchedProxy($value)) return;
 		
@@ -145,6 +146,8 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 				&& $hasher->matches($toManyAnalyzer->getEntityIds(), $oldValueHash)) {
 			return;
 		}
+		
+		$this->checkValueHash($toManyAnalyzer, $hasher, $valueHash);
 		
 		$targetPersistActions = $toManyAnalyzer->getAllPersistActions();
 		
@@ -160,6 +163,19 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 		$persistAction->executeAtEnd(function () use ($persistAction, $targetPersistActions) {
 			$this->applyPersistId($persistAction, $targetPersistActions);
 		});
+	}
+	
+	/**
+	 * @param PersistAction[] $targetPersistActions
+	 * @param ToManyValueHasher $hasher
+	 * @param ToManyValueHash $valueHash
+	 */
+	private function checkValueHash(ToManyAnalyzer $toManyAnalyzer, ToManyValueHasher $hasher, ToManyValueHash $valueHash) {
+		foreach ($toManyAnalyzer->getPendingPersistActions() as $key => $targetPersistAction) {
+			$targetPersistAction->executeAtEnd(function () use ($targetPersistAction, $hasher, $key, $valueHash) {
+				$hasher->reportId($key, $targetPersistAction->getId(), $valueHash);
+			});
+		}	
 	}
 	
 	private function applyPersistId(PersistAction $persistAction, array $targetPersistActions) {

@@ -57,6 +57,6 @@ abstract class MappedRelation extends RelationAdapter {
 		return $this->getMasterRelation()->createInverseJoinTreePoint($this->targetEntityModel, $treePointMeta, $queryState);
 	}
 	
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $oldValueHash = null) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
 	}
 }

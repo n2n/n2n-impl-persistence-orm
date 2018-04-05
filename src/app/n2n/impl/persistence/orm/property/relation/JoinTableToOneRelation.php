@@ -75,11 +75,11 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 		return $toOneRelationSelection;
 	}
 	
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash) {
 		$this->toOneUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
 	}
 	
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ValueHash $oldValueHash = null) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
 		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToOneValueHash);
 		
 		if ($value === null) {
@@ -105,6 +105,9 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 		$joinTableAction->addDependent($targetPersistAction);
 		$targetPersistAction->executeAtEnd(function () use ($joinTableAction, $targetPersistAction, $targetIdProperty) {
 			$joinTableAction->addInverseJoinIdRep($targetIdProperty->valueToRep($targetPersistAction->getId()));
+			
+			$hasher = new ToOneValueHasher($this->getTargetIdEntityProperty());
+			$hasher->reportId($targetId, $valueHash);
 		});
 	}
 	

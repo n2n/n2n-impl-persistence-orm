@@ -86,13 +86,14 @@ class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelatio
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::prepareSupplyJob()
 	 */
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash) {
 		$this->toManyUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyPersistAction()
 	 */
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $oldValueHash = null) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, 
+			?ValueHash $oldValueHash) {
 		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToManyValueHash);
 		if ($oldValueHash !== null && $oldValueHash->checkForUntouchedProxy($value)) return;
 		
@@ -114,11 +115,12 @@ class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelatio
 			$joinTableAction->addInverseJoinIdRaw($targetIdProperty->buildRaw($targetEntityId, $joinTableAction->getPdo()));
 		}
 		
-		foreach ($toManyAnalyzer->getPendingPersistActions() as $targetPersistAction) {
+		foreach ($toManyAnalyzer->getPendingPersistActions() as $key => $targetPersistAction) {
 			$joinTableAction->addDependent($targetPersistAction);
-			$targetPersistAction->executeAtEnd(function () use ($joinTableAction, $targetPersistAction, $targetIdProperty) {
-				$joinTableAction->addInverseJoinIdRaw($targetIdProperty->buildRaw(
-						$targetPersistAction->getId(), $joinTableAction->getPdo()));
+			$targetPersistAction->executeAtEnd(function () use ($joinTableAction, $targetPersistAction, $targetIdProperty, $hasher, $key, $valueHash) {
+				$targetId = $targetPersistAction->getId();
+				$joinTableAction->addInverseJoinIdRaw($targetIdProperty->buildRaw($targetId, $joinTableAction->getPdo()));
+				$hasher->reportId($key, $targetId, $valueHash);
 			});
 		}
 	}

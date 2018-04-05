@@ -44,6 +44,8 @@ use n2n\persistence\orm\store\ValueHash;
 use n2n\impl\persistence\orm\property\relation\util\ToOneUtils;
 use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\persistence\orm\store\EntityInfo;
+use n2n\reflection\ArgUtils;
+use n2n\impl\persistence\orm\property\relation\util\ToOneValueHash;
 
 class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, ActionDependency {
 	private $joinColumnName;
@@ -131,13 +133,14 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 				$this->targetEntityModel->getIdDef()->getEntityProperty(), $this->joinColumnName);
 	}
 	
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash) {
 		$this->toOneUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyPersistAction()
 	 */
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $oldValueHash = null) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, 
+				?ValueHash $oldValueHash) {
 		if ($value === null) {
 			$persistAction->getMeta()->setRawValue($this->entityModel, $this->joinColumnName, null);
 			return;
@@ -163,9 +166,15 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 		
 		$persistAction->addDependent($targetPersistAction);
 		
-		$targetPersistAction->executeAtEnd(function () use ($persistAction, $targetPersistAction, $pdo) {
+		ArgUtils::assertTrue($valueHash instanceof ToOneValueHash);
+		$targetPersistAction->executeAtEnd(function () use ($persistAction, $valueHash, $targetPersistAction, $pdo) {
+			$targetId = $targetPersistAction->getId();
+			
 			$persistAction->getMeta()->setRawValue($this->entityModel, $this->joinColumnName, 
-					$this->getTargetIdEntityProperty()->buildRaw($targetPersistAction->getId(), $pdo));
+					$this->getTargetIdEntityProperty()->buildRaw($targetId, $pdo));
+			
+			$hasher = new ToOneValueHasher($this->getTargetIdEntityProperty());
+			$hasher->reportId($targetId, $valueHash);
 		});
 	}
 // 	/* (non-PHPdoc)

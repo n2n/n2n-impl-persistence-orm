@@ -103,7 +103,7 @@ abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter imple
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\CascadableEntityProperty::prepareSupplyJob()
 	 */
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash) {
 		$this->getRelation()->prepareSupplyJob($supplyJob, $value, $oldValueHash);
 	}
 
@@ -111,8 +111,8 @@ abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter imple
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
 	 */
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ValueHash $oldValueHash = null) {
-		$this->getRelation()->supplyPersistAction($persistAction, $value, $oldValueHash);
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
+		$this->getRelation()->supplyPersistAction($persistAction, $value, $valueHash, $oldValueHash);
 	}
 	
 	/**
