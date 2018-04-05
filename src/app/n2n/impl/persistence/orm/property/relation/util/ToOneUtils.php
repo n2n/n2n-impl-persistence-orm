@@ -35,7 +35,7 @@ class ToOneUtils {
 		$this->master = (boolean) $master;
 	}
 
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash) {
 		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToOneValueHash);
 		
 // 		if ($oldValueHash !== null && $oldValueHash->checkForUntouchedProxy($supplyJob->getActionQueue()->getEntityManager(), $value)) {
@@ -67,6 +67,11 @@ class ToOneUtils {
 			}
 		}
 	}
+	
+	public function reportTargetId() {
+		
+	}
+		
 }
 
 // if ($supplyJob->isInsert()) return;

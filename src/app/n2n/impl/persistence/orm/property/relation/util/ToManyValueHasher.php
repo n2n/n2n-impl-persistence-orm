@@ -57,6 +57,10 @@ class ToManyValueHasher {
 // 		return $idReps;
 // 	}
 
+	public function reportId($key, $id, ToManyValueHash $valueHash) {
+		$valueHash->reportIdRep($key, $this->targetIdProperty->valueToRep($id));
+	}
+
 	public function createValueHash($value) {
 // 		if ($value === null) return new CommonValueHash(array());
 
@@ -164,6 +168,12 @@ class ToManyValueHash implements ValueHash {
 		}
 		
 		throw new IllegalStateException('ArrayObjectProxy not initialized.');
+	}
+	
+	public function reportIdRep($key, $idRep) {
+		IllegalStateException::assertTrue($this->idRepsMap !== null 
+				&& array_key_exists($key, $this->idRepsMap) && $this->idRepsMap[$key] === null);
+		$this->idRepsMap[$key] = $idRep;
 	}
 	
 	public function getIdReps(bool $initialize = false) {

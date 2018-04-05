@@ -80,7 +80,7 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 		return $value;
 	}
 	
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ValueHash $oldValueHash = null) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
 		$rawValue = $this->buildRaw($value, $persistAction->getActionQueue()->getEntityManager()->getPdo());
 		
 		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $rawValue);

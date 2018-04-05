@@ -25,7 +25,7 @@ use n2n\reflection\ArgUtils;
 use n2n\persistence\orm\property\BasicEntityProperty;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\store\ValueHash;
-use n2n\persistence\orm\proxy\EntityProxy;
+use n2n\util\ex\IllegalStateException;
 
 class ToOneValueHasher {
 	private $idEntityProperty;
@@ -38,10 +38,14 @@ class ToOneValueHasher {
 		if ($value === null) return new ToOneValueHash(null);
 		ArgUtils::assertTrue(is_object($value));
 		
-		$value = $this->idEntityProperty->readValue($value);
-		if ($value === null) return new ToOneValueHash(null);
+		$id = $this->idEntityProperty->readValue($value);
+		if ($id === null) return new ToOneValueHash(null);
 		
-		return new ToOneValueHash($this->idEntityProperty->valueToRep($value));
+		return new ToOneValueHash($this->idEntityProperty->valueToRep($id));
+	}
+	
+	public function reportId($id, ToOneValueHash $toOneValueHash) {
+		$toOneValueHash->reportIdRep($this->idEntityProperty->valueToRep($id));
 	}
 	
 	public static function createFromEntityModel(EntityModel $entityModel) {
@@ -52,7 +56,18 @@ class ToOneValueHasher {
 class ToOneValueHash implements ValueHash {
 	private $idRep;
 	
+	/**
+	 * @param string|null $idRep
+	 */
 	public function __construct(string $idRep = null) {
+		$this->idRep = $idRep;
+	}
+	
+	/**
+	 * @param string $idRep
+	 */
+	public function reportIdRep(string $idRep) {
+		IllegalStateException::assertTrue($this->idRep === null, 'IdRep already known.');
 		$this->idRep = $idRep;
 	}
 	
@@ -73,9 +88,9 @@ class ToOneValueHash implements ValueHash {
 		return $this->idRep === $valueHash->getIdRep();
 	}
 	
-	public function checkForUntouchedProxy($entityObj) {
-		if ($entityObj instanceof EntityProxy) {
+// 	public function checkForUntouchedProxy($entityObj) {
+// 		if ($entityObj instanceof EntityProxy) {
 			
-		}
-	}
+// 		}
+// 	}
 }

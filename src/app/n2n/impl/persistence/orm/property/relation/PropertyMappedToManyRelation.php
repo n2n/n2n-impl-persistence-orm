@@ -80,7 +80,7 @@ class PropertyMappedToManyRelation extends MappedRelation implements ToManyRelat
 				->createValueHash($value);
 	}
 
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null) {
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash) {
 		$this->toManyUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
 // 		if (!$this->orphanRemoval || $supplyJob->isInsert()) return;
 	

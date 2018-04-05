@@ -46,7 +46,7 @@ class UrlEntityProperty extends ColumnPropertyAdapter implements BasicEntityProp
 		parent::__construct($accessProxy, $columnName);
 	}
 
-	public function supplyPersistAction(PersistAction $persistingJob, $value, ValueHash $valueHash, ValueHash $oldValueHash = null) {
+	public function supplyPersistAction(PersistAction $persistingJob, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
 		$rawValue = null;
 
 		if ($value instanceof Url) {

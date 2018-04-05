@@ -78,14 +78,14 @@ interface Relation {
 	 * @param mixed $oldValueHash
 	 * @param SupplyJob $supplyJob
 	 */
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ValueHash $oldValueHash = null);
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash);
 	
 	/**
 	 * @param mixed $value
 	 * @param mixed $oldValueHash
 	 * @param PersistAction $persistAction
 	 */
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $oldValueHash = null);
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash);
 	
 	/**
 	 * @param mixed $value

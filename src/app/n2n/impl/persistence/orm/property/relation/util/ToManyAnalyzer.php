@@ -43,7 +43,7 @@ class ToManyAnalyzer {
 		
 		$persistenceContext = $this->actionQueue->getEntityManager()->getPersistenceContext();
 		
-		foreach ($value as $entity) {
+		foreach ($value as $key => $entity) {
 			if (!$persistenceContext->containsManagedEntityObj($entity)) {
 				continue;
 			}
@@ -53,7 +53,7 @@ class ToManyAnalyzer {
 				$this->entityIds[] = $persistAction->getId();
 				$this->persistActions[] = $persistAction;
 			} else {
-				$this->pendingPersistActions[] = $persistAction;
+				$this->pendingPersistActions[$key] = $persistAction;
 			}
 		}
 	}
