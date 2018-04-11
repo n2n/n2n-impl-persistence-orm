@@ -113,6 +113,9 @@ class ToManyValueHasher {
 // 	}
 	
 	public function matches(array $entityIds, ToManyValueHash $valueHash) {
+		// this means that other array object has been asigned
+		if (!$valueHash->isInitialized()) return false;
+		
 		$vhIdReps = $valueHash->getIdReps(true);
 		
 		foreach ($entityIds as $entityId) {
