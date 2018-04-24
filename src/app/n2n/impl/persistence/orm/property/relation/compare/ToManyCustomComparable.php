@@ -119,7 +119,15 @@ class ToManyCustomComparable implements CustomComparable {
 	public function compareWithValue(QueryComparator $queryComparator, $operator, $value) {
 		$this->validateOperator($operator);
 		try {
-			$this->typeConstraint->validate($value);
+			switch ($operator) {
+				case CriteriaComparator::OPERATOR_CONTAINS:
+				case CriteriaComparator::OPERATOR_CONTAINS_NOT:
+					$this->typeConstraint->validate($value);
+					break;
+				case CriteriaComparator::OPERATOR_CONTAINS_ANY:
+				case CriteriaComparator::OPERATOR_CONTAINS_NONE:
+					TypeConstraint::createArrayLike(null, true, $this->typeConstraint)->validate($value);
+			}
 		} catch (ValueIncompatibleWithConstraintsException $e) {
 			throw new CriteriaConflictException('Value can not be compared with property.', 0, $e);
 		}
@@ -139,8 +147,10 @@ class ToManyCustomComparable implements CustomComparable {
 					new QueryPlaceMarker($this->queryState->registerPlaceholderValue(
 							$this->parseFieldValue($value)),
 							QueryComparator::OPERATOR_IN, $this->requestToManyQueryItem()));
+			return;
 		}
 		
+		$entityColumnComparable = $this->requestEntityColumnComparable();
 		$testQueryResult = $this->createTestQueryResult(
 				$entityColumnComparable->buildCounterpartQueryItemFromValue(
 						QueryComparator::OPERATOR_IN, $value));
