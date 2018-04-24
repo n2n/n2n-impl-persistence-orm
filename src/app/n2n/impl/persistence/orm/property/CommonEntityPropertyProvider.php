@@ -248,6 +248,13 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		$classSetup->provideEntityProperty($toManyProperty);
 		
 		$relationFactory = new RelationFactory($classSetup, $toManyProperty, $annoOneToMany);
+
+		if (!$toManyProperty->isMaster()) {
+			$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
+					use ($toManyProperty, $annoOneToMany, $relationFactory) {
+						$entityModelManager->getEntityModelByClass($annoOneToMany->getTargetEntityClass());
+			}, true);
+		}
 			
 		$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
 				use ($toManyProperty, $annoOneToMany, $relationFactory) {

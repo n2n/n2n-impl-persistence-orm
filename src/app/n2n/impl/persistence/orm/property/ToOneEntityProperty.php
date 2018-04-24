@@ -77,6 +77,6 @@ class ToOneEntityProperty extends RelationEntityPropertyAdapter implements Colum
 	}
 	
 	public function getEmbeddedEntityPropertyCollection(): EntityPropertyCollection {
-		return $this->relation->getTargetEntityModel();
+		return $this->getRelation()->getTargetEntityModel();
 	}
 }
