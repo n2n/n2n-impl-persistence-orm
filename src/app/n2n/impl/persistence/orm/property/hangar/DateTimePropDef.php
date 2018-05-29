@@ -21,18 +21,18 @@
  */
 namespace n2n\impl\persistence\orm\property\hangar;
 
-use hangar\entity\model\HangarPropDef;
-use hangar\entity\model\PropSourceDef;
 use n2n\util\config\Attributes;
 use n2n\web\dispatch\mag\MagCollection;
-use hangar\entity\model\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
 use n2n\reflection\ArgUtils;
 use n2n\impl\persistence\orm\property\DateTimeEntityProperty;
-use hangar\core\config\ColumnDefaults;
 use n2n\impl\persistence\meta\mysql\MysqlDateTimeColumn;
-use hangar\entity\model\CompatibilityLevel;
+use hangar\api\HangarPropDef;
+use hangar\api\ColumnDefaults;
+use hangar\api\PropSourceDef;
+use hangar\api\DbInfo;
+use hangar\api\CompatibilityLevel;
 
 class DateTimePropDef implements HangarPropDef {
 	
@@ -62,7 +62,7 @@ class DateTimePropDef implements HangarPropDef {
 	
 	/**
 	 * {@inheritDoc}
-	 * @see \hangar\entity\model\HangarPropDef::applyDbMeta()
+	 * @see \hangar\api\HangarPropDef::applyDbMeta()
 	 */
 	public function applyDbMeta(DbInfo $dbInfo, PropSourceDef $propSourceDef, EntityProperty $entityProperty, 
 			AnnotationSet $annotationSet) {
@@ -74,7 +74,7 @@ class DateTimePropDef implements HangarPropDef {
 	
 	/**
 	 * {@inheritDoc}
-	 * @see \hangar\entity\model\HangarPropDef::createMetaColumn()
+	 * @see \hangar\api\HangarPropDef::createMetaColumn()
 	 */
 	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef) {
 		ArgUtils::assertTrue($entityProperty instanceof DateTimeEntityProperty);
@@ -83,11 +83,19 @@ class DateTimePropDef implements HangarPropDef {
 	
 	/**
 	 * {@inheritDoc}
-	 * @see \hangar\entity\model\HangarPropDef::testCompatibility()
+	 * @see \hangar\api\HangarPropDef::testCompatibility()
 	 */
 	public function testCompatibility(EntityProperty $entityProperty) {
 		if ($entityProperty instanceof DateTimeEntityProperty) return CompatibilityLevel::COMMON;
 		
 		return CompatibilityLevel::NOT_COMPATIBLE; 
 	}
+	
+    /**
+     * {@inheritDoc}
+     * @see \hangar\api\HangarPropDef::resetPropSourceDef()
+     */
+    public function resetPropSourceDef(PropSourceDef $propSourceDef) {
+        
+    }
 }

@@ -23,14 +23,14 @@ namespace n2n\impl\persistence\orm\property\hangar\scalar;
 
 use n2n\util\config\Attributes;
 use n2n\persistence\meta\structure\ColumnFactory;
-use hangar\entity\model\DbInfo;
+use hangar\api\DbInfo;
 use n2n\web\dispatch\mag\MagCollection;
-use hangar\entity\model\PropSourceDef;
+use hangar\api\PropSourceDef;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\ArgUtils;
 use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use n2n\persistence\meta\structure\common\CommonIntegerColumn;
-use hangar\entity\model\CompatibilityLevel;
+use hangar\api\CompatibilityLevel;
 
 class BooleanPropDef extends ScalarPropDefAdapter {
 	

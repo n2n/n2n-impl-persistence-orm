@@ -21,21 +21,21 @@
  */
 namespace n2n\impl\persistence\orm\property\hangar\relation;
 
-use hangar\entity\model\HangarPropDef;
-use hangar\entity\model\PropSourceDef;
+use hangar\api\HangarPropDef;
+use hangar\api\PropSourceDef;
 use n2n\util\config\Attributes;
-use hangar\entity\model\DbInfo;
+use hangar\api\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
 use n2n\reflection\ArgUtils;
 use n2n\persistence\orm\annotation\AnnoManyToOne;
 use n2n\impl\persistence\orm\property\ToOneEntityProperty;
-use hangar\core\config\ColumnDefaults;
+use hangar\api\ColumnDefaults;
 use n2n\impl\persistence\orm\property\relation\JoinColumnToOneRelation;
 use n2n\persistence\meta\structure\IndexType;
 use n2n\persistence\meta\structure\Table;
 use n2n\impl\persistence\orm\property\RelationEntityProperty;
-use hangar\entity\model\CompatibilityLevel;
+use hangar\api\CompatibilityLevel;
 use hangar\core\option\OrmRelationMagCollection;
 use n2n\reflection\CastUtils;
 
@@ -144,5 +144,13 @@ class ManyToOnePropDef implements HangarPropDef {
 		}
 
 		return CompatibilityLevel::NOT_COMPATIBLE;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::resetPropSourceDef()
+	 */
+	public function resetPropSourceDef(PropSourceDef $propSourceDef) {
+	    
 	}
 }

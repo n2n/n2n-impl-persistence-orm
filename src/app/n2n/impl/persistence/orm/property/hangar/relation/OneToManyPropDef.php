@@ -21,10 +21,10 @@
  */
 namespace n2n\impl\persistence\orm\property\hangar\relation;
 
-use hangar\entity\model\HangarPropDef;
-use hangar\entity\model\PropSourceDef;
+use hangar\api\HangarPropDef;
+use hangar\api\PropSourceDef;
 use n2n\util\config\Attributes;
-use hangar\entity\model\DbInfo;
+use hangar\api\DbInfo;
 use n2n\persistence\orm\annotation\AnnoOneToMany;
 use n2n\persistence\meta\structure\Table;
 use n2n\impl\persistence\orm\property\relation\RelationFactory;
@@ -39,9 +39,9 @@ use n2n\persistence\orm\annotation\AnnoJoinColumn;
 use n2n\persistence\meta\structure\IndexType;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\annotation\AnnoJoinTable;
-use hangar\core\config\ColumnDefaults;
+use hangar\api\ColumnDefaults;
 use n2n\impl\persistence\orm\property\ToManyEntityProperty;
-use hangar\entity\model\CompatibilityLevel;
+use hangar\api\CompatibilityLevel;
 use n2n\web\dispatch\mag\MagCollection;
 use hangar\core\option\OrmRelationMagCollection;
 
@@ -124,6 +124,14 @@ class OneToManyPropDef implements HangarPropDef {
 		if (null !== $orphanRemoval) {
 			$annoParam->addConstructorParam($orphanRemoval);
 		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::resetPropSourceDef()
+	 */
+	public function resetPropSourceDef(PropSourceDef $propSourceDef) {
+	    
 	}
 
 	public function applyDbMeta(DbInfo $dbInfo, PropSourceDef $propSourceDef, EntityProperty $entityProperty, 

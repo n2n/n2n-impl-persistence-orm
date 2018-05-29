@@ -21,23 +21,23 @@
  */
 namespace n2n\impl\persistence\orm\property\hangar;
 
-use hangar\entity\model\HangarPropDef;
-use hangar\entity\model\PropSourceDef;
+use hangar\api\HangarPropDef;
+use hangar\api\PropSourceDef;
 use n2n\util\config\Attributes;
 use n2n\web\dispatch\mag\MagCollection;
-use hangar\entity\model\DbInfo;
+use hangar\api\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
 use n2n\reflection\ArgUtils;
 use n2n\io\orm\ManagedFileEntityProperty;
-use hangar\core\config\ColumnDefaults;
 use n2n\impl\web\dispatch\mag\model\NumericMag;
 use n2n\persistence\orm\annotation\AnnoManagedFile;
 use n2n\io\managed\FileManager;
 use n2n\impl\web\dispatch\mag\model\ClassNameMag;
 use n2n\persistence\meta\structure\common\CommonStringColumn;
-use hangar\entity\model\CompatibilityLevel;
+use hangar\api\CompatibilityLevel;
 use n2n\io\managed\File;
+use hangar\api\ColumnDefaults;
 
 class ManagedFilePropDef implements HangarPropDef {
 	const PROP_NAME_LENGTH = 'length';
@@ -101,7 +101,7 @@ class ManagedFilePropDef implements HangarPropDef {
 	
 	/**
 	 * {@inheritDoc}
-	 * @see \hangar\entity\model\HangarPropDef::applyDbMeta()
+	 * @see \hangar\api\HangarPropDef::applyDbMeta()
 	 */
 	public function applyDbMeta(DbInfo $dbInfo, PropSourceDef $propSourceDef, EntityProperty $entityProperty, 
 			AnnotationSet $annotationSet) {
@@ -136,4 +136,11 @@ class ManagedFilePropDef implements HangarPropDef {
 	
 		return CompatibilityLevel::NOT_COMPATIBLE;
 	}
+    /**
+     * {@inheritDoc}
+     * @see \hangar\api\HangarPropDef::resetPropSourceDef()
+     */
+    public function resetPropSourceDef(\hangar\api\PropSourceDef $propSourceDef) {
+        
+    }
 }

@@ -21,19 +21,19 @@
  */
 namespace n2n\impl\persistence\orm\property\hangar;
 
-use hangar\entity\model\HangarPropDef;
-use hangar\entity\model\PropSourceDef;
+use hangar\api\HangarPropDef;
+use hangar\api\PropSourceDef;
 use n2n\util\config\Attributes;
 use n2n\web\dispatch\mag\MagCollection;
-use hangar\entity\model\DbInfo;
+use hangar\api\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
 use n2n\impl\persistence\orm\property\N2nLocaleEntityProperty;
 use n2n\l10n\N2nLocale;
 use n2n\reflection\ArgUtils;
-use hangar\core\config\ColumnDefaults;
+use hangar\api\ColumnDefaults;
 use n2n\persistence\meta\structure\common\CommonStringColumn;
-use hangar\entity\model\CompatibilityLevel;
+use hangar\api\CompatibilityLevel;
 
 class N2nLocalePropDef implements HangarPropDef {
 	const DEFAULT_LOCALE_COLUMN_LENGTH = '12';
@@ -56,6 +56,14 @@ class N2nLocalePropDef implements HangarPropDef {
 		return new MagCollection();
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::resetPropSourceDef()
+	 */
+	public function resetPropSourceDef(PropSourceDef $propSourceDef) {
+	    
+	}
+	
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->setBoolean(false);
 		$propSourceDef->setReturnTypeName(N2nLocale::class);
@@ -64,7 +72,7 @@ class N2nLocalePropDef implements HangarPropDef {
 	
 	/**
 	 * {@inheritDoc}
-	 * @see \hangar\entity\model\HangarPropDef::applyDbMeta()
+	 * @see \hangar\api\HangarPropDef::applyDbMeta()
 	 */
 	public function applyDbMeta(DbInfo $dbInfo, PropSourceDef $propSourceDef, EntityProperty $entityProperty, 
 			AnnotationSet $annotationSet) {

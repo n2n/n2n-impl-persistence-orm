@@ -21,7 +21,7 @@
  */
 namespace n2n\impl\persistence\orm\property\hangar;
 
-use hangar\entity\model\HangarDef;
+use hangar\api\HangarDef;
 use n2n\impl\persistence\orm\property\hangar\relation\ManyToManyPropDef;
 use n2n\impl\persistence\orm\property\hangar\scalar\IntegerPropDef;
 use n2n\impl\persistence\orm\property\hangar\scalar\StringPropDef;
