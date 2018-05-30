@@ -14,22 +14,13 @@
     ],
     "require": {
         "php": ">=7.0",
-<<<<<<< HEAD
         "n2n/n2n-composer-module-installer": "7.1.x-dev",
         "n2n/n2n-persistence": "7.2.x-dev",
         "n2n/n2n-io": "7.2.x-dev",
         "n2n/n2n-l10n": "7.2.x-dev",
         "n2n/n2n-reflection": "7.2.x-dev",
-        "n2n/n2n-util": "7.2.x-dev"
-=======
-        "n2n/n2n-composer-module-installer": "master-dev",
-        "n2n/n2n-persistence": "master-dev",
-        "n2n/n2n-io": "master-dev",
-        "n2n/n2n-l10n": "master-dev",
-        "n2n/n2n-reflection": "master-dev",
-        "n2n/n2n-util": "master-dev",
-        "n2n/hangar-api": "master-dev"
->>>>>>> master
+        "n2n/n2n-util": "7.2.x-dev",
+        "n2n/hangar-api": "1.0.x-dev"
     },
     "autoload": {
         "psr-4": {
