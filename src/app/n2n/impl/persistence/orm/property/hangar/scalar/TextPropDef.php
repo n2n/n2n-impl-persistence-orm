@@ -21,10 +21,10 @@
  */
 namespace n2n\impl\persistence\orm\property\hangar\scalar;
 
-use hangar\entity\model\PropSourceDef;
+use hangar\api\PropSourceDef;
 use n2n\web\dispatch\mag\MagCollection;
 use n2n\util\config\Attributes;
-use hangar\entity\model\DbInfo;
+use hangar\api\DbInfo;
 use n2n\impl\web\dispatch\mag\model\NumericMag;
 use n2n\impl\web\dispatch\mag\model\StringMag;
 use n2n\persistence\meta\structure\ColumnFactory;
@@ -32,7 +32,7 @@ use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\ArgUtils;
 use n2n\persistence\meta\structure\common\CommonTextColumn;
 use n2n\impl\persistence\orm\property\ScalarEntityProperty;
-use hangar\entity\model\CompatibilityLevel;
+use hangar\api\CompatibilityLevel;
 use n2n\util\StringUtils;
 
 class TextPropDef extends ScalarPropDefAdapter {

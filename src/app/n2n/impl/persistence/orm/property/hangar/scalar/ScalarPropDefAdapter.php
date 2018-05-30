@@ -21,17 +21,17 @@
  */
 namespace n2n\impl\persistence\orm\property\hangar\scalar;
 
-use hangar\entity\model\HangarPropDef;
+use hangar\api\HangarPropDef;
 use n2n\util\config\Attributes;
-use hangar\entity\model\PropSourceDef;
-use hangar\entity\model\DbInfo;
+use hangar\api\PropSourceDef;
+use hangar\api\DbInfo;
 use n2n\persistence\meta\structure\ColumnFactory;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
 use n2n\reflection\ArgUtils;
 use n2n\impl\persistence\orm\property\ScalarEntityProperty;
-use hangar\core\config\ColumnDefaults;
-use hangar\entity\model\CompatibilityLevel;
+use hangar\api\ColumnDefaults;
+use hangar\api\CompatibilityLevel;
 
 abstract class ScalarPropDefAdapter implements HangarPropDef {
 	
@@ -68,6 +68,14 @@ abstract class ScalarPropDefAdapter implements HangarPropDef {
 		}
 	
 		return CompatibilityLevel::NOT_COMPATIBLE;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::resetPropSourceDef()
+	 */
+	public function resetPropSourceDef(PropSourceDef $propSourceDef) {
+	    
 	}
 	
 	protected function createColumn(EntityProperty $entityProperty, DbInfo $dbInfo, ColumnFactory $columnFactory, 
