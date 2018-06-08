@@ -40,6 +40,7 @@ use n2n\io\orm\ManagedFileEntityProperty;
 use n2n\io\managed\impl\SimpleFileLocator;
 use n2n\io\IoUtils;
 use n2n\util\uri\Url;
+use n2n\persistence\orm\annotation\AnnoBool;
 
 class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	const PROP_FILE_NAME_SUFFIX = '.originalName';
@@ -107,6 +108,12 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 			$classSetup->provideEntityProperty($manageFileEntityProperty, array($annoN2nLocale));
 			return;
 		}
+		
+		if (null !== ($annoBool = $annotationSet->getPropertyAnnotation($propertyName, AnnoBool::class))) {
+			$classSetup->provideEntityProperty(new BoolEntityProperty($propertyAccessProxy,
+					$classSetup->requestColumn($propertyName)), array($annoBool));
+			return;
+		}
 
 		if ($this->checkForRelations($propertyAccessProxy, $classSetup)) {
 			return;
@@ -125,26 +132,36 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		
 		$parameters = $setterMethod->getParameters();
 		if (count($parameters) == 0) return;
+		$parameter = current($parameters);
 		
-		$paramClass = ReflectionUtils::extractParameterClass(current($parameters));
-		if ($paramClass === null) return;
-		switch ($paramClass->getName()) {
-			case 'DateTime':
-				$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy,
-						$classSetup->requestColumn($propertyName)));
-				break;
-			case 'n2n\l10n\N2nLocale':
-				$classSetup->provideEntityProperty(new N2nLocaleEntityProperty($propertyAccessProxy,
-						$classSetup->requestColumn($propertyName)));
-				break;
-			case 'n2n\io\managed\File':
-				$classSetup->provideEntityProperty(new FileEntityProperty($propertyAccessProxy,
-						$classSetup->requestColumn($propertyName), null));
-				break;
-			case Url::class:
-				$classSetup->provideEntityProperty(new UrlEntityProperty($propertyAccessProxy,
-						$classSetup->requestColumn($propertyName)));
-				break;
+		if (null !== ($paramClass = ReflectionUtils::extractParameterClass($parameter))) {
+			switch ($paramClass->getName()) {
+				case 'DateTime':
+					$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy,
+							$classSetup->requestColumn($propertyName)));
+					break;
+				case 'n2n\l10n\N2nLocale':
+					$classSetup->provideEntityProperty(new N2nLocaleEntityProperty($propertyAccessProxy,
+							$classSetup->requestColumn($propertyName)));
+					break;
+				case 'n2n\io\managed\File':
+					$classSetup->provideEntityProperty(new FileEntityProperty($propertyAccessProxy,
+							$classSetup->requestColumn($propertyName), null));
+					break;
+				case Url::class:
+					$classSetup->provideEntityProperty(new UrlEntityProperty($propertyAccessProxy,
+							$classSetup->requestColumn($propertyName)));
+					break;
+			}
+		}
+		
+		if (null !== ($type = $parameter->getType())) {
+			switch ($type->__toString()) {
+				case 'bool':
+					$classSetup->provideEntityProperty(new BoolEntityProperty($propertyAccessProxy,
+							$classSetup->requestColumn($propertyName)));
+					break;
+			}
 		}
 	}
 	
