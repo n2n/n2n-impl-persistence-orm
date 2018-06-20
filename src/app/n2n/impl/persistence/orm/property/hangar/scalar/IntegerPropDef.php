@@ -36,6 +36,7 @@ use hangar\api\CompatibilityLevel;
 use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use n2n\reflection\ArgUtils;
 use n2n\persistence\meta\structure\common\CommonIntegerColumn;
+use phpbob\representation\PhpTypeDef;
 
 class IntegerPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_SIZE = 'size';
@@ -68,9 +69,7 @@ class IntegerPropDef extends ScalarPropDefAdapter {
 				self::PROP_NAME_SIZE => $attributes->get(self::PROP_NAME_SIZE),
 				self::PROP_NAME_SIGNED => $attributes->get(self::PROP_NAME_SIGNED)));
 		
-		$propSourceDef->setReturnTypeName('int');
-		$propSourceDef->setSetterTypeName('int');
-		$propSourceDef->setBoolean(false);
+		$propSourceDef->setPhpTypeDef(new PhpTypeDef('int'));
 	}
 	
 	/**

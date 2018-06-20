@@ -34,6 +34,7 @@ use n2n\persistence\meta\structure\common\CommonTextColumn;
 use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use hangar\api\CompatibilityLevel;
 use n2n\util\StringUtils;
+use phpbob\representation\PhpTypeDef;
 
 class TextPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_SIZE = 'size';
@@ -60,11 +61,9 @@ class TextPropDef extends ScalarPropDefAdapter {
 	}
 
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
-		$propSourceDef->setBoolean(false);
 		$propSourceDef->getHangarData()->setAll(array(self::PROP_NAME_SIZE => $attributes->get(self::PROP_NAME_SIZE), 
 				self::PROP_NAME_CHARSET => $attributes->get(self::PROP_NAME_CHARSET, false)));
-		$propSourceDef->setReturnTypeName('string');
-		$propSourceDef->setSetterTypeName('string');
+		$propSourceDef->setPhpTypeDef(new PhpTypeDef('string'));
 	}
 	
 	/**

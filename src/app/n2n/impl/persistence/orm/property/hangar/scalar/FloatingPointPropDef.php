@@ -31,6 +31,7 @@ use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\ArgUtils;
 use n2n\persistence\meta\structure\common\CommonFloatingPointColumn;
 use n2n\impl\persistence\orm\property\ScalarEntityProperty;
+use phpbob\representation\PhpTypeDef;
 
 class FloatingPointPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_SIZE = 'size';
@@ -55,9 +56,7 @@ class FloatingPointPropDef extends ScalarPropDefAdapter {
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->getHangarData()->setAll(array(self::PROP_NAME_SIZE => 
 				$attributes->get(self::PROP_NAME_SIZE)));
-		$propSourceDef->setReturnTypeName('float');
-		$propSourceDef->setSetterTypeName('float');
-		$propSourceDef->setBoolean(false);
+		$propSourceDef->setPhpTypeDef(new PhpTypeDef('float'));
 	}
 
 	/**

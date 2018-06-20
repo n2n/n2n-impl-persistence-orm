@@ -32,6 +32,7 @@ use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use hangar\api\CompatibilityLevel;
 use n2n\reflection\ArgUtils;
 use n2n\persistence\meta\structure\common\CommonFixedPointColumn;
+use phpbob\representation\PhpTypeDef;
 
 class FixedPointPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_NUM_INTEGER_DIGITS = 'num-integer-digits';
@@ -74,9 +75,7 @@ class FixedPointPropDef extends ScalarPropDefAdapter {
 		$propSourceDef->getHangarData()->setAll(
 				array(self::PROP_NAME_NUM_DECIMAL_DIGITS => $attributes->get(self::PROP_NAME_NUM_DECIMAL_DIGITS),
 						self::PROP_NAME_NUM_INTEGER_DIGITS => $attributes->get(self::PROP_NAME_NUM_DECIMAL_DIGITS)));
-		$propSourceDef->setReturnTypeName('float');
-		$propSourceDef->setSetterTypeName('float');
-		$propSourceDef->setBoolean(false);
+		$propSourceDef->setPhpTypeDef(new PhpTypeDef('float'));
 	}
 	
 	/**

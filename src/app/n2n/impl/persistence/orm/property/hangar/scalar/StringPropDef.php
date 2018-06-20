@@ -32,6 +32,7 @@ use n2n\persistence\orm\property\EntityProperty;
 use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use n2n\reflection\ArgUtils;
 use n2n\persistence\meta\structure\common\CommonStringColumn;
+use phpbob\representation\PhpTypeDef;
 
 class StringPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_LENGTH = 'length';
@@ -61,9 +62,7 @@ class StringPropDef extends ScalarPropDefAdapter {
 		$propSourceDef->getHangarData()->setAll(
 				array(self::PROP_NAME_LENGTH => $attributes->get(self::PROP_NAME_LENGTH, false, $this->columnDefaults->getDefaultStringLength()),
 						self::PROP_NAME_CHARSET => $attributes->get(self::PROP_NAME_CHARSET, false, $this->columnDefaults->getDefaultStringCharset())));
-		$propSourceDef->setReturnTypeName('string');
-		$propSourceDef->setSetterTypeName('string');
-		$propSourceDef->setBoolean(false);
+		$propSourceDef->setPhpTypeDef(new PhpTypeDef('string'));
 	}
 	
 	/**
