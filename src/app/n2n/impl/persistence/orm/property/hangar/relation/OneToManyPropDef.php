@@ -37,13 +37,13 @@ use n2n\reflection\annotation\AnnotationSet;
 use n2n\reflection\ArgUtils;
 use n2n\persistence\orm\annotation\AnnoJoinColumn;
 use n2n\persistence\meta\structure\IndexType;
-use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\annotation\AnnoJoinTable;
 use hangar\api\ColumnDefaults;
 use n2n\impl\persistence\orm\property\ToManyEntityProperty;
 use hangar\api\CompatibilityLevel;
 use n2n\web\dispatch\mag\MagCollection;
 use hangar\core\option\OrmRelationMagCollection;
+use phpbob\PhprepUtils;
 
 class OneToManyPropDef implements HangarPropDef {
 	private $columnDefaults;
@@ -64,11 +64,14 @@ class OneToManyPropDef implements HangarPropDef {
 		$magCollection = new OrmRelationMagCollection(true, true);
 		
 		if (null !== $propSourceDef) {
-			$phpAnnotation = $propSourceDef->getPhpPropertyAnno()->getParam('n2n\persistence\orm\annotation\AnnoOneToMany');
-			if (null !== $phpAnnotation) {
-				$oneToManyAnno = $phpAnnotation->getAnnotation();
-				IllegalStateException::assertTrue($oneToManyAnno instanceof AnnoOneToMany);
-				$magCollection->setValuesByAnnotation($oneToManyAnno);
+			$propertyAnnoCollection = $propSourceDef->getPhpProperty()->getPhpPropertyAnnoCollection();
+			if ($propertyAnnoCollection->hasPhpAnno(AnnoOneToMany::class)) {
+				$phpAnnotation = $propertyAnnoCollection->getPhpAnno(AnnoOneToMany::class);
+				if (null !== $phpAnnotation &&
+						null !== $annotOneToMany = $phpAnnotation->determineAnnotation()) {
+					CastUtils::assertTrue($annotOneToMany instanceof AnnoOneToMany);
+					$magCollection->setValuesByAnnotation($annotOneToMany);
+				}
 			}
 		}
 		
@@ -76,17 +79,18 @@ class OneToManyPropDef implements HangarPropDef {
 	}
 
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
-		$propSourceDef->setBoolean(false);
 		$propSourceDef->getHangarData()->setAll($attributes->toArray());
 		
 		$targetEntityTypeName = $attributes->get(OrmRelationMagCollection::PROP_NAME_TARGET_ENTITY_CLASS);
-		$propSourceDef->setReturnTypeName($targetEntityTypeName . ' []');
+		//$propSourceDef->setReturnTypeName($targetEntityTypeName . ' []');
 		
-		$propertyAnno = $propSourceDef->getPhpPropertyAnno();
+		$phpProperty = $propSourceDef->getPhpProperty();
+		$propertyAnnoCollection = $phpProperty->getPhpPropertyAnnoCollection();
 		
-		$annoParam = $propertyAnno->getOrCreateParam(AnnoOneToMany::class);
-		$annoParam->setConstructorParams(array());
-		$annoParam->addConstructorParam($targetEntityTypeName . '::getClass()');
+		$anno = $propertyAnnoCollection->getOrCreatePhpAnno(AnnoOneToMany::class);
+		$anno->resetPhpAnnoParams();
+		$anno->createPhpAnnoParam(PhprepUtils::extractClassName($targetEntityTypeName) . '::getClass()');
+		$phpProperty->createPhpUse($targetEntityTypeName);
 		
 		$cascadeTypeValue = OrmRelationMagCollection::buildCascadeTypeAnnoParam(
 				$attributes->get(OrmRelationMagCollection::PROP_NAME_CASCADE_TYPE));
@@ -102,27 +106,27 @@ class OneToManyPropDef implements HangarPropDef {
 		}
 		
 		if (null !== ($mappedBy = $attributes->get(OrmRelationMagCollection::PROP_NAME_MAPPED_BY))) {
-			$annoParam->addConstructorParam($mappedBy, true);
+			$anno->createPhpAnnoParam($mappedBy, true);
 		} else {
 			if (null !== $cascadeTypeValue || null !== $fetchType || null !== $orphanRemoval) {
-				$annoParam->addConstructorParam('null');
+				$anno->createPhpAnnoParam('null');
 			}
 		}
 		
 		if (null !== $cascadeTypeValue) {
-			$annoParam->addConstructorParam($cascadeTypeValue);
+			$anno->createPhpAnnoParam($cascadeTypeValue);
 		} else if (null !== $fetchType || null !== $orphanRemoval) {
-			$annoParam->addConstructorParam('null');
+			$anno->createPhpAnnoParam('null');
 		}
 		
 		if (null !== $fetchType) {
-			$annoParam->addConstructorParam($fetchType);
+			$anno->createPhpAnnoParam($fetchType);
 		} elseif (null !== $orphanRemoval) {
-			$annoParam->addConstructorParam('null');
+			$anno->createPhpAnnoParam('null');
 		}
 	
 		if (null !== $orphanRemoval) {
-			$annoParam->addConstructorParam($orphanRemoval);
+			$anno->addConstructorParam($orphanRemoval);
 		}
 	}
 	
@@ -131,7 +135,20 @@ class OneToManyPropDef implements HangarPropDef {
 	 * @see \hangar\api\HangarPropDef::resetPropSourceDef()
 	 */
 	public function resetPropSourceDef(PropSourceDef $propSourceDef) {
-	    
+		$phpProperty = $propSourceDef->getPhpProperty();
+		$phpPropertyAnnoCollection = $phpProperty->getPhpPropertyAnnoCollection();
+		if ($phpPropertyAnnoCollection->hasPhpAnno(AnnoOneToMany::class)) {
+			$phpAnno = $phpPropertyAnnoCollection->getPhpAnno(AnnoOneToMany::class);
+			if (null !== ($annoOneToMany = $phpAnno->determineAnnotation())) {
+				CastUtils::assertTrue($annoOneToMany instanceof AnnoOneToMany);
+				$phpProperty->removePhpUse($annoOneToMany->getTargetEntityClass()->getName());
+			}
+		
+			//@todo try to findout TargetClassName without Annotation
+		
+			$phpPropertyAnnoCollection->removePhpAnno(AnnoOneToMany::class);
+			$phpProperty->removePhpUse(AnnoOneToMany::class);
+		}
 	}
 
 	public function applyDbMeta(DbInfo $dbInfo, PropSourceDef $propSourceDef, EntityProperty $entityProperty, 
@@ -190,7 +207,6 @@ class OneToManyPropDef implements HangarPropDef {
 				}
 				
 				$inverseJoinColumnName = $relation->getInverseJoinColumnName();
-				$inverseJoinColumn = null;
 				if ($targetTable->containsColumnName($inverseJoinColumnName)) {
 					$targetTable->removeColumnByName($inverseJoinColumnName);
 				}

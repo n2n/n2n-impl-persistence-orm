@@ -38,6 +38,8 @@ use n2n\persistence\meta\structure\common\CommonStringColumn;
 use hangar\api\CompatibilityLevel;
 use n2n\io\managed\File;
 use hangar\api\ColumnDefaults;
+use phpbob\representation\PhpTypeDef;
+use n2n\reflection\CastUtils;
 
 class ManagedFilePropDef implements HangarPropDef {
 	const PROP_NAME_LENGTH = 'length';
@@ -76,23 +78,14 @@ class ManagedFilePropDef implements HangarPropDef {
 	}
 	
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
-		$propSourceDef->setBoolean(false);
-		$propSourceDef->setReturnTypeName(File::class);
-		$propSourceDef->setSetterTypeName(File::class);
+		$propSourceDef->setPhpTypeDef(PhpTypeDef::fromTypeName(File::class));
 		
-		$annoManagedFile = $propSourceDef->getPhpPropertyAnno()
-				->getOrCreateParam(AnnoManagedFile::class);
+		$annoManagedFile = $propSourceDef->getPhpProperty()
+				->getPhpPropertyAnnoCollection()->getOrCreatePhpAnno(AnnoManagedFile::class);
 		
 		$fileManagerLookupId = $attributes->get(self::PROP_NAME_FILE_MANAGER);
-
-		if ($annoManagedFile->hasConstructorParam(1)) {
-			if (null === $fileManagerLookupId) {
-				$annoManagedFile->setConstructorParam(1, $fileManagerLookupId);
-			} else {
-				$annoManagedFile->setConstructorParam(1, $fileManagerLookupId, true);
-			}
-		} else if (null !== $fileManagerLookupId) {
-			$annoManagedFile->addConstructorParam($fileManagerLookupId, true);
+		if (null !== $fileManagerLookupId) {
+			$annoManagedFile->resetPhpAnnoParams()->createPhpAnnoParam($fileManagerLookupId);
 		}
 		
 		$propSourceDef->getHangarData()->setAll(array(
@@ -141,6 +134,20 @@ class ManagedFilePropDef implements HangarPropDef {
      * @see \hangar\api\HangarPropDef::resetPropSourceDef()
      */
     public function resetPropSourceDef(\hangar\api\PropSourceDef $propSourceDef) {
-        
+    	$phpProperty = $propSourceDef->getPhpProperty();
+    	$phpPropertyAnnoCollection = $phpProperty->getPhpPropertyAnnoCollection();
+    	
+        if ($phpPropertyAnnoCollection->hasPhpAnno(AnnoManagedFile::class)) {
+        	$phpProperty->removePhpUse(AnnoManagedFile::class);
+        	$phpAnno = $phpPropertyAnnoCollection->getPhpAnno(AnnoManagedFile::class);
+      		if (null !== ($annoManagedFile = $phpAnno->determineAnnotation())) {
+      			CastUtils::assertTrue($annoManagedFile instanceof AnnoManagedFile);
+      			$phpProperty->removePhpUse($annoManagedFile->getLookupId());
+      			if (null !== ($fileLocator = $annoManagedFile->getFileLocator())) {
+      				$phpProperty->removePhpUse(get_class($fileLocator));
+      			}
+      		}
+      		$phpPropertyAnnoCollection->removePhpAnno(AnnoManagedFile::class);
+        }
     }
 }

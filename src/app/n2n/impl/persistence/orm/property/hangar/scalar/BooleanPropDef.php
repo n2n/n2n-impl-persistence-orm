@@ -31,6 +31,7 @@ use n2n\reflection\ArgUtils;
 use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use n2n\persistence\meta\structure\common\CommonIntegerColumn;
 use hangar\api\CompatibilityLevel;
+use phpbob\representation\PhpTypeDef;
 
 class BooleanPropDef extends ScalarPropDefAdapter {
 	
@@ -43,9 +44,7 @@ class BooleanPropDef extends ScalarPropDefAdapter {
 	}
 	
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
-		$propSourceDef->setReturnTypeName('bool');
-		$propSourceDef->setSetterTypeName('bool');
-		$propSourceDef->setBoolean(true);
+		$propSourceDef->setPhpTypeDef(new PhpTypeDef('bool'));
 	}
 	
 	/**

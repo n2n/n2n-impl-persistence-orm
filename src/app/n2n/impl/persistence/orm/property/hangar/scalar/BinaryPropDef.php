@@ -31,6 +31,7 @@ use n2n\persistence\meta\structure\common\CommonBinaryColumn;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\ArgUtils;
 use n2n\impl\persistence\orm\property\ScalarEntityProperty;
+use phpbob\representation\PhpTypeDef;
 
 class BinaryPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_SIZE = 'size';
@@ -61,9 +62,7 @@ class BinaryPropDef extends ScalarPropDefAdapter {
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->getHangarData()->setAll(array(self::PROP_NAME_SIZE => 
 				$attributes->get(self::PROP_NAME_SIZE)));
-		$propSourceDef->setReturnTypeName('string');
-		$propSourceDef->setSetterTypeName('string');
-		$propSourceDef->setBoolean(false);
+		$propSourceDef->setPhpTypeDef(new PhpTypeDef('string'));
 	}
 
 	/**

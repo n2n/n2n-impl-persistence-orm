@@ -33,6 +33,7 @@ use hangar\api\ColumnDefaults;
 use hangar\api\PropSourceDef;
 use hangar\api\DbInfo;
 use hangar\api\CompatibilityLevel;
+use phpbob\representation\PhpTypeDef;
 
 class DateTimePropDef implements HangarPropDef {
 	
@@ -55,9 +56,7 @@ class DateTimePropDef implements HangarPropDef {
 	}
 	
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
-		$propSourceDef->setBoolean(false);
-		$propSourceDef->setReturnTypeName('\DateTime');
-		$propSourceDef->setSetterTypeName('\DateTime');
+		$propSourceDef->setPhpTypeDef(new PhpTypeDef('\DateTime'));
 	}
 	
 	/**

@@ -34,6 +34,7 @@ use n2n\reflection\ArgUtils;
 use hangar\api\ColumnDefaults;
 use n2n\persistence\meta\structure\common\CommonStringColumn;
 use hangar\api\CompatibilityLevel;
+use phpbob\representation\PhpTypeDef;
 
 class N2nLocalePropDef implements HangarPropDef {
 	const DEFAULT_LOCALE_COLUMN_LENGTH = '12';
@@ -65,9 +66,7 @@ class N2nLocalePropDef implements HangarPropDef {
 	}
 	
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
-		$propSourceDef->setBoolean(false);
-		$propSourceDef->setReturnTypeName(N2nLocale::class);
-		$propSourceDef->setSetterTypeName(N2nLocale::class);
+		$propSourceDef->setPhpTypeDef(PhpTypeDef::fromTypeName(N2nLocale::class));
 	}
 	
 	/**

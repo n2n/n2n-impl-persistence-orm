@@ -38,6 +38,8 @@ use n2n\impl\persistence\orm\property\relation\JoinColumnToOneRelation;
 use hangar\api\ColumnDefaults;
 use hangar\api\CompatibilityLevel;
 use hangar\core\option\OrmRelationMagCollection;
+use phpbob\representation\PhpTypeDef;
+use phpbob\PhprepUtils;
 
 class OneToOnePropDef implements HangarPropDef {
 	const PROP_NAME_PROPS = 'props';
@@ -60,30 +62,33 @@ class OneToOnePropDef implements HangarPropDef {
 		$magCollection = new OrmRelationMagCollection(true, true);
 		
 		if (null !== $propSourceDef) {
-			$phpAnnotation = $propSourceDef->getPhpPropertyAnno()->getParam(AnnoOneToOne::class);
-			if (null !== $phpAnnotation) {
-				$oneToOne = $phpAnnotation->getAnnotation();
-				IllegalStateException::assertTrue($oneToOne instanceof AnnoOneToOne);
-				$magCollection->setValuesByAnnotation($oneToOne);
-			}
+			$propertyAnnoCollection = $propSourceDef->getPhpProperty()->getPhpPropertyAnnoCollection();
+			
+			if ($propertyAnnoCollection->hasPhpAnno(AnnoOneToOne::class)) {
+				$phpAnnotation = $propertyAnnoCollection->getPhpAnno(AnnoOneToOne::class);
+				if (null !== $phpAnnotation && null !== ($oneToOne = $phpAnnotation->determineAnnotation())) {
+					IllegalStateException::assertTrue($oneToOne instanceof AnnoOneToOne);
+					$magCollection->setValuesByAnnotation($oneToOne);
+				}
+			} 
 		}
 		
 		return $magCollection;
 	}
 
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
-		$propSourceDef->setBoolean(false);
 		$propSourceDef->getHangarData()->setAll($attributes->toArray());
 		
 		$targetEntityTypeName = $attributes->get(OrmRelationMagCollection::PROP_NAME_TARGET_ENTITY_CLASS);
-		$propSourceDef->setReturnTypeName($targetEntityTypeName);
-		$propSourceDef->setSetterTypeName($targetEntityTypeName);
+		$propSourceDef->setPhpTypeDef(PhpTypeDef::fromTypeName($targetEntityTypeName));
 		
-		$propertyAnno = $propSourceDef->getPhpPropertyAnno();
+		$phpProperty = $propSourceDef->getPhpProperty();
+		$propertyAnnoCollection = $phpProperty->getPhpPropertyAnnoCollection();
 		
-		$annoParam = $propertyAnno->getOrCreateParam(AnnoOneToOne::class);
-		$annoParam->setConstructorParams(array());
-		$annoParam->addConstructorParam($targetEntityTypeName . '::getClass()');
+		$anno = $propertyAnnoCollection->getOrCreatePhpAnno(AnnoOneToOne::class);
+		$anno->resetPhpAnnoParams();
+		$anno->createPhpAnnoParam(PhprepUtils::extractClassName($targetEntityTypeName) . '::getClass()');
+		$phpProperty->createPhpUse($targetEntityTypeName);
 		
 		$cascadeTypeValue = OrmRelationMagCollection::buildCascadeTypeAnnoParam(
 				$attributes->get(OrmRelationMagCollection::PROP_NAME_CASCADE_TYPE));
@@ -99,27 +104,27 @@ class OneToOnePropDef implements HangarPropDef {
 		}
 		
 		if (null !== ($mappedBy = $attributes->get(OrmRelationMagCollection::PROP_NAME_MAPPED_BY))) {
-			$annoParam->addConstructorParam($mappedBy, true);
+			$anno->createPhpAnnoParam($mappedBy, true);
 		} else {
 			if (null !== $cascadeTypeValue || null !== $fetchType || null !== $orphanRemoval) {
-				$annoParam->addConstructorParam('null');
+				$anno->createPhpAnnoParam('null');
 			}
 		}
 		
 		if (null !== $cascadeTypeValue) {
-			$annoParam->addConstructorParam($cascadeTypeValue);
+			$anno->createPhpAnnoParam($cascadeTypeValue);
 		} else if (null !== $fetchType || null !== $orphanRemoval) {
-			$annoParam->addConstructorParam('null');
+			$anno->createPhpAnnoParam('null');
 		}
 		
 		if (null !== $fetchType) {
-			$annoParam->addConstructorParam($fetchType);
+			$anno->createPhpAnnoParam($fetchType);
 		} elseif (null !== $orphanRemoval) {
-			$annoParam->addConstructorParam('null');
+			$anno->createPhpAnnoParam('null');
 		}
 	
 		if (null !== $orphanRemoval) {
-			$annoParam->addConstructorParam($orphanRemoval);
+			$anno->createPhpAnnoParam($orphanRemoval);
 		}
 	}
 
@@ -171,6 +176,20 @@ class OneToOnePropDef implements HangarPropDef {
 	 * @see \hangar\api\HangarPropDef::resetPropSourceDef()
 	 */
 	public function resetPropSourceDef(PropSourceDef $propSourceDef) {
-	    
+		$phpProperty = $propSourceDef->getPhpProperty();
+		$phpPropertyAnnoCollection = $phpProperty->getPhpPropertyAnnoCollection();
+		
+		if ($phpPropertyAnnoCollection->hasPhpAnno(AnnoOneToOne::class)) {
+			$phpAnno = $phpPropertyAnnoCollection->getPhpAnno(AnnoOneToOne::class);
+			if (null !== ($annoOneToOne = $phpAnno->determineAnnotation())) {
+				CastUtils::assertTrue($annoOneToOne instanceof AnnoOneToOne);
+				$phpProperty->removePhpUse($annoOneToOne->getTargetEntityClass()->getName());
+			}
+		
+			//@todo try to findout TargetClassName without Annotation
+		
+			$phpPropertyAnnoCollection->removePhpAnno(AnnoOneToOne::class);
+			$phpProperty->removePhpUse(AnnoOneToOne::class);
+		}
 	}
 }

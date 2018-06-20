@@ -38,6 +38,8 @@ use n2n\impl\persistence\orm\property\RelationEntityProperty;
 use hangar\api\CompatibilityLevel;
 use hangar\core\option\OrmRelationMagCollection;
 use n2n\reflection\CastUtils;
+use phpbob\representation\PhpTypeDef;
+use phpbob\PhprepUtils;
 
 class ManyToOnePropDef implements HangarPropDef {
 	protected $columnDefaults;
@@ -58,11 +60,14 @@ class ManyToOnePropDef implements HangarPropDef {
 		$magCollection = new OrmRelationMagCollection();
 		
 		if (null !== $propSourceDef) {
-			$phpAnnotation = $propSourceDef->getPhpPropertyAnno()->getParam(AnnoManyToOne::class);
-			if (null !== $phpAnnotation) {
-				$annotManyToOne = $phpAnnotation->getAnnotation();
-				CastUtils::assertTrue($annotManyToOne instanceof AnnoManyToOne);
-				$magCollection->setValuesByAnnotation($annotManyToOne);
+			$propertyAnnoCollection = $propSourceDef->getPhpProperty()->getPhpPropertyAnnoCollection();
+			if ($propertyAnnoCollection->hasPhpAnno(AnnoManyToOne::class)) {
+				$phpAnnotation = $propertyAnnoCollection->getPhpAnno(AnnoManyToOne::class);
+				if (null !== $phpAnnotation && 
+						null !== $annotManyToOne = $phpAnnotation->determineAnnotation()) {
+					CastUtils::assertTrue($annotManyToOne instanceof AnnoManyToOne);
+					$magCollection->setValuesByAnnotation($annotManyToOne);
+				}
 			}
 		}
 		
@@ -70,19 +75,19 @@ class ManyToOnePropDef implements HangarPropDef {
 	}
 
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
-		$propSourceDef->setBoolean(false);
 		$propSourceDef->getHangarData()->setAll($attributes->toArray());
 		
 		$targetEntityTypeName = $attributes->get(OrmRelationMagCollection::PROP_NAME_TARGET_ENTITY_CLASS);
 		
-		$propSourceDef->setReturnTypeName($targetEntityTypeName);
-		$propSourceDef->setSetterTypeName($targetEntityTypeName);
+		$propSourceDef->setPhpTypeDef(PhpTypeDef::fromTypeName($targetEntityTypeName));
 		
-		$propertyAnno = $propSourceDef->getPhpPropertyAnno();
+		$phpProperty = $propSourceDef->getPhpProperty();
+		$propertyAnnoCollection = $phpProperty->getPhpPropertyAnnoCollection();
 		
-		$annoParam = $propertyAnno->getOrCreateParam(AnnoManyToOne::class);
-		$annoParam->setConstructorParams(array());
-		$annoParam->addConstructorParam($targetEntityTypeName . '::getClass()');
+		$anno = $propertyAnnoCollection->getOrCreatePhpAnno(AnnoManyToOne::class);
+		$anno->resetPhpAnnoParams();
+		$anno->createPhpAnnoParam(PhprepUtils::extractClassName($targetEntityTypeName) . '::getClass()');
+		$phpProperty->createPhpUse($targetEntityTypeName);
 		
 		$cascadeTypeValue = OrmRelationMagCollection::buildCascadeTypeAnnoParam(
 				$attributes->get(OrmRelationMagCollection::PROP_NAME_CASCADE_TYPE));
@@ -92,13 +97,13 @@ class ManyToOnePropDef implements HangarPropDef {
 
 		// Pseudo mapped by
 		if (null !== $cascadeTypeValue) {
-			$annoParam->addConstructorParam($cascadeTypeValue);
+			$anno->createPhpAnnoParam($cascadeTypeValue);
 		} elseif (null !== $fetchType) {
-			$annoParam->addConstructorParam('null');
+			$anno->createPhpAnnoParam('null');
 		}
 		
 		if (null !== $fetchType) {
-			$annoParam->addConstructorParam($fetchType);
+			$anno->createPhpAnnoParam($fetchType);
 		}
 	}
 
@@ -151,6 +156,19 @@ class ManyToOnePropDef implements HangarPropDef {
 	 * @see \hangar\api\HangarPropDef::resetPropSourceDef()
 	 */
 	public function resetPropSourceDef(PropSourceDef $propSourceDef) {
-	    
+		$phpProperty = $propSourceDef->getPhpProperty();
+		$phpPropertyAnnoCollection = $phpProperty->getPhpPropertyAnnoCollection();
+		if ($phpPropertyAnnoCollection->hasPhpAnno(AnnoManyToOne::class)) {
+			$phpAnno = $phpPropertyAnnoCollection->getPhpAnno(AnnoManyToOne::class);
+			if (null !== ($annoManyToOne = $phpAnno->determineAnnotation())) {
+				CastUtils::assertTrue($annoManyToOne instanceof AnnoManyToOne);
+				$phpProperty->removePhpUse($annoManyToOne->getTargetEntityClass()->getName());
+			}
+				
+			//@todo try to findout TargetClassName without Annotation
+				
+			$phpPropertyAnnoCollection->removePhpAnno(AnnoManyToOne::class);
+			$phpProperty->removePhpUse(AnnoManyToOne::class);
+		}
 	}
 }
