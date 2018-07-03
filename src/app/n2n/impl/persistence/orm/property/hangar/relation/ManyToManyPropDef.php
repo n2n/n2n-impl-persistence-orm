@@ -37,7 +37,7 @@ use hangar\api\ColumnDefaults;
 use n2n\impl\persistence\orm\property\ToManyEntityProperty;
 use hangar\api\CompatibilityLevel;
 use hangar\core\option\OrmRelationMagCollection;
-use phpbob\PhprepUtils;
+use phpbob\PhpbobUtils;
 
 class ManyToManyPropDef implements HangarPropDef {
 	protected $columnDefaults;
@@ -82,7 +82,7 @@ class ManyToManyPropDef implements HangarPropDef {
 		$propertyAnnoCollection = $phpProperty->getPhpPropertyAnnoCollection();
 		$anno = $propertyAnnoCollection->getOrCreatePhpAnno(AnnoManyToMany::class);
 		$anno->resetPhpAnnoParams();
-		$anno->createPhpAnnoParam(PhprepUtils::extractClassName($targetEntityTypeName) . '::getClass()');
+		$anno->createPhpAnnoParam(PhpbobUtils::extractClassName($targetEntityTypeName) . '::getClass()');
 		$phpProperty->createPhpUse($targetEntityTypeName);
 		
 		$cascadeTypeValue = OrmRelationMagCollection::buildCascadeTypeAnnoParam(
