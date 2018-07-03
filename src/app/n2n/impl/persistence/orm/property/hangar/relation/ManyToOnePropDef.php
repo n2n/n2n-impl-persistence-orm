@@ -39,7 +39,7 @@ use hangar\api\CompatibilityLevel;
 use hangar\core\option\OrmRelationMagCollection;
 use n2n\reflection\CastUtils;
 use phpbob\representation\PhpTypeDef;
-use phpbob\PhprepUtils;
+use phpbob\PhpbobUtils;
 
 class ManyToOnePropDef implements HangarPropDef {
 	protected $columnDefaults;
@@ -86,7 +86,7 @@ class ManyToOnePropDef implements HangarPropDef {
 		
 		$anno = $propertyAnnoCollection->getOrCreatePhpAnno(AnnoManyToOne::class);
 		$anno->resetPhpAnnoParams();
-		$anno->createPhpAnnoParam(PhprepUtils::extractClassName($targetEntityTypeName) . '::getClass()');
+		$anno->createPhpAnnoParam(PhpbobUtils::extractClassName($targetEntityTypeName) . '::getClass()');
 		$phpProperty->createPhpUse($targetEntityTypeName);
 		
 		$cascadeTypeValue = OrmRelationMagCollection::buildCascadeTypeAnnoParam(

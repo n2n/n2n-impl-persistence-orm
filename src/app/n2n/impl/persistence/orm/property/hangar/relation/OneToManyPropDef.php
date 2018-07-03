@@ -43,7 +43,7 @@ use n2n\impl\persistence\orm\property\ToManyEntityProperty;
 use hangar\api\CompatibilityLevel;
 use n2n\web\dispatch\mag\MagCollection;
 use hangar\core\option\OrmRelationMagCollection;
-use phpbob\PhprepUtils;
+use phpbob\PhpbobUtils;
 
 class OneToManyPropDef implements HangarPropDef {
 	private $columnDefaults;
@@ -89,7 +89,7 @@ class OneToManyPropDef implements HangarPropDef {
 		
 		$anno = $propertyAnnoCollection->getOrCreatePhpAnno(AnnoOneToMany::class);
 		$anno->resetPhpAnnoParams();
-		$anno->createPhpAnnoParam(PhprepUtils::extractClassName($targetEntityTypeName) . '::getClass()');
+		$anno->createPhpAnnoParam(PhpbobUtils::extractClassName($targetEntityTypeName) . '::getClass()');
 		$phpProperty->createPhpUse($targetEntityTypeName);
 		
 		$cascadeTypeValue = OrmRelationMagCollection::buildCascadeTypeAnnoParam(
@@ -126,7 +126,7 @@ class OneToManyPropDef implements HangarPropDef {
 		}
 	
 		if (null !== $orphanRemoval) {
-			$anno->addConstructorParam($orphanRemoval);
+			$anno->createPhpAnnoParam($orphanRemoval);
 		}
 	}
 	
