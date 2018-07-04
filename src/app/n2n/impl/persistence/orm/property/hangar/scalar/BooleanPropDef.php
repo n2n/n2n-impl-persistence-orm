@@ -32,6 +32,10 @@ use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use n2n\persistence\meta\structure\common\CommonIntegerColumn;
 use hangar\api\CompatibilityLevel;
 use phpbob\representation\PhpTypeDef;
+use rocket\impl\ei\component\prop\bool\BooleanEiProp;
+use n2n\impl\persistence\orm\property\BoolEntityProperty;
+use n2n\reflection\annotation\AnnotationSet;
+use rocket\ei\component\prop\ScalarEiProp;
 
 class BooleanPropDef extends ScalarPropDefAdapter {
 	
@@ -43,16 +47,34 @@ class BooleanPropDef extends ScalarPropDefAdapter {
 		return new MagCollection();
 	}
 	
+	public function getEntityPropertyClass() {
+		return new \ReflectionClass(BoolEntityProperty::class);
+	}
+	
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->setPhpTypeDef(new PhpTypeDef('bool'));
 	}
 	
+	
+	
+	public function applyDbMeta(DbInfo $dbInfo, PropSourceDef $propSourceDef, EntityProperty $entityProperty,
+			AnnotationSet $annotationSet) {
+				
+		ArgUtils::assertTrue($entityProperty instanceof BoolEntityProperty || $entityProperty instanceof ScalarEntityProperty);
+		
+		$columnName = $entityProperty->getColumnName();
+		$dbInfo->removeColumn($columnName);
+		$columnFactory = $dbInfo->getTable()->createColumnFactory();
+		$attributes = $propSourceDef->getHangarData();
+		
+		$this->createColumn($entityProperty, $dbInfo, $columnFactory, $columnName, $attributes);
+	}
 	/**
 	 * @param PropSourceDef $propSourceDef
 	 * @return \n2n\persistence\meta\structure\Column
 	 */
 	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef) {
-		ArgUtils::assertTrue($entityProperty instanceof ScalarEntityProperty);
+		ArgUtils::assertTrue($entityProperty instanceof BoolEntityProperty || $entityProperty instanceof ScalarEntityProperty);
 	
 		return new CommonIntegerColumn($entityProperty->getColumnName(), 1, false);
 	}
