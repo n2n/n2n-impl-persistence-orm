@@ -86,6 +86,7 @@ class OneToManyPropDef implements HangarPropDef {
 		
 		$phpProperty = $propSourceDef->getPhpProperty();
 		$propertyAnnoCollection = $phpProperty->getPhpPropertyAnnoCollection();
+		$propSourceDef->setPhpTypeDef(null);
 		
 		$anno = $propertyAnnoCollection->getOrCreatePhpAnno(AnnoOneToMany::class);
 		$anno->resetPhpAnnoParams();
