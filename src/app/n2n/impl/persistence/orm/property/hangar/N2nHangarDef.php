@@ -36,10 +36,14 @@ use n2n\impl\persistence\orm\property\hangar\relation\OneToOnePropDef;
 use n2n\impl\persistence\orm\property\hangar\relation\ManyToOnePropDef;
 
 class N2nHangarDef implements HangarDef {
-	public function getPropDefs() {
-		return array(new StringPropDef(), new IntegerPropDef(), new BooleanPropDef(), new DateTimePropDef(),
+	public function getPropDefs(): array {
+		return [new StringPropDef(), new IntegerPropDef(), new BooleanPropDef(), new DateTimePropDef(),
 				new TextPropDef(), new FixedPointPropDef(), new N2nLocalePropDef(), new ManyToOnePropDef(),
 				new OneToManyPropDef(), new ManyToManyPropDef(), new OneToOnePropDef(), new ManagedFilePropDef(),
-				new EnumPropDef(), new FloatingPointPropDef(), new BinaryPropDef());
+				new EnumPropDef(), new FloatingPointPropDef(), new BinaryPropDef()];
+	}
+	
+	public function getTemplateDefs(): array {
+		return [];
 	}
 }
