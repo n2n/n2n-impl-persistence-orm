@@ -82,7 +82,7 @@ class OneToManyPropDef implements HangarPropDef {
 		$propSourceDef->getHangarData()->setAll($attributes->toArray());
 		
 		$targetEntityTypeName = $attributes->get(OrmRelationMagCollection::PROP_NAME_TARGET_ENTITY_CLASS);
-		//$propSourceDef->setReturnTypeName($targetEntityTypeName . ' []');
+		$propSourceDef->setArrayLikePhpTypeDef($targetEntityTypeName);
 		
 		$phpProperty = $propSourceDef->getPhpProperty();
 		$propertyAnnoCollection = $phpProperty->getPhpPropertyAnnoCollection();
@@ -138,6 +138,7 @@ class OneToManyPropDef implements HangarPropDef {
 	public function resetPropSourceDef(PropSourceDef $propSourceDef) {
 		$phpProperty = $propSourceDef->getPhpProperty();
 		$phpPropertyAnnoCollection = $phpProperty->getPhpPropertyAnnoCollection();
+		$propSourceDef->setArrayLikePhpTypeDef(null);
 		if ($phpPropertyAnnoCollection->hasPhpAnno(AnnoOneToMany::class)) {
 			$phpAnno = $phpPropertyAnnoCollection->getPhpAnno(AnnoOneToMany::class);
 			if (null !== ($annoOneToMany = $phpAnno->determineAnnotation())) {
