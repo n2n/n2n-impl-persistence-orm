@@ -32,10 +32,8 @@ use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use n2n\persistence\meta\structure\common\CommonIntegerColumn;
 use hangar\api\CompatibilityLevel;
 use phpbob\representation\PhpTypeDef;
-use rocket\impl\ei\component\prop\bool\BooleanEiProp;
 use n2n\impl\persistence\orm\property\BoolEntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
-use rocket\ei\component\prop\ScalarEiProp;
 
 class BooleanPropDef extends ScalarPropDefAdapter {
 	
