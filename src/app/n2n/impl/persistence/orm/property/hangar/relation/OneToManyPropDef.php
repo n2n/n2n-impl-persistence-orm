@@ -41,7 +41,6 @@ use n2n\persistence\orm\annotation\AnnoJoinTable;
 use hangar\api\ColumnDefaults;
 use n2n\impl\persistence\orm\property\ToManyEntityProperty;
 use hangar\api\CompatibilityLevel;
-use n2n\web\dispatch\mag\MagCollection;
 use hangar\core\option\OrmRelationMagCollection;
 use phpbob\PhpbobUtils;
 
