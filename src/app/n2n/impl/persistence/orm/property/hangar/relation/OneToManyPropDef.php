@@ -43,6 +43,7 @@ use n2n\impl\persistence\orm\property\ToManyEntityProperty;
 use hangar\api\CompatibilityLevel;
 use hangar\core\option\OrmRelationMagCollection;
 use phpbob\PhpbobUtils;
+use phpbob\representation\PhpTypeDef;
 
 class OneToManyPropDef implements HangarPropDef {
 	private $columnDefaults;
@@ -81,7 +82,7 @@ class OneToManyPropDef implements HangarPropDef {
 		$propSourceDef->getHangarData()->setAll($attributes->toArray());
 		
 		$targetEntityTypeName = $attributes->get(OrmRelationMagCollection::PROP_NAME_TARGET_ENTITY_CLASS);
-		$propSourceDef->setArrayLikePhpTypeDef($targetEntityTypeName);
+		$propSourceDef->setArrayLikePhpTypeDef(PhpTypeDef::fromTypeName($targetEntityTypeName));
 		
 		$phpProperty = $propSourceDef->getPhpProperty();
 		$propertyAnnoCollection = $phpProperty->getPhpPropertyAnnoCollection();
