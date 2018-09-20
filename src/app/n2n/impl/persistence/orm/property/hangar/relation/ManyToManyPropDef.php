@@ -78,7 +78,7 @@ class ManyToManyPropDef implements HangarPropDef {
 		
 		$targetEntityTypeName = $attributes->get(OrmRelationMagCollection::PROP_NAME_TARGET_ENTITY_CLASS);
 		$propSourceDef->setArrayLikePhpTypeDef(PhpTypeDef::fromTypeName($targetEntityTypeName));
-		
+		$propSourceDef->setPhpTypeDef(null);
 		$phpProperty = $propSourceDef->getPhpProperty();
 		$propertyAnnoCollection = $phpProperty->getPhpPropertyAnnoCollection();
 		$anno = $propertyAnnoCollection->getOrCreatePhpAnno(AnnoManyToMany::class);
