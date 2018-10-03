@@ -24,7 +24,6 @@ namespace n2n\impl\persistence\orm\property\hangar;
 use hangar\api\HangarPropDef;
 use hangar\api\PropSourceDef;
 use n2n\util\config\Attributes;
-use n2n\web\dispatch\mag\MagCollection;
 use hangar\api\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
@@ -40,6 +39,9 @@ use n2n\io\managed\File;
 use hangar\api\ColumnDefaults;
 use phpbob\representation\PhpTypeDef;
 use n2n\reflection\CastUtils;
+use hangar\api\HuoContext;
+use n2n\persistence\meta\structure\Column;
+use n2n\web\dispatch\mag\MagCollection;
 
 class ManagedFilePropDef implements HangarPropDef {
 	const PROP_NAME_LENGTH = 'length';
@@ -47,19 +49,19 @@ class ManagedFilePropDef implements HangarPropDef {
 	
 	private $columnDefaults;
 	
-	public function setup(ColumnDefaults $columnDefaults) {
+	public function setup(HuoContext $huoContext, ColumnDefaults $columnDefaults) {
 		$this->columnDefaults = $columnDefaults;
 	}
 	
-	public function getName() {
+	public function getName(): string {
 		return 'MangedFile';
 	}
 	
-	public function getEntityPropertyClass() {
+	public function getEntityPropertyClass(): \ReflectionClass {
 		return new \ReflectionClass('n2n\io\orm\ManagedFileEntityProperty');
 	}
 	
-	public function createMagCollection(PropSourceDef $propSourceDef = null) {
+	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		$magCollection = new MagCollection();
 		
 		$size = $this->columnDefaults->getDefaultStringLength();
@@ -113,7 +115,7 @@ class ManagedFilePropDef implements HangarPropDef {
 	 * @param PropSourceDef $propSourceDef
 	 * @return \n2n\persistence\meta\structure\Column
 	 */
-	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef) {
+	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): ?Column {
 		ArgUtils::assertTrue($entityProperty instanceof ManagedFileEntityProperty);
 		return new CommonStringColumn($entityProperty->getColumnName(), 
 				$propSourceDef->getHangarData()->get(self::PROP_NAME_LENGTH, 
@@ -124,7 +126,7 @@ class ManagedFilePropDef implements HangarPropDef {
 	 * @param EntityProperty $entityProperty
 	 * @return int
 	 */
-	public function testCompatibility(EntityProperty $entityProperty) {
+	public function testCompatibility(EntityProperty $entityProperty): int {
 		if ($entityProperty instanceof ManagedFileEntityProperty) return CompatibilityLevel::COMMON;
 	
 		return CompatibilityLevel::NOT_COMPATIBLE;

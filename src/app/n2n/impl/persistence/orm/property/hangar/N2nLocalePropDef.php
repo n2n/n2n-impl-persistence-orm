@@ -35,25 +35,27 @@ use hangar\api\ColumnDefaults;
 use n2n\persistence\meta\structure\common\CommonStringColumn;
 use hangar\api\CompatibilityLevel;
 use phpbob\representation\PhpTypeDef;
+use hangar\api\HuoContext;
+use n2n\persistence\meta\structure\Column;
 
 class N2nLocalePropDef implements HangarPropDef {
 	const DEFAULT_LOCALE_COLUMN_LENGTH = '12';
 	
 	protected $columnDefaults;
 	
-	public function setup(ColumnDefaults $columnDefaults) {
+	public function setup(HuoContext $huoContext, ColumnDefaults $columnDefaults) {
 		$this->columnDefaults = $columnDefaults;
 	}
 	
-	public function getName() {
+	public function getName(): string {
 		return 'N2nLocale';
 	}
 	
-	public function getEntityPropertyClass() {
+	public function getEntityPropertyClass(): \ReflectionClass {
 		return new \ReflectionClass(N2nLocaleEntityProperty::class);
 	}
 	
-	public function createMagCollection(PropSourceDef $propSourceDef = null) {
+	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		return new MagCollection();
 	}
 	
@@ -88,7 +90,7 @@ class N2nLocalePropDef implements HangarPropDef {
 	 * @param PropSourceDef $propSourceDef
 	 * @return \n2n\persistence\meta\structure\Column
 	 */
-	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef) {
+	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): ?Column {
 		ArgUtils::assertTrue($entityProperty instanceof N2nLocaleEntityProperty);
 		return new CommonStringColumn($entityProperty->getColumnName(), self::DEFAULT_LOCALE_COLUMN_LENGTH);
 	}
@@ -97,7 +99,7 @@ class N2nLocalePropDef implements HangarPropDef {
 	 * @param EntityProperty $entityProperty
 	 * @return int
 	 */
-	public function testCompatibility(EntityProperty $entityProperty) {
+	public function testCompatibility(EntityProperty $entityProperty): int {
 		if ($entityProperty instanceof N2nLocaleEntityProperty) return CompatibilityLevel::COMMON;
 	
 		return CompatibilityLevel::NOT_COMPATIBLE;

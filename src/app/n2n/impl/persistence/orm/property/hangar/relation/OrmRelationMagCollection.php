@@ -21,9 +21,7 @@
  */
 namespace n2n\impl\persistence\orm\property\hangar\relation;
 
-use n2n\web\dispatch\mag\MagCollection;
 use n2n\web\dispatch\map\bind\BindingDefinition;
-use hangar\util\EntityUtils;
 use n2n\web\dispatch\map\bind\BindingErrors;
 use n2n\impl\web\dispatch\mag\model\EnumMag;
 use n2n\impl\web\dispatch\mag\model\MultiSelectMag;
@@ -36,6 +34,9 @@ use n2n\persistence\orm\annotation\MappableOrmRelationAnnotation;
 use n2n\persistence\orm\annotation\AnnoOneToMany;
 use n2n\persistence\orm\annotation\AnnoOneToOne;
 use n2n\util\StringUtils;
+use n2n\core\N2N;
+use n2n\persistence\orm\model\EntityModelManager;
+use n2n\web\dispatch\mag\MagCollection;
 
 class OrmRelationMagCollection extends MagCollection {
 	const PROP_NAME_TARGET_ENTITY_CLASS = 'targetEntityClass';
@@ -48,8 +49,13 @@ class OrmRelationMagCollection extends MagCollection {
 	private $groupedMappedByOptions = [];
 	private $mappedByOptions = [];
 	
-	public function __construct(bool $addMappedBy = true, bool $addOrphanRemoval = false) {
-		$this->targetEntityClassOptions = EntityUtils::getEntityClassNames();
+	public function __construct(EntityModelManager $emm, bool $addMappedBy = true, bool $addOrphanRemoval = false) {
+		$entityClassNames = N2N::getAppConfig()->orm()->getEntityClassNames();
+		
+		$this->targetEntityClassOptions = [];
+		foreach ($emm->getRegisteredClassNames() as $entityClassName) {
+			$this->targetEntityClassOptions[$entityClassName] = $entityClassName;
+		}
 		
 		$this->addMag(self::PROP_NAME_TARGET_ENTITY_CLASS, new EnumMag('Target Entity',
 				[null => null] + $this->targetEntityClassOptions, null, true,
@@ -58,8 +64,8 @@ class OrmRelationMagCollection extends MagCollection {
 		
 		if ($addMappedBy) {
 			foreach ($this->targetEntityClassOptions as $entityClassName) {
-				$entityClassDef = EntityUtils::createClassDef($entityClassName, true, false);
-				foreach ($entityClassDef->getEntityModel()->getEntityProperties() as $entityProperty) {
+				$entityModel = $emm->getEntityModelByClass(new \ReflectionClass($entityClassName));
+				foreach ($entityModel->getEntityProperties() as $entityProperty) {
 					if (!$entityProperty->hasTargetEntityModel()) continue;
 					
 					$this->groupedMappedByOptions[$entityClassName][$entityProperty->getName()] = $entityProperty->getTargetEntityModel()->getClass()->getName();

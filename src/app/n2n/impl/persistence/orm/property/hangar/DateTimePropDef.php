@@ -22,7 +22,6 @@
 namespace n2n\impl\persistence\orm\property\hangar;
 
 use n2n\util\config\Attributes;
-use n2n\web\dispatch\mag\MagCollection;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
 use n2n\reflection\ArgUtils;
@@ -34,24 +33,27 @@ use hangar\api\PropSourceDef;
 use hangar\api\DbInfo;
 use hangar\api\CompatibilityLevel;
 use phpbob\representation\PhpTypeDef;
+use hangar\api\HuoContext;
+use n2n\persistence\meta\structure\Column;
+use n2n\web\dispatch\mag\MagCollection;
 
 class DateTimePropDef implements HangarPropDef {
 	
 	protected $columnDefaults;
 	
-	public function setup(ColumnDefaults $columnDefaults) {
+	public function setup(HuoContext $huoContext, ColumnDefaults $columnDefaults) {
 		$this->columnDefaults = $columnDefaults;
 	}
 	
-	public function getName() {
+	public function getName(): string {
 		return 'DateTime';
 	}
 	
-	public function getEntityPropertyClass() {
+	public function getEntityPropertyClass(): \ReflectionClass {
 		return new \ReflectionClass('n2n\impl\persistence\orm\property\DateTimeEntityProperty');
 	}
 	
-	public function createMagCollection(PropSourceDef $propSourceDef = null) {
+	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		return new MagCollection();
 	}
 	
@@ -75,7 +77,7 @@ class DateTimePropDef implements HangarPropDef {
 	 * {@inheritDoc}
 	 * @see \hangar\api\HangarPropDef::createMetaColumn()
 	 */
-	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef) {
+	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): ?Column {
 		ArgUtils::assertTrue($entityProperty instanceof DateTimeEntityProperty);
 		return new MysqlDateTimeColumn($entityProperty->getColumnName(), true, true);
 	}
@@ -84,7 +86,7 @@ class DateTimePropDef implements HangarPropDef {
 	 * {@inheritDoc}
 	 * @see \hangar\api\HangarPropDef::testCompatibility()
 	 */
-	public function testCompatibility(EntityProperty $entityProperty) {
+	public function testCompatibility(EntityProperty $entityProperty): int {
 		if ($entityProperty instanceof DateTimeEntityProperty) return CompatibilityLevel::COMMON;
 		
 		return CompatibilityLevel::NOT_COMPATIBLE; 

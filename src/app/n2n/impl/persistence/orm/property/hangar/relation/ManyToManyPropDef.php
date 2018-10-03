@@ -38,24 +38,31 @@ use n2n\impl\persistence\orm\property\ToManyEntityProperty;
 use hangar\api\CompatibilityLevel;
 use phpbob\PhpbobUtils;
 use phpbob\representation\PhpTypeDef;
+use hangar\api\HuoContext;
+use n2n\persistence\meta\structure\Column;
+use n2n\web\dispatch\mag\MagCollection;
 
 class ManyToManyPropDef implements HangarPropDef {
 	protected $columnDefaults;
+	private $huoContext;
 	
-	public function setup(ColumnDefaults $columnDefaults) {
+	
+	public function setup(HuoContext $huoContext, ColumnDefaults $columnDefaults) {
 		$this->columnDefaults = $columnDefaults;
+		$this->huoContext = $huoContext;
 	}
 	
-	public function getName() {
+	public function getName(): string {
 		return 'ManyToMany';
 	}
 
-	public function getEntityPropertyClass() {
+	public function getEntityPropertyClass(): \ReflectionClass {
 		return new \ReflectionClass('n2n\impl\persistence\orm\property\ToManyEntityProperty');
 	}
 
-	public function createMagCollection(PropSourceDef $propSourceDef = null) {
-		$magCollection = new OrmRelationMagCollection();
+	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
+		$magCollection = new OrmRelationMagCollection($this->huoContext->getEntityModelManager());
+		
 		
 		if (null !== $propSourceDef) {
 			$propertyAnnoCollection = $propSourceDef->getPhpProperty()->getPhpPropertyAnnoCollection();
@@ -147,7 +154,7 @@ class ManyToManyPropDef implements HangarPropDef {
 	 * @param PropSourceDef $propSourceDef
 	 * @return \n2n\persistence\meta\structure\Column
 	 */
-	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef) {
+	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): ?Column {
 		return null;
 	}
 	
@@ -155,7 +162,7 @@ class ManyToManyPropDef implements HangarPropDef {
 	 * @param EntityProperty $entityProperty
 	 * @return int
 	 */
-	public function testCompatibility(EntityProperty $entityProperty) {
+	public function testCompatibility(EntityProperty $entityProperty): int {
 		if ($entityProperty instanceof ToManyEntityProperty 
 				&& $entityProperty->getType() == RelationEntityProperty::TYPE_MANY_TO_MANY) {
 			return CompatibilityLevel::COMMON;

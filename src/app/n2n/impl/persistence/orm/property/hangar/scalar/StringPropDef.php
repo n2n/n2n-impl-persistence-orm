@@ -24,7 +24,6 @@ namespace n2n\impl\persistence\orm\property\hangar\scalar;
 use n2n\util\config\Attributes;
 use hangar\api\DbInfo;
 use n2n\persistence\meta\structure\ColumnFactory;
-use n2n\web\dispatch\mag\MagCollection;
 use hangar\api\PropSourceDef;
 use n2n\impl\web\dispatch\mag\model\NumericMag;
 use n2n\impl\web\dispatch\mag\model\StringMag;
@@ -33,16 +32,18 @@ use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use n2n\reflection\ArgUtils;
 use n2n\persistence\meta\structure\common\CommonStringColumn;
 use phpbob\representation\PhpTypeDef;
+use n2n\web\dispatch\mag\MagCollection;
+use n2n\persistence\meta\structure\Column;
 
 class StringPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_LENGTH = 'length';
 	const PROP_NAME_CHARSET = 'charset';
 	
-	public function getName() {
+	public function getName(): string {
 		return 'String';
 	}
 
-	public function createMagCollection(PropSourceDef $propSourceDef = null) {
+	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		$optionCollection = new MagCollection();
 	
 		$length = $this->columnDefaults->getDefaultStringLength();
@@ -69,7 +70,7 @@ class StringPropDef extends ScalarPropDefAdapter {
 	 * @param EntityProperty $entityProperty
 	 * @return int
 	 */
-	public function testCompatibility(EntityProperty $entityProperty) {
+	public function testCompatibility(EntityProperty $entityProperty): int {
 		if ($entityProperty instanceof ScalarEntityProperty) {
 			return 2;
 		}
@@ -81,7 +82,7 @@ class StringPropDef extends ScalarPropDefAdapter {
 	 * @param PropSourceDef $propSourceDef
 	 * @return \n2n\persistence\meta\structure\Column
 	 */
-	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef) {
+	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): Column {
 		ArgUtils::assertTrue($entityProperty instanceof ScalarEntityProperty);
 	
 		return new CommonStringColumn($entityProperty->getColumnName(),

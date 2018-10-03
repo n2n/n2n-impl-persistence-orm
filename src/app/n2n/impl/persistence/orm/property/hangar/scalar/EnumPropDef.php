@@ -25,18 +25,19 @@ use n2n\util\config\Attributes;
 use hangar\api\DbInfo;
 use n2n\persistence\meta\structure\ColumnFactory;
 use n2n\impl\web\dispatch\mag\model\StringArrayMag;
-use n2n\web\dispatch\mag\MagCollection;
 use hangar\api\PropSourceDef;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\ArgUtils;
 use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use n2n\persistence\meta\structure\common\CommonEnumColumn;
 use phpbob\representation\PhpTypeDef;
+use n2n\web\dispatch\mag\MagCollection;
+use n2n\persistence\meta\structure\Column;
 
 class EnumPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_VALUES = 'values';
 	
-	public function getName() {
+	public function getName(): string {
 		return 'Enum';
 	}
 	
@@ -45,7 +46,7 @@ class EnumPropDef extends ScalarPropDefAdapter {
 		$columnFactory->createEnumColumn($columnName, $this->getValues($attributes));
 	}
 	
-	public function createMagCollection(PropSourceDef $propSourceDef = null) {
+	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		$optionCollection = new MagCollection();
 	
 		$values = array();
@@ -68,7 +69,7 @@ class EnumPropDef extends ScalarPropDefAdapter {
 	 * @param PropSourceDef $propSourceDef
 	 * @return \n2n\persistence\meta\structure\Column
 	 */
-	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef) {
+	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): ?Column {
 		ArgUtils::assertTrue($entityProperty instanceof ScalarEntityProperty);
 	
 		return new CommonEnumColumn($entityProperty->getColumnName(), $this->getValues($propSourceDef->getHangarData()));

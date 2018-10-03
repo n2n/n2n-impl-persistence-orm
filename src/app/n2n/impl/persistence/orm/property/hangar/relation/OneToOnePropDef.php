@@ -39,26 +39,31 @@ use hangar\api\ColumnDefaults;
 use hangar\api\CompatibilityLevel;
 use phpbob\representation\PhpTypeDef;
 use phpbob\PhpbobUtils;
+use hangar\api\HuoContext;
+use n2n\web\dispatch\mag\MagCollection;
+use n2n\persistence\meta\structure\Column;
 
 class OneToOnePropDef implements HangarPropDef {
 	const PROP_NAME_PROPS = 'props';
 	
 	private $columnDefaults;
+	private $huoContext;
 	
-	public function setup(ColumnDefaults $columnDefaults) {
+	public function setup(HuoContext $huoContext, ColumnDefaults $columnDefaults) {
 		$this->columnDefaults = $columnDefaults;
+		$this->huoContext = $huoContext;
 	}
 	
-	public function getName() {
+	public function getName(): string {
 		return 'OneToOne'; 
 	}
 
-	public function getEntityPropertyClass() {
+	public function getEntityPropertyClass(): \ReflectionClass {
 		return new \ReflectionClass(ToOneEntityProperty::class);
 	}
 
-	public function createMagCollection(PropSourceDef $propSourceDef = null) {
-		$magCollection = new OrmRelationMagCollection(true, true);
+	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
+		$magCollection = new OrmRelationMagCollection($this->huoContext->getEntityModelManager(), true, true);
 		
 		if (null !== $propSourceDef) {
 			$propertyAnnoCollection = $propSourceDef->getPhpProperty()->getPhpPropertyAnnoCollection();
@@ -153,7 +158,7 @@ class OneToOnePropDef implements HangarPropDef {
 	 * @param PropSourceDef $propSourceDef
 	 * @return \n2n\persistence\meta\structure\Column
 	 */
-	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef) {
+	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): ?Column {
 		return null;
 	}
 	
@@ -161,7 +166,7 @@ class OneToOnePropDef implements HangarPropDef {
 	 * @param EntityProperty $entityProperty
 	 * @return int
 	 */
-	public function testCompatibility(EntityProperty $entityProperty) {
+	public function testCompatibility(EntityProperty $entityProperty): int {
 		if ($entityProperty instanceof ToOneEntityProperty
 				&& $entityProperty->getType() == RelationEntityProperty::TYPE_ONE_TO_ONE) {
 			return CompatibilityLevel::COMMON;
