@@ -36,7 +36,6 @@ use n2n\persistence\meta\structure\IndexType;
 use hangar\api\ColumnDefaults;
 use n2n\impl\persistence\orm\property\ToManyEntityProperty;
 use hangar\api\CompatibilityLevel;
-use hangar\core\option\OrmRelationMagCollection;
 use phpbob\PhpbobUtils;
 use phpbob\representation\PhpTypeDef;
 

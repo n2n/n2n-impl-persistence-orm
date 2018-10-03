@@ -37,7 +37,6 @@ use n2n\impl\persistence\orm\property\relation\ToOneRelation;
 use n2n\impl\persistence\orm\property\relation\JoinColumnToOneRelation;
 use hangar\api\ColumnDefaults;
 use hangar\api\CompatibilityLevel;
-use hangar\core\option\OrmRelationMagCollection;
 use phpbob\representation\PhpTypeDef;
 use phpbob\PhpbobUtils;
 
