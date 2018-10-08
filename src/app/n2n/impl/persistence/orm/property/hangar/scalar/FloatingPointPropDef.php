@@ -25,22 +25,23 @@ use n2n\util\config\Attributes;
 use hangar\api\DbInfo;
 use n2n\persistence\meta\structure\ColumnFactory;
 use hangar\api\PropSourceDef;
-use n2n\web\dispatch\mag\MagCollection;
 use n2n\impl\web\dispatch\mag\model\NumericMag;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\ArgUtils;
 use n2n\persistence\meta\structure\common\CommonFloatingPointColumn;
 use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use phpbob\representation\PhpTypeDef;
+use n2n\web\dispatch\mag\MagCollection;
+use n2n\persistence\meta\structure\Column;
 
 class FloatingPointPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_SIZE = 'size';
 	
-	public function getName() {
+	public function getName(): string {
 		return 'Floating Point';
 	}
 	
-	public function createMagCollection(PropSourceDef $propSourceDef = null) {
+	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		$optionCollection = new MagCollection();
 		
 		$size = $this->columnDefaults->getDefaultFloatingPointSize();
@@ -63,7 +64,7 @@ class FloatingPointPropDef extends ScalarPropDefAdapter {
 	 * @param PropSourceDef $propSourceDef
 	 * @return \n2n\persistence\meta\structure\Column
 	 */
-	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef) {
+	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): Column {
 		ArgUtils::assertTrue($entityProperty instanceof ScalarEntityProperty);
 	
 		return new CommonFloatingPointColumn($entityProperty->getColumnName(),

@@ -27,7 +27,6 @@ use n2n\persistence\orm\model\EntityModelFactory;
 use n2n\persistence\meta\structure\ColumnFactory;
 use n2n\util\config\Attributes;
 use hangar\api\PropSourceDef;
-use n2n\web\dispatch\mag\MagCollection;
 use n2n\impl\web\dispatch\mag\model\BoolMag;
 use n2n\persistence\meta\structure\Size;
 use n2n\impl\web\dispatch\mag\model\EnumMag;
@@ -37,16 +36,18 @@ use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use n2n\reflection\ArgUtils;
 use n2n\persistence\meta\structure\common\CommonIntegerColumn;
 use phpbob\representation\PhpTypeDef;
+use n2n\persistence\meta\structure\Column;
+use n2n\web\dispatch\mag\MagCollection;
 
 class IntegerPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_SIZE = 'size';
 	const PROP_NAME_SIGNED = 'signed';
 			
-	public function getName() {
+	public function getName(): string {
 		return 'Integer';
 	}
 
-	public function createMagCollection(PropSourceDef $propSourceDef = null) {
+	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		$optionCollection = new MagCollection();
 	
 		$size = $this->columnDefaults->getDefaultIntegerSize();
@@ -76,7 +77,7 @@ class IntegerPropDef extends ScalarPropDefAdapter {
 	 * @param EntityProperty $entityProperty
 	 * @return int
 	 */
-	public function testCompatibility(EntityProperty $entityProperty) {
+	public function testCompatibility(EntityProperty $entityProperty): int {
 		if ($entityProperty instanceof ScalarEntityProperty) {
 			switch ($entityProperty->getName()) {
 				case 'id':
@@ -94,7 +95,7 @@ class IntegerPropDef extends ScalarPropDefAdapter {
 	 * @param PropSourceDef $propSourceDef
 	 * @return \n2n\persistence\meta\structure\Column
 	 */
-	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef) {
+	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): Column {
 		ArgUtils::assertTrue($entityProperty instanceof ScalarEntityProperty);
 	
 		return new CommonIntegerColumn($entityProperty->getColumnName(),
@@ -102,8 +103,9 @@ class IntegerPropDef extends ScalarPropDefAdapter {
 				$this->determineSigned($propSourceDef->getHangarData()));
 	}
 	
-	protected function createColumn(EntityProperty $entityProperty, DbInfo $dbInfo, ColumnFactory $columnFactory, $columnName, Attributes $attributes) {
-		$columnFactory->createIntegerColumn($columnName, $this->determineSize($attributes), 
+	protected function createColumn(EntityProperty $entityProperty, DbInfo $dbInfo, 
+			ColumnFactory $columnFactory, $columnName, Attributes $attributes) {
+		$columnFactory->createIntegerColumn($columnName, $this->determineSize($attributes),
 				$this->determineSigned($attributes));
 		
 		if ($columnName == EntityModelFactory::DEFAULT_ID_PROPERTY_NAME) {

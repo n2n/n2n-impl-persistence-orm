@@ -24,7 +24,6 @@ namespace n2n\impl\persistence\orm\property\hangar\scalar;
 use n2n\util\config\Attributes;
 use n2n\persistence\meta\structure\ColumnFactory;
 use hangar\api\DbInfo;
-use n2n\web\dispatch\mag\MagCollection;
 use hangar\api\PropSourceDef;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\ArgUtils;
@@ -34,26 +33,26 @@ use hangar\api\CompatibilityLevel;
 use phpbob\representation\PhpTypeDef;
 use n2n\impl\persistence\orm\property\BoolEntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
+use n2n\web\dispatch\mag\MagCollection;
+use n2n\persistence\meta\structure\Column;
 
 class BooleanPropDef extends ScalarPropDefAdapter {
 	
-	public function getName() {
+	public function getName(): string {
 		return 'Boolean';
 	}
 
-	public function createMagCollection(PropSourceDef $propSourceDef = null) {
+	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		return new MagCollection();
 	}
 	
-	public function getEntityPropertyClass() {
+	public function getEntityPropertyClass(): \ReflectionClass {
 		return new \ReflectionClass(BoolEntityProperty::class);
 	}
 	
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->setPhpTypeDef(new PhpTypeDef('bool'));
 	}
-	
-	
 	
 	public function applyDbMeta(DbInfo $dbInfo, PropSourceDef $propSourceDef, EntityProperty $entityProperty,
 			AnnotationSet $annotationSet) {
@@ -71,7 +70,7 @@ class BooleanPropDef extends ScalarPropDefAdapter {
 	 * @param PropSourceDef $propSourceDef
 	 * @return \n2n\persistence\meta\structure\Column
 	 */
-	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef) {
+	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): Column {
 		ArgUtils::assertTrue($entityProperty instanceof BoolEntityProperty || $entityProperty instanceof ScalarEntityProperty);
 	
 		return new CommonIntegerColumn($entityProperty->getColumnName(), 1, false);
@@ -81,7 +80,7 @@ class BooleanPropDef extends ScalarPropDefAdapter {
 	 * @param EntityProperty $entityProperty
 	 * @return int
 	 */
-	public function testCompatibility(EntityProperty $entityProperty) {
+	public function testCompatibility(EntityProperty $entityProperty): int {
 		if ($entityProperty instanceof ScalarEntityProperty) {
 			if ($entityProperty->getName() === 'online') {
 				return CompatibilityLevel::COMMON;
@@ -91,7 +90,8 @@ class BooleanPropDef extends ScalarPropDefAdapter {
 		return parent::testCompatibility($entityProperty);
 	}
 	
-	protected function createColumn(EntityProperty $entityProperty, DbInfo $dbInfo, ColumnFactory $columnFactory, $columnName, Attributes $attributes) {
+	protected function createColumn(EntityProperty $entityProperty, DbInfo $dbInfo, 
+			ColumnFactory $columnFactory, $columnName, Attributes $attributes) {
 		$columnFactory->createIntegerColumn($columnName, 1, false);
 	}
 }

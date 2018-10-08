@@ -22,7 +22,6 @@
 namespace n2n\impl\persistence\orm\property\hangar\scalar;
 
 use hangar\api\PropSourceDef;
-use n2n\web\dispatch\mag\MagCollection;
 use n2n\util\config\Attributes;
 use hangar\api\DbInfo;
 use n2n\impl\web\dispatch\mag\model\NumericMag;
@@ -35,16 +34,18 @@ use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use hangar\api\CompatibilityLevel;
 use n2n\util\StringUtils;
 use phpbob\representation\PhpTypeDef;
+use n2n\web\dispatch\mag\MagCollection;
+use n2n\persistence\meta\structure\Column;
 
 class TextPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_SIZE = 'size';
 	const PROP_NAME_CHARSET = 'charset';
 	
-	public function getName() {
+	public function getName(): string {
 		return 'Text';
 	}
 
-	public function createMagCollection(PropSourceDef $propSourceDef = null) {
+	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		$magCollection = new MagCollection();
 		
 		$size = $this->columnDefaults->getDefaultTextSize();
@@ -70,7 +71,7 @@ class TextPropDef extends ScalarPropDefAdapter {
 	 * @param PropSourceDef $propSourceDef
 	 * @return \n2n\persistence\meta\structure\Column
 	 */
-	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef) {
+	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): Column {
 		ArgUtils::assertTrue($entityProperty instanceof ScalarEntityProperty);
 	
 		return new CommonTextColumn($entityProperty->getColumnName(),
@@ -82,7 +83,7 @@ class TextPropDef extends ScalarPropDefAdapter {
 	 * @param EntityProperty $entityProperty
 	 * @return int
 	 */
-	public function testCompatibility(EntityProperty $entityProperty) {
+	public function testCompatibility(EntityProperty $entityProperty): int {
 		if ($entityProperty instanceof ScalarEntityProperty) {
 			switch ($entityProperty->getName()) {
 				case 'description':

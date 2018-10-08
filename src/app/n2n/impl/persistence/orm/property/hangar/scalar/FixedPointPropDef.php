@@ -24,7 +24,6 @@ namespace n2n\impl\persistence\orm\property\hangar\scalar;
 use n2n\util\config\Attributes;
 use hangar\api\DbInfo;
 use n2n\persistence\meta\structure\ColumnFactory;
-use n2n\web\dispatch\mag\MagCollection;
 use hangar\api\PropSourceDef;
 use n2n\impl\web\dispatch\mag\model\NumericMag;
 use n2n\persistence\orm\property\EntityProperty;
@@ -33,12 +32,14 @@ use hangar\api\CompatibilityLevel;
 use n2n\reflection\ArgUtils;
 use n2n\persistence\meta\structure\common\CommonFixedPointColumn;
 use phpbob\representation\PhpTypeDef;
+use n2n\web\dispatch\mag\MagCollection;
+use n2n\persistence\meta\structure\Column;
 
 class FixedPointPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_NUM_INTEGER_DIGITS = 'num-integer-digits';
 	const PROP_NAME_NUM_DECIMAL_DIGITS = 'num-decimal-digits';
 	
-	public function getName() {
+	public function getName(): string {
 		return 'Fixed Point';
 	}
 
@@ -50,7 +51,7 @@ class FixedPointPropDef extends ScalarPropDefAdapter {
 	}
 	
 
-	public function createMagCollection(PropSourceDef $propSourceDef = null) {
+	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		$optionCollection = new MagCollection();
 	
 		$numIntegerDigits = $this->columnDefaults->getDefaultFixedPointNumIntegerDigits();
@@ -82,7 +83,7 @@ class FixedPointPropDef extends ScalarPropDefAdapter {
 	 * @param EntityProperty $entityProperty
 	 * @return int
 	 */
-	public function testCompatibility(EntityProperty $entityProperty) {
+	public function testCompatibility(EntityProperty $entityProperty): int {
 		if ($entityProperty instanceof ScalarEntityProperty) {
 			switch ($entityProperty->getName()) {
 				case 'lat':
@@ -99,7 +100,7 @@ class FixedPointPropDef extends ScalarPropDefAdapter {
 	 * @param PropSourceDef $propSourceDef
 	 * @return \n2n\persistence\meta\structure\Column
 	 */
-	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef) {
+	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): ?Column {
 		ArgUtils::assertTrue($entityProperty instanceof ScalarEntityProperty);
 	
 		return new CommonFixedPointColumn($entityProperty->getColumnName(), 

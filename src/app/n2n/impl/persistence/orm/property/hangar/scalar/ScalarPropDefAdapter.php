@@ -32,16 +32,19 @@ use n2n\reflection\ArgUtils;
 use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use hangar\api\ColumnDefaults;
 use hangar\api\CompatibilityLevel;
+use hangar\api\HuoContext;
 
 abstract class ScalarPropDefAdapter implements HangarPropDef {
 	
 	protected $columnDefaults;
+	protected $huoContext;
 	
-	public function setup(ColumnDefaults $columnDefaults) {
+	public function setup(HuoContext $huoContext, ColumnDefaults $columnDefaults) {
+		$this->huoContext = $huoContext;
 		$this->columnDefaults = $columnDefaults;
 	}
 	
-	public function getEntityPropertyClass() {
+	public function getEntityPropertyClass(): \ReflectionClass {
 		return new \ReflectionClass('n2n\impl\persistence\orm\property\ScalarEntityProperty');
 	}
 	
@@ -62,7 +65,7 @@ abstract class ScalarPropDefAdapter implements HangarPropDef {
 	 * @param EntityProperty $entityProperty
 	 * @return int
 	 */
-	public function testCompatibility(EntityProperty $entityProperty) {
+	public function testCompatibility(EntityProperty $entityProperty): int {
 		if ($entityProperty instanceof ScalarEntityProperty) {
 			return CompatibilityLevel::COMPATIBLE;
 		}
