@@ -33,12 +33,23 @@ use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use phpbob\representation\PhpTypeDef;
 use n2n\web\dispatch\mag\MagCollection;
 use n2n\persistence\meta\structure\Column;
+use phpbob\Phpbob;
+use hangar\api\CompatibilityLevel;
 
 class FloatingPointPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_SIZE = 'size';
 	
 	public function getName(): string {
 		return 'Floating Point';
+	}
+	
+	public function testSourceCompatibility(PropSourceDef $propSourceDef): int {
+		if (null === $propSourceDef->getPhpTypeDef() || $propSourceDef->getPhpTypeDef()->isFloat()) {
+			return parent::testSourceCompatibility($propSourceDef);
+		}
+		
+		return CompatibilityLevel::NOT_COMPATIBLE;
+		
 	}
 	
 	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
@@ -57,7 +68,7 @@ class FloatingPointPropDef extends ScalarPropDefAdapter {
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->getHangarData()->setAll(array(self::PROP_NAME_SIZE => 
 				$attributes->get(self::PROP_NAME_SIZE)));
-		$propSourceDef->setPhpTypeDef(new PhpTypeDef('float'));
+		$propSourceDef->setPhpTypeDef(new PhpTypeDef(Phpbob::TYPE_FLOAT));
 	}
 
 	/**

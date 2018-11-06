@@ -33,6 +33,7 @@ use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use hangar\api\ColumnDefaults;
 use hangar\api\CompatibilityLevel;
 use hangar\api\HuoContext;
+use phpbob\PhpbobUtils;
 
 abstract class ScalarPropDefAdapter implements HangarPropDef {
 	
@@ -44,10 +45,10 @@ abstract class ScalarPropDefAdapter implements HangarPropDef {
 		$this->columnDefaults = $columnDefaults;
 	}
 	
-	public function getEntityPropertyClass(): \ReflectionClass {
-		return new \ReflectionClass('n2n\impl\persistence\orm\property\ScalarEntityProperty');
-	}
-	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::applyDbMeta()
+	 */
 	public function applyDbMeta(DbInfo $dbInfo, PropSourceDef $propSourceDef, EntityProperty $entityProperty,
 			AnnotationSet $annotationSet) {
 		
@@ -62,14 +63,13 @@ abstract class ScalarPropDefAdapter implements HangarPropDef {
 	}
 
 	/**
-	 * @param EntityProperty $entityProperty
-	 * @return int
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::testCompatibility()
 	 */
-	public function testCompatibility(EntityProperty $entityProperty): int {
-		if ($entityProperty instanceof ScalarEntityProperty) {
-			return CompatibilityLevel::COMPATIBLE;
-		}
-	
+	public function testCompatibility(PropSourceDef $propSourceDef): int {
+		if ($propSourceDef->getPhpTypeDef() === null) return CompatibilityLevel::COMPATIBLE;
+		if (count(PhpbobUtils::explodeTypeName($propSourceDef->getPhpTypeDef()->determineUseTypeName())) === 1) return CompatibilityLevel::COMPATIBLE;
+		
 		return CompatibilityLevel::NOT_COMPATIBLE;
 	}
 	

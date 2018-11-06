@@ -33,10 +33,15 @@ use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use phpbob\representation\PhpTypeDef;
 use n2n\web\dispatch\mag\MagCollection;
 use n2n\persistence\meta\structure\Column;
+use hangar\api\CompatibilityLevel;
 
 class BinaryPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_SIZE = 'size';
 	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::getName()
+	 */
 	public function getName(): string {
 		return 'Binary'; 
 	}
@@ -47,6 +52,10 @@ class BinaryPropDef extends ScalarPropDefAdapter {
 				$attributes->get(self::PROP_NAME_SIZE, false, $this->columnDefaults->getDefaultBinarySize()));
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::createMagCollection()
+	 */
 	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		$optionCollection = new MagCollection();
 		
@@ -60,10 +69,26 @@ class BinaryPropDef extends ScalarPropDefAdapter {
 		return $optionCollection;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::updatePropSourceDef()
+	 */
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->getHangarData()->setAll(array(self::PROP_NAME_SIZE => 
 				$attributes->get(self::PROP_NAME_SIZE)));
 		$propSourceDef->setPhpTypeDef(new PhpTypeDef('string'));
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\impl\persistence\orm\property\hangar\scalar\ScalarPropDefAdapter::testSourceCompatibility()
+	 */
+	public function testSourceCompatibility(PropSourceDef $propSourceDef): int {
+		if (null === $propSourceDef->getPhpTypeDef() || $propSourceDef->getPhpTypeDef()->isString()) {
+			return CompatibilityLevel::COMPATIBLE;
+		}
+		
+		return CompatibilityLevel::NOT_COMPATIBLE;
 	}
 
 	/**

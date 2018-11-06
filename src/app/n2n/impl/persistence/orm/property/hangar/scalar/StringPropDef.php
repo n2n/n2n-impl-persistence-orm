@@ -34,6 +34,7 @@ use n2n\persistence\meta\structure\common\CommonStringColumn;
 use phpbob\representation\PhpTypeDef;
 use n2n\web\dispatch\mag\MagCollection;
 use n2n\persistence\meta\structure\Column;
+use hangar\api\CompatibilityLevel;
 
 class StringPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_LENGTH = 'length';
@@ -66,16 +67,16 @@ class StringPropDef extends ScalarPropDefAdapter {
 		$propSourceDef->setPhpTypeDef(new PhpTypeDef('string'));
 	}
 	
-	/**
-	 * @param EntityProperty $entityProperty
-	 * @return int
-	 */
-	public function testCompatibility(EntityProperty $entityProperty): int {
-		if ($entityProperty instanceof ScalarEntityProperty) {
+	public function testCompatibility(PropSourceDef $propSourceDef): int {
+		if (null === $propSourceDef->getPhpTypeDef() || $propSourceDef->getPhpTypeDef()->isString()) {
+			if (null !== $propSourceDef->getPhpTypeDef()) {
+				return CompatibilityLevel::COMMON;
+			}
+			
 			return 2;
 		}
-	
-		return parent::testCompatibility($entityProperty);
+		
+		return CompatibilityLevel::NOT_COMPATIBLE;
 	}
 	
 	/**

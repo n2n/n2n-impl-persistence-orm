@@ -36,6 +36,7 @@ use phpbob\representation\PhpTypeDef;
 use hangar\api\HuoContext;
 use n2n\persistence\meta\structure\Column;
 use n2n\web\dispatch\mag\MagCollection;
+use n2n\persistence\orm\annotation\AnnoDateTime;
 
 class DateTimePropDef implements HangarPropDef {
 	
@@ -45,18 +46,35 @@ class DateTimePropDef implements HangarPropDef {
 		$this->columnDefaults = $columnDefaults;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::getName()
+	 */
 	public function getName(): string {
 		return 'DateTime';
 	}
 	
-	public function getEntityPropertyClass(): \ReflectionClass {
-		return new \ReflectionClass('n2n\impl\persistence\orm\property\DateTimeEntityProperty');
-	}
-	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::createMagCollection()
+	 */
 	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		return new MagCollection();
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::resetPropSourceDef()
+	 */
+	public function resetPropSourceDef(PropSourceDef $propSourceDef) {
+		$propSourceDef->removePhpPropertyAnno(AnnoDateTime::class);
+		$propSourceDef->removePhpUse(AnnoDateTime::class);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::updatePropSourceDef()
+	 */
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->setPhpTypeDef(new PhpTypeDef('\DateTime'));
 	}
@@ -79,6 +97,7 @@ class DateTimePropDef implements HangarPropDef {
 	 */
 	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): ?Column {
 		ArgUtils::assertTrue($entityProperty instanceof DateTimeEntityProperty);
+		
 		return new MysqlDateTimeColumn($entityProperty->getColumnName(), true, true);
 	}
 	
@@ -86,17 +105,11 @@ class DateTimePropDef implements HangarPropDef {
 	 * {@inheritDoc}
 	 * @see \hangar\api\HangarPropDef::testCompatibility()
 	 */
-	public function testCompatibility(EntityProperty $entityProperty): int {
-		if ($entityProperty instanceof DateTimeEntityProperty) return CompatibilityLevel::COMMON;
+	public function testCompatibility(PropSourceDef $propSourceDef): int {
+		if ($propSourceDef->hasPhpPropertyAnno(AnnoDateTime::class)) return CompatibilityLevel::COMMON;
+		if (null !== ($phpTypeDef = $propSourceDef->getPhpTypeDef()) && 
+				$phpTypeDef->getLocalName() === \DateTime::class) return CompatibilityLevel::COMMON; 
 		
 		return CompatibilityLevel::NOT_COMPATIBLE; 
 	}
-	
-    /**
-     * {@inheritDoc}
-     * @see \hangar\api\HangarPropDef::resetPropSourceDef()
-     */
-    public function resetPropSourceDef(PropSourceDef $propSourceDef) {
-        
-    }
 }

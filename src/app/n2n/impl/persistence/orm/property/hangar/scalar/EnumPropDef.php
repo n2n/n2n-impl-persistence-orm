@@ -33,6 +33,7 @@ use n2n\persistence\meta\structure\common\CommonEnumColumn;
 use phpbob\representation\PhpTypeDef;
 use n2n\web\dispatch\mag\MagCollection;
 use n2n\persistence\meta\structure\Column;
+use hangar\api\CompatibilityLevel;
 
 class EnumPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_VALUES = 'values';
@@ -46,6 +47,10 @@ class EnumPropDef extends ScalarPropDefAdapter {
 		$columnFactory->createEnumColumn($columnName, $this->getValues($attributes));
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::createMagCollection()
+	 */
 	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		$optionCollection = new MagCollection();
 	
@@ -59,10 +64,26 @@ class EnumPropDef extends ScalarPropDefAdapter {
 		return $optionCollection;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::updatePropSourceDef()
+	 */
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->getHangarData()->setAll(array(self::PROP_NAME_VALUES => 
 				$attributes->get(self::PROP_NAME_VALUES)));
 		$propSourceDef->setPhpTypeDef(new PhpTypeDef('string'));
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\impl\persistence\orm\property\hangar\scalar\ScalarPropDefAdapter::testSourceCompatibility()
+	 */
+	public function testCompatibility(PropSourceDef $propSourceDef): int {
+		if (null === $propSourceDef->getPhpTypeDef() || $propSourceDef->getPhpTypeDef()->isString()) {
+			return CompatibilityLevel::COMPATIBLE;
+		}
+		
+		return CompatibilityLevel::NOT_COMPATIBLE;
 	}
 	
 	/**

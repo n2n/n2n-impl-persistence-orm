@@ -37,6 +37,7 @@ use hangar\api\CompatibilityLevel;
 use phpbob\representation\PhpTypeDef;
 use hangar\api\HuoContext;
 use n2n\persistence\meta\structure\Column;
+use n2n\persistence\orm\annotation\AnnoN2nLocale;
 
 class N2nLocalePropDef implements HangarPropDef {
 	const DEFAULT_LOCALE_COLUMN_LENGTH = '12';
@@ -51,10 +52,6 @@ class N2nLocalePropDef implements HangarPropDef {
 		return 'N2nLocale';
 	}
 	
-	public function getEntityPropertyClass(): \ReflectionClass {
-		return new \ReflectionClass(N2nLocaleEntityProperty::class);
-	}
-	
 	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		return new MagCollection();
 	}
@@ -64,7 +61,9 @@ class N2nLocalePropDef implements HangarPropDef {
 	 * @see \hangar\api\HangarPropDef::resetPropSourceDef()
 	 */
 	public function resetPropSourceDef(PropSourceDef $propSourceDef) {
-	    
+	    $propSourceDef->removePhpPropertyAnno(AnnoN2nLocale::class);
+	    $propSourceDef->removePhpUse(AnnoN2nLocale::class);
+	    $propSourceDef->removePhpUse(N2nLocale::class);
 	}
 	
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
@@ -84,7 +83,6 @@ class N2nLocalePropDef implements HangarPropDef {
 		$dbInfo->getTable()->createColumnFactory()
 				->createStringColumn($columnName, self::DEFAULT_LOCALE_COLUMN_LENGTH);
 	}
-	
 
 	/**
 	 * @param PropSourceDef $propSourceDef
@@ -96,12 +94,14 @@ class N2nLocalePropDef implements HangarPropDef {
 	}
 	
 	/**
-	 * @param EntityProperty $entityProperty
-	 * @return int
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::testCompatibility()
 	 */
-	public function testCompatibility(EntityProperty $entityProperty): int {
-		if ($entityProperty instanceof N2nLocaleEntityProperty) return CompatibilityLevel::COMMON;
-	
+	public function testCompatibility(PropSourceDef $propSourceDef): int {
+		if ($propSourceDef->hasPhpPropertyAnno(AnnoN2nLocale::class)) return CompatibilityLevel::COMMON;
+		if (null !== ($phpTypeDef = $propSourceDef->getPhpTypeDef()) && 
+				$phpTypeDef->getTypeName() === N2nLocale::class) return CompatibilityLevel::COMMON;
+		
 		return CompatibilityLevel::NOT_COMPATIBLE;
 	}
 }

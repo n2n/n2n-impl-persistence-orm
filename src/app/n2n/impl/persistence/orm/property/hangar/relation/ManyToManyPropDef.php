@@ -34,7 +34,6 @@ use n2n\reflection\CastUtils;
 use n2n\impl\persistence\orm\property\relation\JoinTableToManyRelation;
 use n2n\persistence\meta\structure\IndexType;
 use hangar\api\ColumnDefaults;
-use n2n\impl\persistence\orm\property\ToManyEntityProperty;
 use hangar\api\CompatibilityLevel;
 use phpbob\PhpbobUtils;
 use phpbob\representation\PhpTypeDef;
@@ -52,45 +51,85 @@ class ManyToManyPropDef implements HangarPropDef {
 		$this->huoContext = $huoContext;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::getName()
+	 */
 	public function getName(): string {
 		return 'ManyToMany';
 	}
 
-	public function getEntityPropertyClass(): \ReflectionClass {
-		return new \ReflectionClass('n2n\impl\persistence\orm\property\ToManyEntityProperty');
-	}
-
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::createMagCollection()
+	 */
 	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		$magCollection = new OrmRelationMagCollection($this->huoContext->getEntityModelManager());
 		
 		
 		if (null !== $propSourceDef) {
-			$propertyAnnoCollection = $propSourceDef->getPhpProperty()->getPhpPropertyAnnoCollection();
-			if ($propertyAnnoCollection->hasPhpAnno(AnnoManyToMany::class)) {
-				$phpAnnotation = $propertyAnnoCollection->getPhpAnno(AnnoManyToMany::class);
-				if (null !== $phpAnnotation &&
-						null !== $annotManyToMany = $phpAnnotation->determineAnnotation()) {
-					CastUtils::assertTrue($annotManyToMany instanceof AnnoManyToMany);
-					$magCollection->setValuesByAnnotation($annotManyToMany);
+			if ($propSourceDef->hasPhpPropertyAnno(AnnoManyToMany::class)) {
+				$phpAnnotation = $propSourceDef->getPhpPropertyAnno(AnnoManyToMany::class);
+				
+				$localName = OrmRelationMagCollection::determineLocalName($phpAnnotation->getPhpAnnoParam(1));
+				$magCollection->setTargetEntityClasName($propSourceDef->determineTypeName($localName) ?? $localName);
+				
+				if ($phpAnnotation->hasPhpAnnoParam(2)) {
+					$magCollection->setMappedBy($phpAnnotation->getPhpAnnoParam(2)->getStringValue());
+				}
+				
+				if ($phpAnnotation->hasPhpAnnoParam(3)) {
+					$magCollection->setCascadeTypes(
+							OrmRelationMagCollection::determineCascadeTypes($phpAnnotation->getPhpAnnoParam(3)));
+				}
+				
+				if ($phpAnnotation->hasPhpAnnoParam(4)) {
+					$magCollection->setFetchType(
+							OrmRelationMagCollection::determineFetchType($phpAnnotation->getPhpAnnoParam(4)));
 				}
 			}
 		}
 		
 		return $magCollection;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::resetPropSourceDef()
+	 */
+	public function resetPropSourceDef(PropSourceDef $propSourceDef) {
+		$propSourceDef->setArrayLikePhpTypeDef(null);
+		
+		if ($propSourceDef->hasPhpPropertyAnno(AnnoManyToMany::class)) {
+			$phpAnno = $propSourceDef->getPhpPropertyAnno(AnnoManyToMany::class);
+			
+			$localName = OrmRelationMagCollection::determineLocalName($phpAnno->getPhpAnnoParam(1));
+			$typeName = $propSourceDef->determineTypeName($localName);
+			if (null === $typeName && null !== ($phpTypeDef = $propSourceDef->getArrayLikePhpTypeDef())) {
+				$typeName = $phpTypeDef->getTypeName();
+			}
+			
+			$propSourceDef->removePhpUse($typeName);
+			$propSourceDef->removePhpPropertyAnno(AnnoManyToMany::class);
+			$propSourceDef->removePhpUse(AnnoManyToMany::class);
+		}
+	}
 
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::updatePropSourceDef()
+	 */
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->getHangarData()->setAll($attributes->toArray());
 		
 		$targetEntityTypeName = $attributes->get(OrmRelationMagCollection::PROP_NAME_TARGET_ENTITY_CLASS);
 		$propSourceDef->setArrayLikePhpTypeDef(PhpTypeDef::fromTypeName($targetEntityTypeName));
 		$propSourceDef->setPhpTypeDef(null);
-		$phpProperty = $propSourceDef->getPhpProperty();
-		$propertyAnnoCollection = $phpProperty->getPhpPropertyAnnoCollection();
-		$anno = $propertyAnnoCollection->getOrCreatePhpAnno(AnnoManyToMany::class);
+		
+		$anno = $propSourceDef->getOrCreatePhpPropertyAnno(AnnoManyToMany::class);
 		$anno->resetPhpAnnoParams();
 		$anno->createPhpAnnoParam(PhpbobUtils::extractClassName($targetEntityTypeName) . '::getClass()');
-		$phpProperty->createPhpUse($targetEntityTypeName);
+		$propSourceDef->createPhpUse($targetEntityTypeName);
 		
 		$cascadeTypeValue = OrmRelationMagCollection::buildCascadeTypeAnnoParam(
 				$attributes->get(OrmRelationMagCollection::PROP_NAME_CASCADE_TYPE));
@@ -159,37 +198,15 @@ class ManyToManyPropDef implements HangarPropDef {
 	}
 	
 	/**
-	 * @param EntityProperty $entityProperty
-	 * @return int
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::testSourceCompatibility()
 	 */
-	public function testCompatibility(EntityProperty $entityProperty): int {
-		if ($entityProperty instanceof ToManyEntityProperty 
-				&& $entityProperty->getType() == RelationEntityProperty::TYPE_MANY_TO_MANY) {
+	public function testCompatibility(PropSourceDef $propSourceDef): int {
+		$propertyAnnoCollection = $propSourceDef->getPhpProperty()->getPhpPropertyAnnoCollection();
+		if ($propertyAnnoCollection->hasPhpAnno(AnnoManyToMany::class)) {
 			return CompatibilityLevel::COMMON;
 		}
-	
+		
 		return CompatibilityLevel::NOT_COMPATIBLE;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see \hangar\api\HangarPropDef::resetPropSourceDef()
-	 */
-	public function resetPropSourceDef(PropSourceDef $propSourceDef) {
-		$phpProperty = $propSourceDef->getPhpProperty();
-		$propSourceDef->setArrayLikePhpTypeDef(null);
-		$phpPropertyAnnoCollection = $phpProperty->getPhpPropertyAnnoCollection();
-		if ($phpPropertyAnnoCollection->hasPhpAnno(AnnoManyToMany::class)) {
-			$phpAnno = $phpPropertyAnnoCollection->getPhpAnno(AnnoManyToMany::class);
-			if (null !== ($annoManyToMany = $phpAnno->determineAnnotation())) {
-				CastUtils::assertTrue($annoManyToMany instanceof AnnoManyToMany);
-				$phpProperty->removePhpUse($annoManyToMany->getTargetEntityClass()->getName());		
-			}
-			
-			//@todo try to findout TargetClassName without Annotation
-			
-			$phpPropertyAnnoCollection->removePhpAnno(AnnoManyToMany::class);
-			$phpProperty->removePhpUse(AnnoManyToMany::class);
-		}
 	}
 }
