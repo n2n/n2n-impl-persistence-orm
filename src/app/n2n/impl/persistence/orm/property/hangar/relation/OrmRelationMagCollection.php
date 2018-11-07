@@ -22,21 +22,23 @@
 namespace n2n\impl\persistence\orm\property\hangar\relation;
 
 use n2n\web\dispatch\map\bind\BindingDefinition;
-use n2n\web\dispatch\map\bind\BindingErrors;
 use n2n\impl\web\dispatch\mag\model\EnumMag;
 use n2n\impl\web\dispatch\mag\model\MultiSelectMag;
 use n2n\impl\web\dispatch\mag\model\BoolMag;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\CascadeType;
 use n2n\persistence\orm\FetchType;
-use n2n\persistence\orm\annotation\OrmRelationAnnotation;
-use n2n\persistence\orm\annotation\MappableOrmRelationAnnotation;
 use n2n\persistence\orm\annotation\AnnoOneToMany;
 use n2n\persistence\orm\annotation\AnnoOneToOne;
 use n2n\util\StringUtils;
 use n2n\core\N2N;
 use n2n\persistence\orm\model\EntityModelManager;
 use n2n\web\dispatch\mag\MagCollection;
+use hangar\util\EntityUtils;
+use n2n\persistence\orm\annotation\AnnoManyToMany;
+use phpbob\representation\PhpClass;
+use n2n\reflection\ReflectionUtils;
+use n2n\impl\web\dispatch\mag\model\StringMag;
 
 class OrmRelationMagCollection extends MagCollection {
 	const PROP_NAME_TARGET_ENTITY_CLASS = 'targetEntityClass';
@@ -50,8 +52,6 @@ class OrmRelationMagCollection extends MagCollection {
 	private $mappedByOptions = [];
 	
 	public function __construct(EntityModelManager $emm, bool $addMappedBy = true, bool $addOrphanRemoval = false) {
-		$entityClassNames = N2N::getAppConfig()->orm()->getEntityClassNames();
-		
 		$this->targetEntityClassOptions = [];
 		foreach ($emm->getRegisteredClassNames() as $entityClassName) {
 			$this->targetEntityClassOptions[$entityClassName] = $entityClassName;
@@ -64,20 +64,32 @@ class OrmRelationMagCollection extends MagCollection {
 		
 		if ($addMappedBy) {
 			foreach ($this->targetEntityClassOptions as $entityClassName) {
-				$entityModel = $emm->getEntityModelByClass(new \ReflectionClass($entityClassName));
-				foreach ($entityModel->getEntityProperties() as $entityProperty) {
-					if (!$entityProperty->hasTargetEntityModel()) continue;
+				$entityClassDef = EntityUtils::createClassDef($entityClassName, false, false);
+				$phpClass = $entityClassDef->getPhpClass();
+				foreach ($entityClassDef->getPropertyNames() as $propertyName) {
+					$phpAnnoCollection = $phpClass->getPhpAnnotationSet()->getOrCreatePhpPropertyAnnoCollection($propertyName);
+					$phpAnno = null;
+					if ($phpAnnoCollection->hasPhpAnno(AnnoOneToMany::class)) {
+						$phpAnno = $phpAnnoCollection->getPhpAnno(AnnoOneToMany::class);
+					} elseif ($phpAnnoCollection->hasPhpAnno(AnnoManyToMany::class)) {
+						$phpAnno = $phpAnnoCollection->getPhpAnno(AnnoManyToMany::class);
+					} elseif ($phpAnnoCollection->hasPhpAnno(AnnoOneToOne::class)) {
+						$phpAnno = $phpAnnoCollection->getPhpAnno(AnnoOneToOne::class);
+					}
 					
-					$this->groupedMappedByOptions[$entityClassName][$entityProperty->getName()] = $entityProperty->getTargetEntityModel()->getClass()->getName();
-					$this->mappedByOptions[$entityProperty->getName()] = $entityProperty->getName();
+					if (null === $phpAnno) continue;
+					
+					$this->groupedMappedByOptions[$entityClassName][$propertyName] = $phpClass->determineTypeName($phpAnno->getPhpAnnoParam(1));
+					$this->mappedByOptions[$propertyName] = $propertyName;
 				}
 			}
 			
 			$this->addMag(self::PROP_NAME_MAPPED_BY, 
-					new EnumMag('Mapped By', $this->mappedByOptions, null, false,
+					new StringMag('Mapped By', null, false, null, false,
+							array('class' => 'hangar-orm-relation-mapped-by-container'),
 							array('class' => 'hangar-orm-relation-mapped-by', 
-									'data-grouped-options' => StringUtils::jsonEncode($this->groupedMappedByOptions)), 
-							array('class' => 'hangar-orm-relation-mapped-by-container')));
+									'data-grouped-options' => StringUtils::jsonEncode($this->groupedMappedByOptions),
+									'data-mapped-by-options' => StringUtils::jsonEncode($this->mappedByOptions))));
 		}
 		
 		$this->addMag(OrmRelationMagCollection::PROP_NAME_CASCADE_TYPE, 
@@ -111,16 +123,16 @@ class OrmRelationMagCollection extends MagCollection {
 	public function setupBindingDefinition(BindingDefinition $bd) {
 		parent::setupBindingDefinition($bd);
 		
-		if ($this->containsPropertyName(self::PROP_NAME_MAPPED_BY)) {
-			$that = $this;
-			$bd->closure(function($targetEntityClass, $mappedBy, BindingErrors $be) use ($that) {
-				if (!$mappedBy) return;
-				if (isset($that->groupedMappedByOptions[$targetEntityClass][$mappedBy])) return;
-				//@todo check TargetEntityClassName
+// 		if ($this->containsPropertyName(self::PROP_NAME_MAPPED_BY)) {
+// 			$that = $this;
+// 			$bd->closure(function($targetEntityClass, $mappedBy, BindingErrors $be) use ($that) {
+// 				if (!$mappedBy) return;
+// 				if (isset($that->groupedMappedByOptions[$targetEntityClass][$mappedBy])) return;
+// 				//@todo check TargetEntityClassName
 				
-				$be->addError(self::PROP_NAME_MAPPED_BY, 'Invalid mapped by property name');
-			});
-		}
+// 				$be->addError(self::PROP_NAME_MAPPED_BY, 'Invalid mapped by property name');
+// 			});
+// 		}
 	}
 	
 
@@ -142,6 +154,27 @@ class OrmRelationMagCollection extends MagCollection {
 	
 	public function setOrphanRemoval(bool $orphanRemoval) {
 		$this->getMagByPropertyName(self::PROP_NAME_ORPHAN_REMOVAL)->setValue($orphanRemoval);
+	}
+	
+	public static function buildFetchTypeAnnoParam($fetchType, $addTypeName = true) {
+		switch ($fetchType) {
+			case FetchType::LAZY:
+				return null;
+			case FetchType::EAGER:
+				return '\n2n\persistence\orm\FetchType::EAGER';
+			default:
+				throw new IllegalStateException('Invalid fetch Type: ' . $fetchType);
+		}
+	}
+	
+	public static function getCascadeTypeOptions() {
+		return array(CascadeType::PERSIST => 'PERSIST',
+				CascadeType::MERGE => 'MERGE', CascadeType::REMOVE => 'REMOVE', CascadeType::REFRESH => 'REFRESH',
+				CascadeType::DETACH => 'DETACH');
+	}
+	
+	public static function getFetchTypeOptions() {
+		return array(FetchType::EAGER => 'Eager', FetchType::LAZY => 'Lazy');
 	}
 	
 	public static function buildCascadeTypeAnnoParam(array $cascadeTypes, $addTypeName = true) {
@@ -182,42 +215,7 @@ class OrmRelationMagCollection extends MagCollection {
 		
 		return implode('|', $nameParts);
 	}
-	
-	public static function buildFetchTypeAnnoParam($fetchType, $addTypeName = true) {
-		switch ($fetchType) {
-			case FetchType::LAZY:
-				return null;
-			case FetchType::EAGER:
-				return '\n2n\persistence\orm\FetchType::EAGER';
-			default:
-				throw new IllegalStateException('Invalid fetch Type: ' . $fetchType);
-		}
-	}
-	
-	public static function getCascadeTypeOptions() {
-		return array(CascadeType::PERSIST => 'PERSIST',
-				CascadeType::MERGE => 'MERGE', CascadeType::REMOVE => 'REMOVE', CascadeType::REFRESH => 'REFRESH',
-				CascadeType::DETACH => 'DETACH');
-	}
-	
-	public static function getFetchTypeOptions() {
-		return array(FetchType::EAGER => 'Eager', FetchType::LAZY => 'Lazy');
-	}
-	
-	public function setValuesByAnnotation(OrmRelationAnnotation $annotation) {
-		$this->setCascadeTypes(self::buildCascadeTypes($annotation->getCascadeType()));
-		$this->setFetchType($annotation->getFetchType());
-		$this->setTargetEntityClasName($annotation->getTargetEntityClass()->getName());
-		
-		if ($annotation instanceof MappableOrmRelationAnnotation && null !== $annotation->getMappedBy()) {
-			$this->setMappedBy($annotation->getMappedBy());
-		}
-		
-		if ($annotation instanceof AnnoOneToMany || $annotation instanceof AnnoOneToOne) {
-			$this->setOrphanRemoval($annotation->isOrphanRemoval());
-		}
-	}
-	
+
 	private static function buildCascadeTypes($cascadeType) {
 		$cascadeTypes = array();
 		if ($cascadeType & CascadeType::DETACH) {
@@ -239,8 +237,88 @@ class OrmRelationMagCollection extends MagCollection {
 		if ($cascadeType & CascadeType::REMOVE) {
 			$cascadeTypes[CascadeType::REMOVE] = CascadeType::REMOVE;
 		}
+		
 		return $cascadeTypes;
 	}
 	
+	public static function determineLocalName(string $param) {
+		if (StringUtils::endsWith('::getClass()', $param)) {
+			return mb_substr($param, 0, -12);
+		}
+		
+		$reflClassParam = null;
+		if (StringUtils::startsWith('new \ReflectionClass(', $param)) {
+			$reflClassParam = mb_substr($param, 21, -1);
+		} else if (StringUtils::startsWith('ReflectionUtils::createReflectionClass(', $param)) {
+			$reflClassParam = mb_substr($param, 39, -1);
+		}
+		
+		if (null !== $reflClassParam) {
+			if (StringUtils::startsWith('\'', $reflClassParam)) {
+				return mb_substr($reflClassParam, 1, -1);
+			}
+			
+			if (StringUtils::endsWith('::class', $reflClassParam)) {
+				return mb_substr($reflClassParam, 0, -7);
+			}
+		}
+		
+		throw new \InvalidArgumentException('Invalid Reflection Class Param given.');
+	}
 	
+	public static function determineCascadeTypes(string $param) {
+		if ('null' === $param) return [];
+		
+		$cascadeTypes = [];
+		foreach (explode('|', $param) as $paramPart) {
+			switch ($paramPart) {
+				case 'CascadeType::DETACH':
+				case '\n2n\persistence\orm\CascadeType::DETACH':
+					$cascadeTypes[CascadeType::DETACH] = CascadeType::DETACH;
+					break;
+				case 'CascadeType::MERGE':
+				case '\n2n\persistence\orm\CascadeType::MERGE':
+					$cascadeTypes[CascadeType::MERGE] = CascadeType::MERGE;
+					break;
+				case 'CascadeType::PERSIST':
+				case '\n2n\persistence\orm\CascadeType::PERSIST':
+					$cascadeTypes[CascadeType::PERSIST] = CascadeType::PERSIST;
+					break;
+				case 'CascadeType::REFRESH':
+				case '\n2n\persistence\orm\CascadeType::REFRESH':
+					$cascadeTypes[CascadeType::REFRESH] = CascadeType::REFRESH;
+					break;
+				case 'CascadeType::REMOVE':
+				case '\n2n\persistence\orm\CascadeType::REMOVE':
+					$cascadeTypes[CascadeType::REMOVE] = CascadeType::REMOVE;
+					break;
+				case 'CascadeType::ALL':
+				case '\n2n\persistence\orm\CascadeType::ALL':
+					$cascadeTypes[CascadeType::DETACH] = CascadeType::DETACH;
+					$cascadeTypes[CascadeType::MERGE] = CascadeType::MERGE;
+					$cascadeTypes[CascadeType::PERSIST] = CascadeType::PERSIST;
+					$cascadeTypes[CascadeType::REFRESH] = CascadeType::REFRESH;
+					$cascadeTypes[CascadeType::REMOVE] = CascadeType::REMOVE;
+					break;
+				default: 
+					throw new \InvalidArgumentException('Invalid cascade type param given: ' . $paramPart);
+			}
+		}
+		return $cascadeTypes;
+	}
+	
+	public static function determineFetchType(string $param) {
+		if ('null' === $param) return FetchType::LAZY;
+		
+		switch ($param) {
+			case 'FetchType::EAGER':
+			case '\n2n\persistence\orm\FetchType::EAGER':
+				return FetchType::EAGER;
+			case 'FetchType::LAZY':
+			case '\n2n\persistence\orm\FetchType::LAZY':
+				return FetchType::LAZY;
+		}
+		
+		throw new \InvalidArgumentException('Invalid fetch type param given: ' . $param);
+	}
 }

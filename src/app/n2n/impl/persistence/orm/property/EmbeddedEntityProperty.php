@@ -44,6 +44,8 @@ use n2n\persistence\orm\EntityManager;
 use n2n\persistence\meta\data\QueryComparator;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\meta\data\QueryItem;
+use n2n\persistence\orm\store\ValueHash;
+use n2n\persistence\orm\store\CommonValueHash;
 
 class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComparableEntityProperty, 
 		EntityPropertyCollection, JoinableEntityProperty {
@@ -55,7 +57,18 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 		$this->targetClass = $targetClass;
 	}
 	
+	/**
+	 * @return \ReflectionClass
+	 */
 	public function getTargetClass() {
+		return $this->targetClass;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\persistence\orm\model\EntityPropertyCollection::getClass()
+	 */
+	public function getClass(): \ReflectionClass {
 		return $this->targetClass;
 	}
 		
@@ -118,7 +131,7 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
 	 */
-	public function supplyPersistAction($object, $valueHash, PersistAction $persistingJob) {
+	public function supplyPersistAction(PersistAction $persistingJob, $object, ValueHash $valueHash, ?ValueHash $oldValueHash) {
 		ArgUtils::assertTrue($valueHash === null || is_array($valueHash));
 		
 		foreach ($this->properties as $propertyName => $property)  {
@@ -139,8 +152,10 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyRemoveAction()
 	 */
-	public function supplyRemoveAction($object, $valueHash, RemoveAction $removeAction) {
-		ArgUtils::assertTrue($valueHash === null || is_array($valueHash));
+	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
+		ArgUtils::assertTrue($oldValueHash instanceof CommonValueHash);
+		
+		$valueHash = $oldValueHash->getHash();
 		
 		foreach ($this->properties as $propertyName => $property)  {
 			$propertyValue = $property->readValue($object);
@@ -157,14 +172,14 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
 	 */
-	public function createValueHash($value, EntityManager $em) {
-		if ($value === null) return null;
+	public function createValueHash($value, EntityManager $em): ValueHash {
+		if ($value === null) return new CommonValueHash(null);
 		
 		$valueHash = array();
 		foreach ($this->properties as $propertyName => $property)  {
 			$valueHash[$propertyName] = $property->readValue($value);
 		}
-		return $valueHash;
+		return new CommonValueHash($valueHash);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\JoinableEntityProperty::createJoinTreePoint()
@@ -180,6 +195,11 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	public function getEmbeddedEntityPropertyCollection(): EntityPropertyCollection {
 		return $this;
 	}
+	
+	public function getAvailableJoinTypes(): array {
+		return [JoinType::INNER];
+	}
+
 }
 
 class EmbeddedTreePoint extends ExtendableTreePoint implements JoinedTreePoint {

@@ -75,25 +75,32 @@ class FixedPointPropDef extends ScalarPropDefAdapter {
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->getHangarData()->setAll(
 				array(self::PROP_NAME_NUM_DECIMAL_DIGITS => $attributes->get(self::PROP_NAME_NUM_DECIMAL_DIGITS),
-						self::PROP_NAME_NUM_INTEGER_DIGITS => $attributes->get(self::PROP_NAME_NUM_DECIMAL_DIGITS)));
+						self::PROP_NAME_NUM_INTEGER_DIGITS => $attributes->get(self::PROP_NAME_NUM_INTEGER_DIGITS)));
 		$propSourceDef->setPhpTypeDef(new PhpTypeDef('float'));
 	}
-	
+
 	/**
-	 * @param EntityProperty $entityProperty
-	 * @return int
+	 * {@inheritDoc}
+	 * @see \n2n\impl\persistence\orm\property\hangar\scalar\ScalarPropDefAdapter::testSourceCompatibility()
 	 */
-	public function testCompatibility(EntityProperty $entityProperty): int {
-		if ($entityProperty instanceof ScalarEntityProperty) {
-			switch ($entityProperty->getName()) {
+	public function testCompatibility(PropSourceDef $propSourceDef): int {
+		$phpTypeDef = $propSourceDef->getPhpTypeDef();
+		if ($phpTypeDef === null || $phpTypeDef->isFloat()) {
+			if (null !== $phpTypeDef) {
+				return 2;
+			}
+				
+			switch ($propSourceDef->getPropertyName()) {
 				case 'lat':
 				case 'lng':
 				case 'currency':
 					return CompatibilityLevel::COMMON;
 			}
+			
+			return parent::testCompatibility($propSourceDef);
 		}
 	
-		return parent::testCompatibility($entityProperty);
+		return CompatibilityLevel::NOT_COMPATIBLE;
 	}
 	
 	/**

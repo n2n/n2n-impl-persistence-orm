@@ -38,22 +38,34 @@ use n2n\persistence\meta\structure\Column;
 
 class BooleanPropDef extends ScalarPropDefAdapter {
 	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::getName()
+	 */
 	public function getName(): string {
 		return 'Boolean';
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::createMagCollection()
+	 */
 	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		return new MagCollection();
 	}
 	
-	public function getEntityPropertyClass(): \ReflectionClass {
-		return new \ReflectionClass(BoolEntityProperty::class);
-	}
-	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::updatePropSourceDef()
+	 */
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->setPhpTypeDef(new PhpTypeDef('bool'));
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\impl\persistence\orm\property\hangar\scalar\ScalarPropDefAdapter::applyDbMeta()
+	 */
 	public function applyDbMeta(DbInfo $dbInfo, PropSourceDef $propSourceDef, EntityProperty $entityProperty,
 			AnnotationSet $annotationSet) {
 				
@@ -77,17 +89,19 @@ class BooleanPropDef extends ScalarPropDefAdapter {
 	}
 	
 	/**
-	 * @param EntityProperty $entityProperty
-	 * @return int
+	 * {@inheritDoc}
+	 * @see \n2n\impl\persistence\orm\property\hangar\scalar\ScalarPropDefAdapter::testSourceCompatibility()
 	 */
-	public function testCompatibility(EntityProperty $entityProperty): int {
-		if ($entityProperty instanceof ScalarEntityProperty) {
-			if ($entityProperty->getName() === 'online') {
+	public function testCompatibility(PropSourceDef $propSourceDef): int {
+		if (null === $propSourceDef->getPhpTypeDef() || $propSourceDef->getPhpTypeDef()->isBool()) {
+			if (null === $propSourceDef || $propSourceDef->getPropertyName() === 'online') {
 				return CompatibilityLevel::COMMON;
 			}
+			
+			return parent::testCompatibility($propSourceDef);
 		}
-
-		return parent::testCompatibility($entityProperty);
+		
+		return CompatibilityLevel::NOT_COMPATIBLE;
 	}
 	
 	protected function createColumn(EntityProperty $entityProperty, DbInfo $dbInfo, 

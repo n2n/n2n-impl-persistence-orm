@@ -41,10 +41,18 @@ class TextPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_SIZE = 'size';
 	const PROP_NAME_CHARSET = 'charset';
 	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::getName()
+	 */
 	public function getName(): string {
 		return 'Text';
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::createMagCollection()
+	 */
 	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		$magCollection = new MagCollection();
 		
@@ -78,25 +86,31 @@ class TextPropDef extends ScalarPropDefAdapter {
 				$this->determineSize($propSourceDef->getHangarData()),
 				$this->determineCharset($propSourceDef->getHangarData()));
 	}
-	
+
 	/**
 	 * @param EntityProperty $entityProperty
 	 * @return int
 	 */
-	public function testCompatibility(EntityProperty $entityProperty): int {
-		if ($entityProperty instanceof ScalarEntityProperty) {
-			switch ($entityProperty->getName()) {
+	public function testCompatibility(PropSourceDef $propSourceDef): int {
+		if ($propSourceDef->getPhpTypeDef() === null || $propSourceDef->getPhpTypeDef()->isString()) {
+			switch ($propSourceDef->getPropertyName()) {
 				case 'description':
 				case 'lead':
 					return CompatibilityLevel::COMMON;
 			}
 			
-			if (StringUtils::endsWith('Html', $entityProperty->getName())) {
+			if (StringUtils::endsWith('Html', $propSourceDef->getPropertyName())) {
 				return CompatibilityLevel::COMMON;
 			}
+			
+			if (null !== $propSourceDef) {
+				return CompatibilityLevel::COMPATIBLE;
+			}
+			
+			return parent::testCompatibility($propSourceDef);
 		}
-	
-		return parent::testCompatibility($entityProperty);
+		
+		return CompatibilityLevel::NOT_COMPATIBLE;
 	}
 
 	protected function createColumn(EntityProperty $entityProperty, DbInfo $dbInfo, ColumnFactory $columnFactory, $columnName, Attributes $attributes) {

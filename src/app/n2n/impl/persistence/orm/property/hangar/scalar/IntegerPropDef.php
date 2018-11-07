@@ -65,6 +65,10 @@ class IntegerPropDef extends ScalarPropDefAdapter {
 		return $optionCollection;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::updatePropSourceDef()
+	 */
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->getHangarData()->setAll(array(
 				self::PROP_NAME_SIZE => $attributes->get(self::PROP_NAME_SIZE),
@@ -74,21 +78,27 @@ class IntegerPropDef extends ScalarPropDefAdapter {
 	}
 	
 	/**
-	 * @param EntityProperty $entityProperty
-	 * @return int
+	 * {@inheritDoc}
+	 * @see \n2n\impl\persistence\orm\property\hangar\scalar\ScalarPropDefAdapter::testCompatibility()
 	 */
-	public function testCompatibility(EntityProperty $entityProperty): int {
-		if ($entityProperty instanceof ScalarEntityProperty) {
-			switch ($entityProperty->getName()) {
+	public function testCompatibility(PropSourceDef $propSourceDef): int {
+		if (null === $propSourceDef->getPhpTypeDef() || $propSourceDef->getPhpTypeDef()->isInt()) {
+			if (null !== $propSourceDef->getPhpTypeDef()) {
+				return CompatibilityLevel::COMMON;
+			}
+			
+			switch ($propSourceDef->getPropertyName()) {
 				case 'id':
 				case 'orderIndex':
 				case 'lft':
 				case 'rgt':
 					return CompatibilityLevel::COMMON;
 			}
+			
+			return parent::testCompatibility($propSourceDef);
 		}
-	
-		return parent::testCompatibility($entityProperty);
+		
+		return CompatibilityLevel::NOT_COMPATIBLE;
 	}
 	
 	/**

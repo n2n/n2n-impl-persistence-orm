@@ -37,6 +37,7 @@ use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\store\ValueHash;
+use n2n\persistence\orm\criteria\JoinType;
 
 abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter implements RelationEntityProperty, 
 		CascadableEntityProperty {
@@ -137,5 +138,13 @@ abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter imple
 	
 	public function getTargetEntityModel(): EntityModel {
 		return $this->getRelation()->getTargetEntityModel();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \n2n\persistence\orm\property\JoinableEntityProperty::getAvailableJoinTypes()
+	 */
+	public function getAvailableJoinTypes(): array {
+		return JoinType::getValues();
 	}
 }
