@@ -33,7 +33,6 @@ use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use hangar\api\ColumnDefaults;
 use hangar\api\CompatibilityLevel;
 use hangar\api\HuoContext;
-use phpbob\PhpbobUtils;
 
 abstract class ScalarPropDefAdapter implements HangarPropDef {
 	
@@ -67,8 +66,7 @@ abstract class ScalarPropDefAdapter implements HangarPropDef {
 	 * @see \hangar\api\HangarPropDef::testCompatibility()
 	 */
 	public function testCompatibility(PropSourceDef $propSourceDef): int {
-		if ($propSourceDef->getPhpTypeDef() === null) return CompatibilityLevel::COMPATIBLE;
-		if (count(PhpbobUtils::explodeTypeName($propSourceDef->getPhpTypeDef()->determineUseTypeName())) === 1) return CompatibilityLevel::COMPATIBLE;
+		if ($propSourceDef->getPhpTypeDef() === null || $propSourceDef->getPhpTypeDef()->isScalar()) return CompatibilityLevel::COMPATIBLE;
 		
 		return CompatibilityLevel::NOT_COMPATIBLE;
 	}
