@@ -38,8 +38,8 @@ use hangar\api\CompatibilityLevel;
 use phpbob\representation\PhpTypeDef;
 use phpbob\PhpbobUtils;
 use hangar\api\HuoContext;
-use n2n\persistence\meta\structure\Column;
 use n2n\web\dispatch\mag\MagCollection;
+use n2n\persistence\meta\structure\Column;
 
 class ManyToOnePropDef implements HangarPropDef {
 	protected $columnDefaults;
@@ -78,12 +78,12 @@ class ManyToOnePropDef implements HangarPropDef {
 
 				if ($phpAnnotation->hasPhpAnnoParam(2)) {
 					$magCollection->setCascadeTypes(
-							OrmRelationMagCollection::determineCascadeTypes($phpAnnotation->getPhpAnnoParam(3)));
+							OrmRelationMagCollection::determineCascadeTypes($phpAnnotation->getPhpAnnoParam(2)));
 				}
 				
 				if ($phpAnnotation->hasPhpAnnoParam(3)) {
 					$magCollection->setFetchType(
-							OrmRelationMagCollection::determineFetchType($phpAnnotation->getPhpAnnoParam(4)));
+							OrmRelationMagCollection::determineFetchType($phpAnnotation->getPhpAnnoParam(3)));
 				}
 			}
 		}
