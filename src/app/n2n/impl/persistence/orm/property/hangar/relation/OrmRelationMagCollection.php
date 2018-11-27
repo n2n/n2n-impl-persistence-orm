@@ -136,7 +136,7 @@ class OrmRelationMagCollection extends MagCollection {
 		$this->getMagByPropertyName(self::PROP_NAME_TARGET_ENTITY_CLASS)->setValue($targetEntityClassName);
 	}
 	
-	public function setMappedBy(string $mappedBy) {
+	public function setMappedBy(string $mappedBy = null) {
 		$this->getMagByPropertyName(self::PROP_NAME_MAPPED_BY)->setValue($mappedBy);
 	}
 	
