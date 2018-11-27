@@ -31,13 +31,9 @@ use n2n\persistence\orm\FetchType;
 use n2n\persistence\orm\annotation\AnnoOneToMany;
 use n2n\persistence\orm\annotation\AnnoOneToOne;
 use n2n\util\StringUtils;
-use n2n\core\N2N;
 use n2n\persistence\orm\model\EntityModelManager;
 use n2n\web\dispatch\mag\MagCollection;
-use hangar\util\EntityUtils;
 use n2n\persistence\orm\annotation\AnnoManyToMany;
-use phpbob\representation\PhpClass;
-use n2n\reflection\ReflectionUtils;
 use n2n\impl\web\dispatch\mag\model\StringMag;
 
 class OrmRelationMagCollection extends MagCollection {
