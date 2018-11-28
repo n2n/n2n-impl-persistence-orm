@@ -132,20 +132,30 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
 	 */
 	public function supplyPersistAction(PersistAction $persistingJob, $object, ValueHash $valueHash, ?ValueHash $oldValueHash) {
-		ArgUtils::assertTrue($valueHash === null || is_array($valueHash));
+		ArgUtils::assertTrue($valueHash instanceof CommonValueHash);
+		
+		$propertyValueHashes = $valueHash->getHash();
+		$oldPropertyValueHashes = null;
+		if ($oldValueHash !== null) {
+			$oldPropertyValueHashes = $oldValueHash->getHash();
+		}
 		
 		foreach ($this->properties as $propertyName => $property)  {
 			$propertyValue = null;
 			if ($object !== null) {
 				$propertyValue = $property->readValue($object);
 			}
-			$propertyValueHash = null;
-			if ($valueHash !== null) {
-				ArgUtils::assertTrue(array_key_exists($propertyName, $valueHash));
-				$propertyValueHash = $valueHash[$propertyName];
+			
+			ArgUtils::assertTrue(array_key_exists($propertyName, $propertyValueHashes));
+			$propertyValueHash = $propertyValueHashes[$propertyName];
+			
+			$oldPropertyValueHash = null;
+			if ($oldPropertyValueHashes !== null) {
+				ArgUtils::assertTrue(array_key_exists($propertyName, $oldPropertyValueHashes));
+				$oldPropertyValueHash = $oldPropertyValueHashes[$propertyName] ?? null;
 			}
 			
-			$property->supplyPersistAction($propertyValue, $propertyValueHash, $persistingJob);
+			$property->supplyPersistAction($persistingJob, $propertyValue, $propertyValueHash, $oldPropertyValueHash);
 		}
 	}
 
@@ -169,17 +179,16 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 		}
 	}
 
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
-	 */
 	public function createValueHash($value, EntityManager $em): ValueHash {
-		if ($value === null) return new CommonValueHash(null);
-		
-		$valueHash = array();
+		$valueHashes = array();
 		foreach ($this->properties as $propertyName => $property)  {
-			$valueHash[$propertyName] = $property->readValue($value);
+			$propertyValue = null;
+			if ($value !== null) {
+				$propertyValue = $property->readValue($value);
+			}
+			$valueHashes[$propertyName] = $property->createValueHash($propertyValue, $em);
 		}
-		return new CommonValueHash($valueHash);
+		return new CommonValueHash($valueHashes);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\JoinableEntityProperty::createJoinTreePoint()

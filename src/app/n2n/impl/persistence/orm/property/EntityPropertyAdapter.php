@@ -42,14 +42,16 @@ abstract class EntityPropertyAdapter implements EntityProperty {
 		$this->accessProxy = $accessProxy;
 	}
 	
-	/* (non-PHPdoc)
+	/**
+	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::setEntityModel()
 	 */
 	public function setEntityModel(EntityModel $entityModel) {
 		$this->entityModel = $entityModel;	
 	}
 	
-	/* (non-PHPdoc)
+	/**
+	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::getEntityModel()
 	 */
 	public function getEntityModel() {
@@ -60,28 +62,35 @@ abstract class EntityPropertyAdapter implements EntityProperty {
 		return $this->entityModel;
 	}
 	
-	/* (non-PHPdoc)
+	
+	/**
+	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::setParent()
 	 */
 	public function setParent(EntityProperty $parent) {
 		$this->parent = $parent;
 	}
 	
-	/* (non-PHPdoc)
+	/**
+	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::getParent()
 	 */
 	public function getParent() {
 		return $this->parent;
 	}
 	
-	/* (non-PHPdoc)
+	
+	/**
+	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::getName()
 	 */
 	public function getName() {
 		return $this->accessProxy->getPropertyName();
 	}
 	
-	/* (non-PHPdoc)
+	
+	/**
+	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::writeValue()
 	 */
 	public function writeValue($object, $value) {
