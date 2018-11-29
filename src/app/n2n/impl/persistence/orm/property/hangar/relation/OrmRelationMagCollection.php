@@ -40,6 +40,7 @@ use phpbob\analyze\PhpSourceAnalyzer;
 use n2n\reflection\CastUtils;
 use n2n\core\TypeLoader;
 use phpbob\PhpbobUtils;
+use phpbob\representation\PhpClass;
 
 class OrmRelationMagCollection extends MagCollection {
 	const PROP_NAME_TARGET_ENTITY_CLASS = 'targetEntityClass';
