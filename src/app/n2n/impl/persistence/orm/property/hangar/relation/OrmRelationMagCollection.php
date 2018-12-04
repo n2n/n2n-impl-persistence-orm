@@ -31,14 +31,16 @@ use n2n\persistence\orm\FetchType;
 use n2n\persistence\orm\annotation\AnnoOneToMany;
 use n2n\persistence\orm\annotation\AnnoOneToOne;
 use n2n\util\StringUtils;
-use n2n\core\N2N;
 use n2n\persistence\orm\model\EntityModelManager;
 use n2n\web\dispatch\mag\MagCollection;
-use hangar\util\EntityUtils;
 use n2n\persistence\orm\annotation\AnnoManyToMany;
-use phpbob\representation\PhpClass;
-use n2n\reflection\ReflectionUtils;
 use n2n\impl\web\dispatch\mag\model\StringMag;
+use n2n\io\IoUtils;
+use phpbob\analyze\PhpSourceAnalyzer;
+use n2n\reflection\CastUtils;
+use n2n\core\TypeLoader;
+use phpbob\PhpbobUtils;
+use phpbob\representation\PhpClass;
 
 class OrmRelationMagCollection extends MagCollection {
 	const PROP_NAME_TARGET_ENTITY_CLASS = 'targetEntityClass';
@@ -63,10 +65,13 @@ class OrmRelationMagCollection extends MagCollection {
 				array('class' => 'hangar-orm-relation-target-entity-container')));
 		
 		if ($addMappedBy) {
+			$analyzer = new PhpSourceAnalyzer();
 			foreach ($this->targetEntityClassOptions as $entityClassName) {
-				$entityClassDef = EntityUtils::createClassDef($entityClassName, false, false);
-				$phpClass = $entityClassDef->getPhpClass();
-				foreach ($entityClassDef->getPropertyNames() as $propertyName) {
+				$phpFile = $analyzer->analyze(IoUtils::getContents(TypeLoader::getFilePathOfType($entityClassName)));
+				$phpClass = $phpFile->getPhpNamespace(PhpbobUtils::extractNamespace($entityClassName))
+						->getPhpType(PhpbobUtils::extractClassName($entityClassName));
+				CastUtils::assertTrue($phpClass instanceof PhpClass);
+				foreach (array_keys($phpClass->getPhpProperties()) as $propertyName) {
 					$phpAnnoCollection = $phpClass->getPhpAnnotationSet()->getOrCreatePhpPropertyAnnoCollection($propertyName);
 					$phpAnno = null;
 					if ($phpAnnoCollection->hasPhpAnno(AnnoOneToMany::class)) {
@@ -140,7 +145,7 @@ class OrmRelationMagCollection extends MagCollection {
 		$this->getMagByPropertyName(self::PROP_NAME_TARGET_ENTITY_CLASS)->setValue($targetEntityClassName);
 	}
 	
-	public function setMappedBy(string $mappedBy) {
+	public function setMappedBy(string $mappedBy = null) {
 		$this->getMagByPropertyName(self::PROP_NAME_MAPPED_BY)->setValue($mappedBy);
 	}
 	
