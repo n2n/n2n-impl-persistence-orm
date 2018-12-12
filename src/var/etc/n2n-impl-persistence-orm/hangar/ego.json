@@ -8,6 +8,7 @@
         "n2n\\impl\\persistence\\orm\\property\\hangar\\scalar\\TextPropDef",
         "n2n\\impl\\persistence\\orm\\property\\hangar\\scalar\\FixedPointPropDef",
         "n2n\\impl\\persistence\\orm\\property\\hangar\\N2nLocalePropDef",
+        "n2n\\impl\\persistence\\orm\\property\\hangar\\UrlPropDef",
         "n2n\\impl\\persistence\\orm\\property\\hangar\\relation\\ManyToOnePropDef",
         "n2n\\impl\\persistence\\orm\\property\\hangar\\relation\\OneToManyPropDef",
         "n2n\\impl\\persistence\\orm\\property\\hangar\\relation\\ManyToManyPropDef",
