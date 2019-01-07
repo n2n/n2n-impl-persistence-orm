@@ -30,7 +30,7 @@ use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
 use n2n\impl\persistence\orm\property\N2nLocaleEntityProperty;
 use n2n\l10n\N2nLocale;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use hangar\api\ColumnDefaults;
 use n2n\persistence\meta\structure\common\CommonStringColumn;
 use hangar\api\CompatibilityLevel;
