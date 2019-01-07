@@ -33,10 +33,10 @@ use n2n\persistence\orm\property\QueryItemRepresentableEntityProperty;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\annotation\AnnoOneToMany;
 use n2n\persistence\orm\annotation\AnnoOneToOne;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\annotation\AnnoAssociationOverrides;
-use n2n\reflection\ReflectionUtils;
 use n2n\persistence\orm\FetchType;
+use n2n\util\type\TypeUtils;
 
 class RelationFactory {
 	private $classSetup;
@@ -365,7 +365,7 @@ class RelationFactory {
 		} catch (UnknownEntityPropertyException $e) {
 			throw $this->classSetup->createException($this->classSetup->getClass()->getName() . '::$'
 					. $this->relationProperty->getName() . ' is mapped by unknown entity property '
-					. ReflectionUtils::prettyClassPropName($targetEntityModel->getClass(), $mappedBy) 
+					. TypeUtils::prettyClassPropName($targetEntityModel->getClass(), $mappedBy) 
 					. '.', $e, array($this->relationAnnotation));
 		}
 	}

@@ -37,7 +37,7 @@ use n2n\persistence\orm\annotation\AnnoManyToMany;
 use n2n\impl\web\dispatch\mag\model\StringMag;
 use n2n\io\IoUtils;
 use phpbob\analyze\PhpSourceAnalyzer;
-use n2n\reflection\CastUtils;
+use n2n\util\type\CastUtils;
 use n2n\core\TypeLoader;
 use phpbob\PhpbobUtils;
 use phpbob\representation\PhpClass;

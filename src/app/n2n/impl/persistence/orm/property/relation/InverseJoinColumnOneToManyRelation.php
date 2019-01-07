@@ -38,7 +38,7 @@ use n2n\impl\persistence\orm\property\relation\util\ToManyValueHasher;
 use n2n\impl\persistence\orm\property\relation\util\ToManyAnalyzer;
 use n2n\impl\persistence\orm\property\relation\compare\IdColumnComparableDecorator;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\util\col\ArrayUtils;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\EntityManager;

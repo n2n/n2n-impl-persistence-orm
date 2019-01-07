@@ -29,7 +29,7 @@ use n2n\impl\web\dispatch\mag\model\NumericMag;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use hangar\api\CompatibilityLevel;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\meta\structure\common\CommonFixedPointColumn;
 use phpbob\representation\PhpTypeDef;
 use n2n\web\dispatch\mag\MagCollection;

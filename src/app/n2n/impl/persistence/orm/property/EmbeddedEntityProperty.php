@@ -29,7 +29,7 @@ use n2n\reflection\property\AccessProxy;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\store\action\PersistAction;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\store\action\RemoveAction;
 use n2n\persistence\orm\store\operation\MergeOperation;
 use n2n\reflection\ReflectionUtils;

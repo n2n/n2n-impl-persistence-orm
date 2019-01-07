@@ -21,7 +21,7 @@
  */
 namespace n2n\impl\persistence\orm\property\relation\util;
 
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\property\BasicEntityProperty;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\store\ValueHash;

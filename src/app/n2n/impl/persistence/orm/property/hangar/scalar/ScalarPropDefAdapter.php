@@ -28,7 +28,7 @@ use hangar\api\DbInfo;
 use n2n\persistence\meta\structure\ColumnFactory;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use hangar\api\ColumnDefaults;
 use hangar\api\CompatibilityLevel;

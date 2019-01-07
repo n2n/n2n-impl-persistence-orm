@@ -28,7 +28,7 @@ use n2n\impl\web\dispatch\mag\model\NumericMag;
 use n2n\impl\web\dispatch\mag\model\StringMag;
 use n2n\persistence\meta\structure\ColumnFactory;
 use n2n\persistence\orm\property\EntityProperty;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\meta\structure\common\CommonTextColumn;
 use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use hangar\api\CompatibilityLevel;

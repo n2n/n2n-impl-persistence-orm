@@ -23,7 +23,7 @@ namespace n2n\impl\persistence\orm\property\relation;
 
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\property\EntityProperty;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\persistence\orm\store\action\PersistAction;
 use n2n\persistence\orm\model\EntityModel;

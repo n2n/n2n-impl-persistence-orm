@@ -24,7 +24,7 @@ namespace n2n\impl\persistence\orm\property\hangar;
 use n2n\util\config\Attributes;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\impl\persistence\orm\property\DateTimeEntityProperty;
 use n2n\impl\persistence\meta\mysql\MysqlDateTimeColumn;
 use hangar\api\HangarPropDef;

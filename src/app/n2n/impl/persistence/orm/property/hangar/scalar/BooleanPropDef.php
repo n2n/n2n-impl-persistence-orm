@@ -26,7 +26,7 @@ use n2n\persistence\meta\structure\ColumnFactory;
 use hangar\api\DbInfo;
 use hangar\api\PropSourceDef;
 use n2n\persistence\orm\property\EntityProperty;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\impl\persistence\orm\property\ScalarEntityProperty;
 use n2n\persistence\meta\structure\common\CommonIntegerColumn;
 use hangar\api\CompatibilityLevel;

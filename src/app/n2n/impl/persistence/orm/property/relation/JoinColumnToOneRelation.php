@@ -44,7 +44,7 @@ use n2n\persistence\orm\store\ValueHash;
 use n2n\impl\persistence\orm\property\relation\util\ToOneUtils;
 use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\persistence\orm\store\EntityInfo;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\impl\persistence\orm\property\relation\util\ToOneValueHash;
 
 class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, ActionDependency {
