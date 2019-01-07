@@ -25,7 +25,7 @@ use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\reflection\property\TypeConstraint;
 use n2n\persistence\orm\criteria\compare\CriteriaComparator;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 
 class IdColumnComparableDecorator implements ColumnComparable {
 	private $idColumnComparable;	

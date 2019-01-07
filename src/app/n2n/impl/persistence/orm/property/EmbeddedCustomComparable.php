@@ -29,9 +29,9 @@ use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\from\TreePath;
 use n2n\reflection\property\ValueIncompatibleWithConstraintsException;
 use n2n\persistence\orm\property\EntityProperty;
-use n2n\reflection\ReflectionUtils;
 use n2n\persistence\orm\criteria\compare\QueryComparatorBuilder;
 use n2n\util\ex\IllegalStateException;
+use n2n\util\type\TypeUtils;
 
 class EmbeddedCustomComparable implements CustomComparable {
 	private $metaTreePoint;
@@ -59,7 +59,7 @@ class EmbeddedCustomComparable implements CustomComparable {
 	public function compareWithValue(QueryComparator $queryComparator, $operator, $object) {
 		if ($object !== null && !is_a($object, $this->embeddedEntityProperty->getTargetClass()->getName())) {
 			throw new CriteriaConflictException('Type ' . $this->embeddedEntityProperty->getTargetClass()->getName() 
-					. ' required. Given: ' . ReflectionUtils::getTypeInfo($object));
+					. ' required. Given: ' . TypeUtils::getTypeInfo($object));
 		}
 		
 		$queryComparator = $queryComparator->andGroup();
@@ -86,7 +86,7 @@ class EmbeddedCustomComparable implements CustomComparable {
 		}
 		
 		throw new CriteriaConflictException('Property ' . $entityProperty->toPropertyString() . ' can not be compared with value: <' 
-				. ReflectionUtils::getTypeInfo($propertyValue) . '>');
+				. TypeUtils::getTypeInfo($propertyValue) . '>');
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\criteria\compare\CustomComparable::compareWith()

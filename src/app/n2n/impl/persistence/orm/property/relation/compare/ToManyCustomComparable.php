@@ -27,7 +27,7 @@ use n2n\persistence\orm\criteria\compare\CriteriaComparator;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 use n2n\persistence\meta\data\QueryPlaceMarker;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\query\QueryState;
 use n2n\reflection\property\TypeConstraint;
 use n2n\persistence\orm\model\EntityModel;

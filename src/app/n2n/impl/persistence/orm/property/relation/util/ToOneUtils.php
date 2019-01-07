@@ -24,7 +24,7 @@ namespace n2n\impl\persistence\orm\property\relation\util;
 use n2n\impl\persistence\orm\property\relation\ToOneRelation;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\persistence\orm\store\ValueHash;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 
 class ToOneUtils {
 	private $toOneRelation;

@@ -22,7 +22,7 @@
 namespace n2n\impl\persistence\orm\property\relation\util;
 
 use n2n\persistence\orm\store\action\supply\SupplyJob;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\util\col\ArrayUtils;
 use n2n\impl\persistence\orm\property\relation\ToManyRelation;
 use n2n\persistence\orm\store\ValueHash;

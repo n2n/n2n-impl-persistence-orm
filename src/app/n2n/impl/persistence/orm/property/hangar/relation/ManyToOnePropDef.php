@@ -27,7 +27,7 @@ use n2n\util\config\Attributes;
 use hangar\api\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\annotation\AnnoManyToOne;
 use n2n\impl\persistence\orm\property\ToOneEntityProperty;
 use hangar\api\ColumnDefaults;

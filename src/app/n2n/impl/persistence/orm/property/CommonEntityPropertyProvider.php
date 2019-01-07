@@ -33,7 +33,7 @@ use n2n\persistence\orm\annotation\AnnoManyToMany;
 use n2n\reflection\property\PropertiesAnalyzer;
 use n2n\reflection\ReflectionUtils;
 use n2n\persistence\orm\model\NamingStrategy;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\annotation\AnnoEmbedded;
 use n2n\io\orm\FileEntityProperty;
 use n2n\io\orm\ManagedFileEntityProperty;

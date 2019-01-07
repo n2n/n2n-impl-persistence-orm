@@ -25,10 +25,10 @@ use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\property\AccessProxy;
 use n2n\util\ex\IllegalStateException;
-use n2n\reflection\ReflectionUtils;
 use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\persistence\orm\EntityDataException;
 use n2n\reflection\ReflectionException;
+use n2n\util\type\TypeUtils;
 
 abstract class EntityPropertyAdapter implements EntityProperty {
 	private $entityModel;
@@ -109,7 +109,7 @@ abstract class EntityPropertyAdapter implements EntityProperty {
 	}
 	
 	public function toPropertyString() {
-		return ReflectionUtils::prettyReflPropName($this->accessProxy->getProperty());
+		return TypeUtils::prettyReflPropName($this->accessProxy->getProperty());
 	}
 	
 	public function copy($value) {

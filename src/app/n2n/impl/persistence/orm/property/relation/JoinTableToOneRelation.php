@@ -35,7 +35,7 @@ use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\impl\persistence\orm\property\relation\util\ToOneUtils;
 use n2n\persistence\orm\store\ValueHash;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\impl\persistence\orm\property\relation\util\ToOneValueHash;
 use n2n\persistence\orm\EntityManager;
 

@@ -25,7 +25,7 @@ use n2n\impl\persistence\orm\property\relation\Relation;
 use n2n\reflection\property\TypeConstraint;
 use n2n\persistence\orm\store\operation\CascadeOperation;
 use n2n\util\col\ArrayUtils;
-use n2n\reflection\ArgUtils;
+use n2n\util\type\ArgUtils;
 use n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy;
 use n2n\persistence\orm\store\operation\MergeOperation;
 use n2n\persistence\orm\CascadeType;
