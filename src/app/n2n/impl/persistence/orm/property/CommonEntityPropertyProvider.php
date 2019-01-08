@@ -67,10 +67,10 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 			return;
 		}
 
-		if (null !== ($annoUrlLocale = $annotationSet->getPropertyAnnotation($propertyName,
+		if (null !== ($annoUrl = $annotationSet->getPropertyAnnotation($propertyName,
 				'n2n\persistence\orm\annotation\AnnoUrl'))) {
 			$classSetup->provideEntityProperty(new UrlEntityProperty($propertyAccessProxy,
-				$classSetup->requestColumn($propertyName)), array($annoN2nLocale));
+					$classSetup->requestColumn($propertyName)), array($annoUrl));
 			return;
 		}
 
