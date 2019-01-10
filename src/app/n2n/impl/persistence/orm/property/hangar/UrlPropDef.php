@@ -23,7 +23,7 @@ namespace n2n\impl\persistence\orm\property\hangar;
 
 use hangar\api\HangarPropDef;
 use hangar\api\PropSourceDef;
-use n2n\util\config\Attributes;
+use n2n\config\Attributes;
 use n2n\web\dispatch\mag\MagCollection;
 use hangar\api\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
