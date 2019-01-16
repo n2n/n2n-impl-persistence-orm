@@ -27,7 +27,7 @@ use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 use n2n\persistence\orm\criteria\CriteriaConflictException;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\from\TreePath;
-use n2n\reflection\property\ValueIncompatibleWithConstraintsException;
+use n2n\util\type\ValueIncompatibleWithConstraintsException;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\criteria\compare\QueryComparatorBuilder;
 use n2n\util\ex\IllegalStateException;

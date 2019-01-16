@@ -23,7 +23,7 @@ namespace n2n\impl\persistence\orm\property;
 
 use n2n\persistence\orm\criteria\compare\UrlColumnComparable;
 use n2n\persistence\orm\query\select\UrlSelection;
-use n2n\reflection\property\TypeConstraint;
+use n2n\util\type\TypeConstraint;
 use n2n\persistence\orm\store\action\PersistAction;
 use n2n\reflection\property\AccessProxy;
 use n2n\persistence\orm\store\action\RemoveAction;
