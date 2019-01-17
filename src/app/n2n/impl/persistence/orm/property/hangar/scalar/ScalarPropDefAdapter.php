@@ -22,7 +22,7 @@
 namespace n2n\impl\persistence\orm\property\hangar\scalar;
 
 use hangar\api\HangarPropDef;
-use n2n\config\Attributes;
+use n2n\util\type\attrs\Attributes;
 use hangar\api\PropSourceDef;
 use hangar\api\DbInfo;
 use n2n\persistence\meta\structure\ColumnFactory;
