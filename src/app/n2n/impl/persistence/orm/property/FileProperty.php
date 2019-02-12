@@ -27,7 +27,7 @@ use n2n\io\managed\impl\SimpleFileLocator;
 use n2n\reflection\property\AccessProxy;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\model\EntityModel;
-use n2n\reflection\property\TypeConstraint;
+use n2n\util\type\TypeConstraint;
 use n2n\core\N2N;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\from\MetaTreePoint;

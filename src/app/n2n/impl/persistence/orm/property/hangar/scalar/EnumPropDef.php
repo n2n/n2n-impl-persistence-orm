@@ -21,7 +21,7 @@
  */
 namespace n2n\impl\persistence\orm\property\hangar\scalar;
 
-use n2n\util\config\Attributes;
+use n2n\util\type\attrs\Attributes;
 use hangar\api\DbInfo;
 use n2n\persistence\meta\structure\ColumnFactory;
 use n2n\impl\web\dispatch\mag\model\StringArrayMag;

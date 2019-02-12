@@ -23,7 +23,7 @@ namespace n2n\impl\persistence\orm\property\hangar\relation;
 
 use hangar\api\HangarPropDef;
 use hangar\api\PropSourceDef;
-use n2n\util\config\Attributes;
+use n2n\util\type\attrs\Attributes;
 use hangar\api\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;

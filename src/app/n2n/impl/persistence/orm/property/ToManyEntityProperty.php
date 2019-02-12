@@ -22,7 +22,7 @@
 namespace n2n\impl\persistence\orm\property;
 
 use n2n\impl\persistence\orm\property\relation\Relation;
-use n2n\reflection\property\TypeConstraint;
+use n2n\util\type\TypeConstraint;
 use n2n\persistence\orm\store\operation\CascadeOperation;
 use n2n\util\col\ArrayUtils;
 use n2n\util\type\ArgUtils;
