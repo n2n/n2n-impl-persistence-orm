@@ -108,7 +108,7 @@ class DateTimePropDef implements HangarPropDef {
 	public function testCompatibility(PropSourceDef $propSourceDef): int {
 		if ($propSourceDef->hasPhpPropertyAnno(AnnoDateTime::class)) return CompatibilityLevel::COMMON;
 		if (null !== ($phpTypeDef = $propSourceDef->getPhpTypeDef()) && 
-				$phpTypeDef->getLocalName() === \DateTime::class) return CompatibilityLevel::COMMON; 
+				$phpTypeDef->getLocalName() === '\DateTime') return CompatibilityLevel::COMMON; 
 		
 		return CompatibilityLevel::NOT_COMPATIBLE; 
 	}
