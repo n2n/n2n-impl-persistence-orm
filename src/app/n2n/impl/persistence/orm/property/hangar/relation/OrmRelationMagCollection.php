@@ -41,6 +41,7 @@ use n2n\util\type\CastUtils;
 use n2n\core\TypeLoader;
 use phpbob\PhpbobUtils;
 use phpbob\representation\PhpClass;
+use n2n\persistence\orm\annotation\AnnoManyToOne;
 
 class OrmRelationMagCollection extends MagCollection {
 	const PROP_NAME_TARGET_ENTITY_CLASS = 'targetEntityClass';
@@ -61,7 +62,7 @@ class OrmRelationMagCollection extends MagCollection {
 		
 		$this->addMag(self::PROP_NAME_TARGET_ENTITY_CLASS, new EnumMag('Target Entity',
 				[null => null] + $this->targetEntityClassOptions, null, true,
-				array('class' => 'hangar-orm-relation-target-entity'), 
+				array('class' => $addMappedBy ? 'hangar-orm-relation-target-entity'  : 'hangar-autocompletion'), 
 				array('class' => 'hangar-orm-relation-target-entity-container')));
 		
 		if ($addMappedBy) {
@@ -80,11 +81,14 @@ class OrmRelationMagCollection extends MagCollection {
 						$phpAnno = $phpAnnoCollection->getPhpAnno(AnnoManyToMany::class);
 					} elseif ($phpAnnoCollection->hasPhpAnno(AnnoOneToOne::class)) {
 						$phpAnno = $phpAnnoCollection->getPhpAnno(AnnoOneToOne::class);
+					}elseif ($phpAnnoCollection->hasPhpAnno(AnnoManyToOne::class)) {
+						$phpAnno = $phpAnnoCollection->getPhpAnno(AnnoManyToOne::class);
 					}
 					
 					if (null === $phpAnno) continue;
 					
-					$this->groupedMappedByOptions[$entityClassName][$propertyName] = $phpClass->determineTypeName($phpAnno->getPhpAnnoParam(1));
+					$this->groupedMappedByOptions[$entityClassName][$propertyName] = $phpClass->determineTypeName(
+							preg_replace('/::getClass\(\)$/', '', (string) $phpAnno->getPhpAnnoParam(1)));
 					$this->mappedByOptions[$propertyName] = $propertyName;
 				}
 			}
@@ -310,6 +314,11 @@ class OrmRelationMagCollection extends MagCollection {
 			}
 		}
 		return $cascadeTypes;
+	}
+	
+	private static function determineTypeName(string $str) {
+		test($str);
+		die();
 	}
 	
 	public static function determineFetchType(string $param) {
