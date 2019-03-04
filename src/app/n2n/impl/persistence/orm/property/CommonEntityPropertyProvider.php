@@ -41,6 +41,7 @@ use n2n\io\managed\impl\SimpleFileLocator;
 use n2n\io\IoUtils;
 use n2n\util\uri\Url;
 use n2n\persistence\orm\annotation\AnnoBool;
+use n2n\util\type\TypeName;
 
 class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	const PROP_FILE_NAME_SUFFIX = '.originalName';
@@ -114,6 +115,17 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 					$classSetup->requestColumn($propertyName)), array($annoBool));
 			return;
 		}
+		
+		switch ($propertyAccessProxy->getConstraint()->getTypeName()) {
+			case TypeName::BOOL:
+				$classSetup->provideEntityProperty(new BoolEntityProperty($propertyAccessProxy,
+						$classSetup->requestColumn($propertyName)));
+				return;
+			case TypeName::INT:
+				$classSetup->provideEntityProperty(new IntEntityProperty($propertyAccessProxy,
+						$classSetup->requestColumn($propertyName)));
+				return;
+		}
 
 		if ($this->checkForRelations($propertyAccessProxy, $classSetup)) {
 			return;
@@ -157,8 +169,12 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		
 		if (null !== ($type = $parameter->getType())) {
 			switch ($type->__toString()) {
-				case 'bool':
+				case TypeName::BOOL:
 					$classSetup->provideEntityProperty(new BoolEntityProperty($propertyAccessProxy,
+							$classSetup->requestColumn($propertyName)));
+					break;
+				case TypeName::INT:
+					$classSetup->provideEntityProperty(new IntEntityProperty($propertyAccessProxy,
 							$classSetup->requestColumn($propertyName)));
 					break;
 			}

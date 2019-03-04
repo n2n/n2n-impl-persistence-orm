@@ -38,6 +38,7 @@ use n2n\persistence\meta\structure\common\CommonIntegerColumn;
 use phpbob\representation\PhpTypeDef;
 use n2n\persistence\meta\structure\Column;
 use n2n\web\dispatch\mag\MagCollection;
+use n2n\impl\persistence\orm\property\IntEntityProperty;
 
 class IntegerPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_SIZE = 'size';
@@ -106,7 +107,7 @@ class IntegerPropDef extends ScalarPropDefAdapter {
 	 * @return \n2n\persistence\meta\structure\Column
 	 */
 	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): Column {
-		ArgUtils::assertTrue($entityProperty instanceof ScalarEntityProperty);
+		ArgUtils::assertTrue($entityProperty instanceof IntEntityProperty || $entityProperty instanceof ScalarEntityProperty);
 	
 		return new CommonIntegerColumn($entityProperty->getColumnName(),
 				$this->determineSize($propSourceDef->getHangarData()),
