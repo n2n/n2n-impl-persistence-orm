@@ -21,56 +21,49 @@
  */
 namespace n2n\impl\persistence\orm\property;
 
-use n2n\util\type\TypeConstraint;
 use n2n\reflection\property\AccessProxy;
+use n2n\util\type\TypeConstraint;
 use n2n\persistence\orm\property\BasicEntityProperty;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\QueryState;
-use n2n\persistence\meta\data\QueryItem;
-use n2n\util\type\ArgUtils;
-use n2n\persistence\orm\store\action\PersistAction;
-use n2n\persistence\orm\store\operation\MergeOperation;
-use n2n\persistence\Pdo;
-use n2n\persistence\orm\store\action\RemoveAction;
-use n2n\persistence\orm\EntityManager;
-use n2n\persistence\orm\store\ValueHash;
-use n2n\persistence\orm\store\CommonValueHash;
 use n2n\persistence\orm\criteria\compare\ScalarColumnComparable;
 use n2n\persistence\orm\query\select\SimpleSelection;
+use n2n\persistence\orm\store\action\PersistAction;
+use n2n\persistence\orm\store\operation\MergeOperation;
+use n2n\persistence\orm\store\action\RemoveAction;
+use n2n\persistence\meta\data\QueryItem;
+use n2n\persistence\Pdo;
+use n2n\persistence\orm\EntityManager;
+use n2n\util\type\ArgUtils;
+use n2n\persistence\orm\store\ValueHash;
+use n2n\persistence\orm\store\CommonValueHash;
+use n2n\util\type\TypeName;
 
-class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
+class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	/**
 	 * @param AccessProxy $accessProxy
 	 * @param string $columnName
 	 */
 	public function __construct(AccessProxy $accessProxy, $columnName) {
-		$accessProxy->setConstraint(TypeConstraint::createSimple('bool', true, true));
-
+		$accessProxy->setConstraint(TypeConstraint::createSimple(TypeName::STRING, true, true));
+		
 		parent::__construct($accessProxy, $columnName);
 	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see \n2n\persistence\orm\property\ColumnComparableEntityProperty::createColumnComparable()
+	/* (non-PHPdoc)
+	 * @see \n2n\persistence\orm\property\ColumnComparableEntityProperty::createComparisonStrategy()
 	 */
 	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
-		return new ScalarColumnComparable($this->createQueryColumn($metaTreePoint->getMeta()), $queryState, 'bool');
+		return new ScalarColumnComparable($this->createQueryColumn($metaTreePoint->getMeta()), $queryState);
 	}
-
-	/**
-	 * {@inheritDoc}
+	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::createColumnComparableFromQueryItem()
 	 */
 	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
-		return new ScalarColumnComparable($queryItem, $queryState, 'bool');
+		return new ScalarColumnComparable($queryItem, $queryState);
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 * @see \n2n\persistence\orm\property\EntityProperty::createSelection()
-	 */
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
-		return new SimpleSelection($this->createQueryColumn($metaTreePoint->getMeta()), 'bool');
+		return new SimpleSelection($this->createQueryColumn($metaTreePoint->getMeta()), TypeName::STRING);
 	}
 
 	/**
@@ -78,35 +71,37 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::valueToRep()
 	 */
 	public function valueToRep($value): string {
-		ArgUtils::assertTrue(is_bool($value));
-		
-		return (string) (int) $value;
+		ArgUtils::valScalar($value);
+		return (string) $value;
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::repToValue()
 	 */
-	public function repToValue(string $rep) {		
-		ArgUtils::assertTrue(is_numeric($rep));
-		return (bool) $rep;
+	public function repToValue(string $rep) {
+		return $rep;
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
 	 */
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
-		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $value, \PDO::PARAM_BOOL);
+	public function supplyPersistAction(PersistAction $persistAction, $mappedValue, ValueHash $valueHash, ?ValueHash $oldValueHash) {
+// 		$pdoDataType = null;
+// 		if (is_bool($mappedValue)) {
+// 			$pdoDataType = PDO::PARAM_BOOL;
+// 		}
+		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $mappedValue/*, $pdoDataType*/);
 	}
 
+	
 	/**
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
 	 */
 	public function createValueHash($value, EntityManager $em): ValueHash {
-		if ($value === null) return new CommonValueHash(null);
-		return new CommonValueHash($this->valueToRep($value));
+		return new CommonValueHash($value);
 	}
 
 	/**
@@ -121,7 +116,7 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyRemoveAction()
 	 */
-	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $valueHash = null) {
+	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
 	}
 
 	/**
@@ -129,17 +124,33 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::parseValue()
 	 */
 	public function parseValue($raw, Pdo $pdo) {
-		if ($raw === null) return null;
-		
-		return (bool) $raw;
+		return $raw;
 	}
-
+	/* (non-PHPdoc)
+	 * @see \n2n\persistence\orm\property\BasicEntityProperty::buildRaw()
+	 */
 	public function buildRaw($value, Pdo $pdo) {
-		ArgUtils::valType($value, 'bool', true);
 		return $value;
 	}
-
+	/* (non-PHPdoc)
+	 * @see \n2n\persistence\orm\property\BasicEntityProperty::createSelectionFromQueryItem()
+	 */
 	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
-		return new SimpleSelection($queryItem, 'bool');
+		return new SimpleSelection($queryItem, TypeName::STRING);
 	}
+
+
+	
+// 	public function getTypeConstraint() {
+//  		return $this->getAccessProxy()->getConstraint();
+// 	}
+	
+// 	public function buildComparableValue($value) {
+// 		return $value;
+// 	}
+	
+// 	public static function areConstraintsTypical(TypeConstraint $constraints = null) {
+// 		return is_null($constraints) 
+// 				|| (is_null($constraints->getParamClass()) && !$constraints->isArray());		
+// 	}
 }
