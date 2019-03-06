@@ -125,6 +125,14 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 				$classSetup->provideEntityProperty(new IntEntityProperty($propertyAccessProxy,
 						$classSetup->requestColumn($propertyName)));
 				return;
+			case TypeName::FLOAT:
+				$classSetup->provideEntityProperty(new IntEntityProperty($propertyAccessProxy,
+						$classSetup->requestColumn($propertyName)));
+				return;
+			case TypeName::STRING:
+				$classSetup->provideEntityProperty(new IntEntityProperty($propertyAccessProxy,
+						$classSetup->requestColumn($propertyName)));
+				return;
 		}
 
 		if ($this->checkForRelations($propertyAccessProxy, $classSetup)) {

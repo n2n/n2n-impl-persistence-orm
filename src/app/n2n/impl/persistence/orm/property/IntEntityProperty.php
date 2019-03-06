@@ -45,7 +45,7 @@ class IntEntityProperty extends ColumnPropertyAdapter implements BasicEntityProp
 	 * @param string $columnName
 	 */
 	public function __construct(AccessProxy $accessProxy, $columnName) {
-		$accessProxy->setConstraint(TypeConstraint::createSimple('int', true));
+		$accessProxy->setConstraint(TypeConstraint::createSimple(TypeName::INT, true, true));
 		
 		parent::__construct($accessProxy, $columnName);
 	}

@@ -316,11 +316,6 @@ class OrmRelationMagCollection extends MagCollection {
 		return $cascadeTypes;
 	}
 	
-	private static function determineTypeName(string $str) {
-		test($str);
-		die();
-	}
-	
 	public static function determineFetchType(string $param) {
 		if ('null' === $param) return FetchType::LAZY;
 		
