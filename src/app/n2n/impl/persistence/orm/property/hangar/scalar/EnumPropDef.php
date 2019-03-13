@@ -50,6 +50,7 @@ class EnumPropDef extends ScalarPropDefAdapter {
 	/**
 	 * {@inheritDoc}
 	 * @see \hangar\api\HangarPropDef::createMagCollection()
+	 * @return MagCollection
 	 */
 	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		$optionCollection = new MagCollection();
@@ -88,7 +89,7 @@ class EnumPropDef extends ScalarPropDefAdapter {
 	
 	/**
 	 * @param PropSourceDef $propSourceDef
-	 * @return \n2n\persistence\meta\structure\Column
+	 * @return Column
 	 */
 	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): ?Column {
 		ArgUtils::assertTrue($entityProperty instanceof ScalarEntityProperty);

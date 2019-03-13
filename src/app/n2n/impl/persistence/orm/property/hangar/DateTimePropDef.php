@@ -94,6 +94,7 @@ class DateTimePropDef implements HangarPropDef {
 	/**
 	 * {@inheritDoc}
 	 * @see \hangar\api\HangarPropDef::createMetaColumn()
+	 * @return Column
 	 */
 	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): ?Column {
 		ArgUtils::assertTrue($entityProperty instanceof DateTimeEntityProperty);
