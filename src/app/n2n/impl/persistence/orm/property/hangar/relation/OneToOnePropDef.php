@@ -67,6 +67,7 @@ class OneToOnePropDef implements HangarPropDef {
 	/**
 	 * {@inheritDoc}
 	 * @see \hangar\api\HangarPropDef::createMagCollection()
+	 * @return MagCollection
 	 */
 	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		$magCollection = new OrmRelationMagCollection($this->huoContext->getEntityModelManager(), true, true);
@@ -188,22 +189,24 @@ class OneToOnePropDef implements HangarPropDef {
 				AnnoOneToOne::class);
 		CastUtils::assertTrue($annoOneToOne instanceof AnnoOneToOne);
 		
-		if (null === $annoOneToOne->getMappedBy()) {
-			$relation = $entityProperty->getRelation();
-			ArgUtils::assertTrue($relation instanceof ToOneRelation);
-			
-			if ($relation instanceof JoinColumnToOneRelation) {
-				$dbInfo->getTable()->createColumnFactory()->createIntegerColumn(
-						$relation->getJoinColumnName(), 
-						$this->columnDefaults->getDefaultIntegerSize(), 
-						$this->columnDefaults->getDefaultInterSigned());
-			}
+		if (null !== $annoOneToOne->getMappedBy()) return;
+		
+		$relation = $entityProperty->getRelation();
+		ArgUtils::assertTrue($relation instanceof ToOneRelation);
+		if (!$relation instanceof JoinColumnToOneRelation) return;
+		
+		$table = $dbInfo->getTable();
+		if (!$table->containsColumnName($relation->getJoinColumnName())) {
+			$table->createColumnFactory()->createIntegerColumn(
+					$relation->getJoinColumnName(), 
+					$this->columnDefaults->getDefaultIntegerSize(), 
+					$this->columnDefaults->getDefaultInterSigned());
 		}
 	}
 	
 	/**
 	 * @param PropSourceDef $propSourceDef
-	 * @return \n2n\persistence\meta\structure\Column
+	 * @return Column
 	 */
 	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): ?Column {
 		return null;

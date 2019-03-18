@@ -70,6 +70,7 @@ class OneToManyPropDef implements HangarPropDef {
 	/**
 	 * {@inheritDoc}
 	 * @see \hangar\api\HangarPropDef::createMagCollection()
+	 * @return MagCollection
 	 */
 	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		$magCollection = new OrmRelationMagCollection($this->huoContext->getEntityModelManager(), true, true);
@@ -219,11 +220,12 @@ class OneToManyPropDef implements HangarPropDef {
 				
 				$columnFactory = $joinTable->createColumnFactory();
 				$joinTable->removeAllColumns();
+				
 				$joinColumnName = $relation->getJoinColumnName();
 				$inverseJoinColumnName = $relation->getInverseJoinColumnName();
 
-				$joinTable->addColumn($columnFactory->createIntegerColumn($joinColumnName, $idColumnSize, $idColumnSigned));
-				$joinTable->addColumn($columnFactory->createIntegerColumn($inverseJoinColumnName, $idColumnSize, $idColumnSigned));
+				$columnFactory->createIntegerColumn($joinColumnName, $idColumnSize, $idColumnSigned);
+				$columnFactory->createIntegerColumn($inverseJoinColumnName, $idColumnSize, $idColumnSigned);
 				
 				$joinTable->removeAllIndexes();
 				$joinTable->createIndex(IndexType::PRIMARY, array($joinColumnName, $inverseJoinColumnName));
@@ -252,7 +254,7 @@ class OneToManyPropDef implements HangarPropDef {
 	
 	/**
 	 * @param PropSourceDef $propSourceDef
-	 * @return \n2n\persistence\meta\structure\Column
+	 * @return Column
 	 */
 	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): ?Column {
 		return null;

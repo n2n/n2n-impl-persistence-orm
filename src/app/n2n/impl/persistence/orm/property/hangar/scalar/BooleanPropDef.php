@@ -49,6 +49,7 @@ class BooleanPropDef extends ScalarPropDefAdapter {
 	/**
 	 * {@inheritDoc}
 	 * @see \hangar\api\HangarPropDef::createMagCollection()
+	 * @return MagCollection
 	 */
 	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		return new MagCollection();
@@ -80,7 +81,7 @@ class BooleanPropDef extends ScalarPropDefAdapter {
 	}
 	/**
 	 * @param PropSourceDef $propSourceDef
-	 * @return \n2n\persistence\meta\structure\Column
+	 * @return Column
 	 */
 	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): Column {
 		ArgUtils::assertTrue($entityProperty instanceof BoolEntityProperty || $entityProperty instanceof ScalarEntityProperty);
