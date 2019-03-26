@@ -91,7 +91,7 @@ class UrlPropDef implements HangarPropDef {
 	 * @return Column
 	 */
 	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): ?Column {
-		ArgUtils::assertTrue($entityProperty instanceof N2nLocaleEntityProperty);
+		ArgUtils::assertTrue($entityProperty instanceof UrlEntityProperty);
 		return new CommonStringColumn($entityProperty->getColumnName(), self::DEFAULT_URL_COLUMN_LENGTH);
 	}
 	
