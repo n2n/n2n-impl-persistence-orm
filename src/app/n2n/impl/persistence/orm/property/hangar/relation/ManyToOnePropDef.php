@@ -40,6 +40,7 @@ use phpbob\PhpbobUtils;
 use hangar\api\HuoContext;
 use n2n\web\dispatch\mag\MagCollection;
 use n2n\persistence\meta\structure\Column;
+use n2n\impl\persistence\orm\property\IntEntityProperty;
 
 class ManyToOnePropDef implements HangarPropDef {
 	protected $columnDefaults;
@@ -159,8 +160,17 @@ class ManyToOnePropDef implements HangarPropDef {
 		$joinColumnName = $relation->getJoinColumnName();
 		$table = $dbInfo->getTable();
 		if (!$table->containsColumnName($joinColumnName)) {
-			$dbInfo->getTable()->createColumnFactory()->createIntegerColumn($joinColumnName, 
-					$this->columnDefaults->getDefaultIntegerSize(), $this->columnDefaults->getDefaultInterSigned());
+			$relation->getTargetEntityModel()->getTableName();
+			$targetEntityProperty = $relation->getTargetEntityModel()->getIdDef()->getEntityProperty();
+			
+			//@todo @andi: das sollte einfach sein eine lösung zu finden, sobald das die EntityProperties selbst können
+			if ($targetEntityProperty instanceof IntEntityProperty || $targetEntityProperty->getName() === 'id') {
+				$dbInfo->getTable()->createColumnFactory()->createIntegerColumn($joinColumnName, 
+						$this->columnDefaults->getDefaultIntegerSize(), $this->columnDefaults->getDefaultInterSigned());
+			} else {
+				$dbInfo->getTable()->createColumnFactory()->createStringColumn($joinColumnName, 
+						$this->columnDefaults->getDefaultStringLength(), $this->columnDefaults->getDefaultStringCharset());
+			}
 		}
 		
 		if (!$this->hasIndexForColumn($dbInfo->getTable(), $joinColumnName)) {
