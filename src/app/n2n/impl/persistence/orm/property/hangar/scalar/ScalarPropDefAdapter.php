@@ -34,6 +34,8 @@ use hangar\api\ColumnDefaults;
 use hangar\api\CompatibilityLevel;
 use hangar\api\HuoContext;
 use n2n\impl\persistence\orm\property\IntEntityProperty;
+use n2n\util\type\TypeUtils;
+use n2n\impl\persistence\orm\property\BoolEntityProperty;
 
 abstract class ScalarPropDefAdapter implements HangarPropDef {
 	
@@ -51,7 +53,7 @@ abstract class ScalarPropDefAdapter implements HangarPropDef {
 	 */
 	public function applyDbMeta(DbInfo $dbInfo, PropSourceDef $propSourceDef, EntityProperty $entityProperty,
 			AnnotationSet $annotationSet) {
-		ArgUtils::assertTrue($entityProperty instanceof ScalarEntityProperty || $entityProperty instanceof IntEntityProperty);
+		ArgUtils::assertTrue($entityProperty instanceof ScalarEntityProperty || $entityProperty instanceof IntEntityProperty || $entityProperty instanceof BoolEntityProperty);
 				
 		$columnName = $entityProperty->getColumnName();
 		$dbInfo->removeColumn($columnName);
