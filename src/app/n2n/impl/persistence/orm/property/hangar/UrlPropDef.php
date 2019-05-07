@@ -63,13 +63,14 @@ class UrlPropDef implements HangarPropDef {
 	 * @see \hangar\api\HangarPropDef::resetPropSourceDef()
 	 */
 	public function resetPropSourceDef(PropSourceDef $propSourceDef) {
-	    $propSourceDef->removePhpPropertyAnno(Url::class);
+	    $propSourceDef->removePhpPropertyAnno(AnnoUrl::class);
 	    $propSourceDef->removePhpUse(AnnoUrl::class);
 	    $propSourceDef->removePhpUse(Url::class);
 	}
 	
 	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
 		$propSourceDef->setPhpTypeDef(PhpTypeDef::fromTypeName(Url::class));
+		$propSourceDef->getPhpProperty()->getPhpPropertyAnnoCollection()->getOrCreatePhpAnno(AnnoUrl::class);
 	}
 	
 	/**
@@ -99,9 +100,9 @@ class UrlPropDef implements HangarPropDef {
 	 * @see \hangar\api\HangarPropDef::testCompatibility()
 	 */
 	public function testCompatibility(PropSourceDef $propSourceDef): int {
-		if ($propSourceDef->hasPhpPropertyAnno(AnnoN2nLocale::class)) return CompatibilityLevel::COMMON;
+		if ($propSourceDef->hasPhpPropertyAnno(AnnoUrl::class)) return CompatibilityLevel::COMMON;
 		if (null !== ($phpTypeDef = $propSourceDef->getPhpTypeDef()) && 
-				$phpTypeDef->getTypeName() === N2nLocale::class) return CompatibilityLevel::COMMON;
+				$phpTypeDef->getTypeName() === Url::class) return CompatibilityLevel::COMMON;
 		
 		return CompatibilityLevel::NOT_COMPATIBLE;
 	}
