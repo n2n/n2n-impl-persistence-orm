@@ -21,7 +21,7 @@
  */
 namespace n2n\impl\persistence\orm\property\hangar\scalar;
 
-use n2n\util\type\attrs\Attributes;
+use n2n\util\type\attrs\DataSet;
 use hangar\api\DbInfo;
 use n2n\persistence\meta\structure\ColumnFactory;
 use hangar\api\PropSourceDef;
@@ -55,9 +55,9 @@ class FloatingPointPropDef extends ScalarPropDefAdapter {
 		return $optionCollection;
 	}
 
-	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
+	public function updatePropSourceDef(DataSet $dataSet, PropSourceDef $propSourceDef) {
 		$propSourceDef->getHangarData()->setAll(array(self::PROP_NAME_SIZE => 
-				$attributes->get(self::PROP_NAME_SIZE)));
+				$dataSet->get(self::PROP_NAME_SIZE)));
 		$propSourceDef->setPhpTypeDef(new PhpTypeDef(Phpbob::TYPE_FLOAT));
 	}
 
@@ -73,12 +73,19 @@ class FloatingPointPropDef extends ScalarPropDefAdapter {
 	}
 
 	protected function createColumn(EntityProperty $entityProperty, 
-			DbInfo $dbInfo, ColumnFactory $columnFactory, $columnName, Attributes $attributes) {
+			DbInfo $dbInfo, ColumnFactory $columnFactory, $columnName, DataSet $attributes) {
 		$columnFactory->createFloatingPointColumn($columnName, $this->determineSize($attributes));
 	}
 	
-	private function determineSize(Attributes $attributes) {
-		return $attributes->get(self::PROP_NAME_SIZE, false, 
-				$this->columnDefaults->getDefaultFloatingPointSize());
+	private function determineSize(DataSet $dataSet) {
+		return $dataSet->optInt(self::PROP_NAME_SIZE, $this->columnDefaults->getDefaultFloatingPointSize());
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::isBasic()
+	 */
+	public function isBasic(): bool {
+		return true;
 	}
 }

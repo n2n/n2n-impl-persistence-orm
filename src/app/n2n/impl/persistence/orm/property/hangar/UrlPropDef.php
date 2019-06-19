@@ -23,12 +23,11 @@ namespace n2n\impl\persistence\orm\property\hangar;
 
 use hangar\api\HangarPropDef;
 use hangar\api\PropSourceDef;
-use n2n\util\type\attrs\Attributes;
+use n2n\util\type\attrs\DataSet;
 use n2n\web\dispatch\mag\MagCollection;
 use hangar\api\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
-use n2n\l10n\N2nLocale;
 use n2n\util\type\ArgUtils;
 use hangar\api\ColumnDefaults;
 use n2n\persistence\meta\structure\common\CommonStringColumn;
@@ -36,7 +35,6 @@ use hangar\api\CompatibilityLevel;
 use phpbob\representation\PhpTypeDef;
 use hangar\api\HuoContext;
 use n2n\persistence\meta\structure\Column;
-use n2n\persistence\orm\annotation\AnnoN2nLocale;
 use n2n\util\uri\Url;
 use n2n\persistence\orm\annotation\AnnoUrl;
 use n2n\impl\persistence\orm\property\UrlEntityProperty;
@@ -68,7 +66,7 @@ class UrlPropDef implements HangarPropDef {
 	    $propSourceDef->removePhpUse(Url::class);
 	}
 	
-	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
+	public function updatePropSourceDef(DataSet $dataSet, PropSourceDef $propSourceDef) {
 		$propSourceDef->setPhpTypeDef(PhpTypeDef::fromTypeName(Url::class));
 		$propSourceDef->getPhpProperty()->getPhpPropertyAnnoCollection()->getOrCreatePhpAnno(AnnoUrl::class);
 	}
@@ -105,5 +103,13 @@ class UrlPropDef implements HangarPropDef {
 				$phpTypeDef->getTypeName() === Url::class) return CompatibilityLevel::COMMON;
 		
 		return CompatibilityLevel::NOT_COMPATIBLE;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::isBasic()
+	 */
+	public function isBasic(): bool {
+		return false;
 	}
 }

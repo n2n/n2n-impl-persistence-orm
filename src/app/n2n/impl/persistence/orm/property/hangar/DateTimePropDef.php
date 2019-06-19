@@ -21,7 +21,7 @@
  */
 namespace n2n\impl\persistence\orm\property\hangar;
 
-use n2n\util\type\attrs\Attributes;
+use n2n\util\type\attrs\DataSet;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
 use n2n\util\type\ArgUtils;
@@ -75,7 +75,7 @@ class DateTimePropDef implements HangarPropDef {
 	 * {@inheritDoc}
 	 * @see \hangar\api\HangarPropDef::updatePropSourceDef()
 	 */
-	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
+	public function updatePropSourceDef(DataSet $dataSet, PropSourceDef $propSourceDef) {
 		$propSourceDef->setPhpTypeDef(new PhpTypeDef('\DateTime'));
 	}
 	
@@ -112,5 +112,13 @@ class DateTimePropDef implements HangarPropDef {
 				$phpTypeDef->getLocalName() === '\DateTime') return CompatibilityLevel::COMMON; 
 		
 		return CompatibilityLevel::NOT_COMPATIBLE; 
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::isBasic()
+	 */
+	public function isBasic(): bool {
+		return true;
 	}
 }

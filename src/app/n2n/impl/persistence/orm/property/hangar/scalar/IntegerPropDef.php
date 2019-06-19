@@ -25,7 +25,7 @@ use hangar\api\DbInfo;
 use n2n\persistence\meta\structure\IndexType;
 use n2n\persistence\orm\model\EntityModelFactory;
 use n2n\persistence\meta\structure\ColumnFactory;
-use n2n\util\type\attrs\Attributes;
+use n2n\util\type\attrs\DataSet;
 use hangar\api\PropSourceDef;
 use n2n\impl\web\dispatch\mag\model\BoolMag;
 use n2n\persistence\meta\structure\Size;
@@ -70,10 +70,10 @@ class IntegerPropDef extends ScalarPropDefAdapter {
 	 * {@inheritDoc}
 	 * @see \hangar\api\HangarPropDef::updatePropSourceDef()
 	 */
-	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
+	public function updatePropSourceDef(DataSet $dataSet, PropSourceDef $propSourceDef) {
 		$propSourceDef->getHangarData()->setAll(array(
-				self::PROP_NAME_SIZE => $attributes->get(self::PROP_NAME_SIZE),
-				self::PROP_NAME_SIGNED => $attributes->get(self::PROP_NAME_SIGNED)));
+				self::PROP_NAME_SIZE => $dataSet->get(self::PROP_NAME_SIZE),
+				self::PROP_NAME_SIGNED => $dataSet->get(self::PROP_NAME_SIGNED)));
 		
 		$propSourceDef->setPhpTypeDef(new PhpTypeDef('int'));
 	}
@@ -115,7 +115,7 @@ class IntegerPropDef extends ScalarPropDefAdapter {
 	}
 	
 	protected function createColumn(EntityProperty $entityProperty, DbInfo $dbInfo, 
-			ColumnFactory $columnFactory, $columnName, Attributes $attributes) {
+			ColumnFactory $columnFactory, $columnName, DataSet $attributes) {
 		$columnFactory->createIntegerColumn($columnName, $this->determineSize($attributes),
 				$this->determineSigned($attributes));
 		
@@ -124,16 +124,24 @@ class IntegerPropDef extends ScalarPropDefAdapter {
 		}
 	}
 	
-	private function determineSize(Attributes $attributes) {
-		return $attributes->get(self::PROP_NAME_SIZE, false, $this->columnDefaults->getDefaultIntegerSize());
+	private function determineSize(DataSet $dataSet) {
+		return $dataSet->get(self::PROP_NAME_SIZE, false, $this->columnDefaults->getDefaultIntegerSize());
 	}
 	
-	private function determineSigned(Attributes $attributes) {
-		return $attributes->get(self::PROP_NAME_SIGNED, false, $this->columnDefaults->getDefaultInterSigned());
+	private function determineSigned(DataSet $dataSet) {
+		return $dataSet->get(self::PROP_NAME_SIGNED, false, $this->columnDefaults->getDefaultInterSigned());
 	}
 	
 	private function getSizeOptions() {
 		return array(Size::SHORT => 'Short', Size::MEDIUM => 'Medium', Size::INTEGER => 'Integer', 
 				Size::LONG => 'Long');
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::isBasic()
+	 */
+	public function isBasic(): bool {
+		return true;
 	}
 }

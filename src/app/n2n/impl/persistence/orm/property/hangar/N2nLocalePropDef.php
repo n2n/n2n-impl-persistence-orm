@@ -23,7 +23,7 @@ namespace n2n\impl\persistence\orm\property\hangar;
 
 use hangar\api\HangarPropDef;
 use hangar\api\PropSourceDef;
-use n2n\util\type\attrs\Attributes;
+use n2n\util\type\attrs\DataSet;
 use n2n\web\dispatch\mag\MagCollection;
 use hangar\api\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
@@ -66,7 +66,7 @@ class N2nLocalePropDef implements HangarPropDef {
 	    $propSourceDef->removePhpUse(N2nLocale::class);
 	}
 	
-	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
+	public function updatePropSourceDef(DataSet $dataSet, PropSourceDef $propSourceDef) {
 		$propSourceDef->setPhpTypeDef(PhpTypeDef::fromTypeName(N2nLocale::class));
 	}
 	
@@ -103,5 +103,12 @@ class N2nLocalePropDef implements HangarPropDef {
 				$phpTypeDef->getTypeName() === N2nLocale::class) return CompatibilityLevel::COMMON;
 		
 		return CompatibilityLevel::NOT_COMPATIBLE;
+	}
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::isBasic()
+	 */
+	public function isBasic(): bool {
+		return true;
 	}
 }

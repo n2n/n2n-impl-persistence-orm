@@ -21,7 +21,7 @@
  */
 namespace n2n\impl\persistence\orm\property\hangar\scalar;
 
-use n2n\util\type\attrs\Attributes;
+use n2n\util\type\attrs\DataSet;
 use hangar\api\DbInfo;
 use n2n\persistence\meta\structure\ColumnFactory;
 use n2n\impl\web\dispatch\mag\model\StringArrayMag;
@@ -43,7 +43,7 @@ class EnumPropDef extends ScalarPropDefAdapter {
 	}
 	
 	protected function createColumn(EntityProperty $entityProperty, DbInfo $dbInfo, ColumnFactory $columnFactory, 
-			$columnName, Attributes $attributes) {
+			$columnName, DataSet $attributes) {
 		$columnFactory->createEnumColumn($columnName, $this->getValues($attributes));
 	}
 	
@@ -69,9 +69,9 @@ class EnumPropDef extends ScalarPropDefAdapter {
 	 * {@inheritDoc}
 	 * @see \hangar\api\HangarPropDef::updatePropSourceDef()
 	 */
-	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
+	public function updatePropSourceDef(DataSet $dataSet, PropSourceDef $propSourceDef) {
 		$propSourceDef->getHangarData()->setAll(array(self::PROP_NAME_VALUES => 
-				$attributes->get(self::PROP_NAME_VALUES)));
+				$dataSet->optScalarArray(self::PROP_NAME_VALUES)));
 		$propSourceDef->setPhpTypeDef(new PhpTypeDef('string'));
 	}
 	
@@ -97,7 +97,15 @@ class EnumPropDef extends ScalarPropDefAdapter {
 		return new CommonEnumColumn($entityProperty->getColumnName(), $this->getValues($propSourceDef->getHangarData()));
 	}
 	
-	private function getValues(Attributes $attributes) {
-		return $attributes->getArray(self::PROP_NAME_VALUES, false, array());
+	private function getValues(DataSet $dataSet) {
+		return $dataSet->optArray(self::PROP_NAME_VALUES);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::isBasic()
+	 */
+	public function isBasic(): bool {
+		return true;
 	}
 }

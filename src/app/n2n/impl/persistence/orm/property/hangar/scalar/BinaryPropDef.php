@@ -21,7 +21,7 @@
  */
 namespace n2n\impl\persistence\orm\property\hangar\scalar;
 
-use n2n\util\type\attrs\Attributes;
+use n2n\util\type\attrs\DataSet;
 use hangar\api\DbInfo;
 use n2n\persistence\meta\structure\ColumnFactory;
 use n2n\impl\web\dispatch\mag\model\NumericMag;
@@ -47,9 +47,9 @@ class BinaryPropDef extends ScalarPropDefAdapter {
 	}
 
 	protected function createColumn(EntityProperty $entityProperty, DbInfo $dbInfo, ColumnFactory $columnFactory, $columnName, 
-			Attributes $attributes) {
+			DataSet $dataSet) {
 		$columnFactory->createBinaryColumn($columnName, 
-				$attributes->get(self::PROP_NAME_SIZE, false, $this->columnDefaults->getDefaultBinarySize()));
+				$dataSet->get(self::PROP_NAME_SIZE, false, $this->columnDefaults->getDefaultBinarySize()));
 	}
 	
 	/**
@@ -74,9 +74,9 @@ class BinaryPropDef extends ScalarPropDefAdapter {
 	 * {@inheritDoc}
 	 * @see \hangar\api\HangarPropDef::updatePropSourceDef()
 	 */
-	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
+	public function updatePropSourceDef(DataSet $dataSet, PropSourceDef $propSourceDef) {
 		$propSourceDef->getHangarData()->setAll(array(self::PROP_NAME_SIZE => 
-				$attributes->get(self::PROP_NAME_SIZE)));
+				$dataSet->get(self::PROP_NAME_SIZE)));
 		$propSourceDef->setPhpTypeDef(new PhpTypeDef('string'));
 	}
 	
@@ -103,8 +103,15 @@ class BinaryPropDef extends ScalarPropDefAdapter {
 				$this->determineSize($propSourceDef->getHangarData()));
 	}
 	
-	private function determineSize(Attributes $attributes) {
-		return $attributes->get(self::PROP_NAME_SIZE, false, 
-				$this->columnDefaults->getDefaultBinarySize());
+	private function determineSize(DataSet $dataSet) {
+		return $dataSet->optInt(self::PROP_NAME_SIZE,  $this->columnDefaults->getDefaultBinarySize());
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::isBasic()
+	 */
+	public function isBasic(): bool {
+		return false;
 	}
 }

@@ -23,7 +23,7 @@ namespace n2n\impl\persistence\orm\property\hangar;
 
 use hangar\api\HangarPropDef;
 use hangar\api\PropSourceDef;
-use n2n\util\type\attrs\Attributes;
+use n2n\util\type\attrs\DataSet;
 use hangar\api\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
@@ -121,12 +121,12 @@ class ManagedFilePropDef implements HangarPropDef {
 		return $fileManagerLookupId;
 	}
 	
-	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
+	public function updatePropSourceDef(DataSet $dataSet, PropSourceDef $propSourceDef) {
 		$propSourceDef->setPhpTypeDef(PhpTypeDef::fromTypeName(File::class));
 		
 		$annoManagedFile = $propSourceDef->getOrCreatePhpPropertyAnno(AnnoManagedFile::class);
 		
-		$fileManagerLookupId = $attributes->get(self::PROP_NAME_FILE_MANAGER);
+		$fileManagerLookupId = $dataSet->get(self::PROP_NAME_FILE_MANAGER);
 		if ($fileManagerLookupId === FileManager::TYPE_PUBLIC) {
 			$fileManagerLookupId = null;
 		}
@@ -143,7 +143,7 @@ class ManagedFilePropDef implements HangarPropDef {
 		}
 		
 		$propSourceDef->getHangarData()->setAll(array(
-				self::PROP_NAME_LENGTH => $attributes->get(self::PROP_NAME_LENGTH)));
+				self::PROP_NAME_LENGTH => $dataSet->get(self::PROP_NAME_LENGTH)));
 	}
 	
 	/**
@@ -198,5 +198,13 @@ class ManagedFilePropDef implements HangarPropDef {
     	}
     	
     	throw new \InvalidArgumentException('Invalid file manager param: ' . $param);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see \hangar\api\HangarPropDef::isBasic()
+     */
+    public function isBasic(): bool {
+    	return false;
     }
 }

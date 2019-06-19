@@ -22,7 +22,7 @@
 namespace n2n\impl\persistence\orm\property\hangar\scalar;
 
 use hangar\api\PropSourceDef;
-use n2n\util\type\attrs\Attributes;
+use n2n\util\type\attrs\DataSet;
 use hangar\api\DbInfo;
 use n2n\impl\web\dispatch\mag\model\NumericMag;
 use n2n\impl\web\dispatch\mag\model\StringMag;
@@ -69,9 +69,9 @@ class TextPropDef extends ScalarPropDefAdapter {
 		return $magCollection;
 	}
 
-	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
-		$propSourceDef->getHangarData()->setAll(array(self::PROP_NAME_SIZE => $attributes->get(self::PROP_NAME_SIZE), 
-				self::PROP_NAME_CHARSET => $attributes->get(self::PROP_NAME_CHARSET, false)));
+	public function updatePropSourceDef(DataSet $dataSet, PropSourceDef $propSourceDef) {
+		$propSourceDef->getHangarData()->setAll(array(self::PROP_NAME_SIZE => $dataSet->get(self::PROP_NAME_SIZE), 
+				self::PROP_NAME_CHARSET => $dataSet->get(self::PROP_NAME_CHARSET, false)));
 		$propSourceDef->setPhpTypeDef(new PhpTypeDef('string'));
 	}
 	
@@ -113,17 +113,20 @@ class TextPropDef extends ScalarPropDefAdapter {
 		return CompatibilityLevel::NOT_COMPATIBLE;
 	}
 
-	protected function createColumn(EntityProperty $entityProperty, DbInfo $dbInfo, ColumnFactory $columnFactory, $columnName, Attributes $attributes) {
+	protected function createColumn(EntityProperty $entityProperty, DbInfo $dbInfo, ColumnFactory $columnFactory, $columnName, DataSet $attributes) {
 		$columnFactory->createTextColumn($columnName, $this->determineSize($attributes), 
 				$this->determineCharset($attributes));
 	}
 	
-	private function determineSize(Attributes $attributes) {
-		return $attributes->get(self::PROP_NAME_SIZE, false, $this->columnDefaults->getDefaultTextSize());
+	private function determineSize(DataSet $dataSet) {
+		return $dataSet->optInt(self::PROP_NAME_SIZE, $this->columnDefaults->getDefaultTextSize());
 	}
 	
-	private function determineCharset(Attributes $attributes) {
-		return $attributes->get(self::PROP_NAME_CHARSET, 
-				false, $this->columnDefaults->getDefaultTextCharset());
+	private function determineCharset(DataSet $dataSet) {
+		return $dataSet->optString(self::PROP_NAME_CHARSET, $this->columnDefaults->getDefaultTextCharset());
+	}
+	
+	public function isBasic(): bool {
+		return false;
 	}
 }

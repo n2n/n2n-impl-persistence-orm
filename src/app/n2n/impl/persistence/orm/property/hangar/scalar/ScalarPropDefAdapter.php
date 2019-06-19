@@ -22,7 +22,7 @@
 namespace n2n\impl\persistence\orm\property\hangar\scalar;
 
 use hangar\api\HangarPropDef;
-use n2n\util\type\attrs\Attributes;
+use n2n\util\type\attrs\DataSet;
 use hangar\api\PropSourceDef;
 use hangar\api\DbInfo;
 use n2n\persistence\meta\structure\ColumnFactory;
@@ -34,7 +34,6 @@ use hangar\api\ColumnDefaults;
 use hangar\api\CompatibilityLevel;
 use hangar\api\HuoContext;
 use n2n\impl\persistence\orm\property\IntEntityProperty;
-use n2n\util\type\TypeUtils;
 use n2n\impl\persistence\orm\property\BoolEntityProperty;
 
 abstract class ScalarPropDefAdapter implements HangarPropDef {
@@ -58,9 +57,9 @@ abstract class ScalarPropDefAdapter implements HangarPropDef {
 		$columnName = $entityProperty->getColumnName();
 		$dbInfo->removeColumn($columnName);
 		$columnFactory = $dbInfo->getTable()->createColumnFactory();
-		$attributes = $propSourceDef->getHangarData();
+		$dataSet = $propSourceDef->getHangarData();
 	
-		$this->createColumn($entityProperty, $dbInfo, $columnFactory, $columnName, $attributes);
+		$this->createColumn($entityProperty, $dbInfo, $columnFactory, $columnName, $dataSet);
 	}
 
 	/**
@@ -82,6 +81,6 @@ abstract class ScalarPropDefAdapter implements HangarPropDef {
 	}
 	
 	protected function createColumn(EntityProperty $entityProperty, DbInfo $dbInfo, ColumnFactory $columnFactory, 
-			$columnName, Attributes $attributes) {}
+			$columnName, DataSet $datSet) {}
 	
 }
