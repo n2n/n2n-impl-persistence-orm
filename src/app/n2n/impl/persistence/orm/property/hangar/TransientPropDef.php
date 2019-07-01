@@ -23,7 +23,7 @@ namespace n2n\impl\persistence\orm\property\hangar;
 
 use hangar\api\HangarPropDef;
 use hangar\api\PropSourceDef;
-use n2n\util\type\attrs\Attributes;
+use n2n\util\type\attrs\DataSet;
 use n2n\web\dispatch\mag\MagCollection;
 use hangar\api\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
@@ -69,8 +69,8 @@ class TransientPropDef implements HangarPropDef {
 		$propSourceDef->removePhpUse(AnnoTransient::class);
 	}
 	
-	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
-		if (!empty($typeName = $attributes->getScalar(self::PROP_NAME_TYPE_NAME, false))) {
+	public function updatePropSourceDef(DataSet $dataSet, PropSourceDef $propSourceDef) {
+		if (!empty($typeName = $dataSet->getScalar(self::PROP_NAME_TYPE_NAME, false))) {
 			$propSourceDef->setPhpTypeDef(PhpTypeDef::fromTypeName($typeName));
 		}
 		
@@ -101,5 +101,13 @@ class TransientPropDef implements HangarPropDef {
 		if ($propSourceDef->hasPhpPropertyAnno(AnnoTransient::class)) return CompatibilityLevel::COMMON;
 		
 		return CompatibilityLevel::NOT_COMPATIBLE;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::isBasic()
+	 */
+	public function isBasic(): bool {
+		return false;
 	}
 }

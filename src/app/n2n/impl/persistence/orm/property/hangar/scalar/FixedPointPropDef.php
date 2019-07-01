@@ -21,7 +21,7 @@
  */
 namespace n2n\impl\persistence\orm\property\hangar\scalar;
 
-use n2n\util\type\attrs\Attributes;
+use n2n\util\type\attrs\DataSet;
 use hangar\api\DbInfo;
 use n2n\persistence\meta\structure\ColumnFactory;
 use hangar\api\PropSourceDef;
@@ -44,7 +44,7 @@ class FixedPointPropDef extends ScalarPropDefAdapter {
 	}
 
 	protected function createColumn(EntityProperty $entityProperty, DbInfo $dbInfo, ColumnFactory $columnFactory, $columnName, 
-			Attributes $attributes) {
+			DataSet $attributes) {
 		$columnFactory->createFixedPointColumn($columnName, 
 				$this->determineNumIntegerDigits($entityProperty->getName(), $attributes),
 				$this->determineNumDecimalDigits($entityProperty->getName(), $attributes));
@@ -72,10 +72,10 @@ class FixedPointPropDef extends ScalarPropDefAdapter {
 		return $optionCollection;
 	}
 	
-	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
+	public function updatePropSourceDef(DataSet $dataSet, PropSourceDef $propSourceDef) {
 		$propSourceDef->getHangarData()->setAll(
-				array(self::PROP_NAME_NUM_DECIMAL_DIGITS => $attributes->get(self::PROP_NAME_NUM_DECIMAL_DIGITS),
-						self::PROP_NAME_NUM_INTEGER_DIGITS => $attributes->get(self::PROP_NAME_NUM_INTEGER_DIGITS)));
+				array(self::PROP_NAME_NUM_DECIMAL_DIGITS => $dataSet->get(self::PROP_NAME_NUM_DECIMAL_DIGITS),
+						self::PROP_NAME_NUM_INTEGER_DIGITS => $dataSet->get(self::PROP_NAME_NUM_INTEGER_DIGITS)));
 		$propSourceDef->setPhpTypeDef(new PhpTypeDef('float'));
 	}
 
@@ -115,9 +115,9 @@ class FixedPointPropDef extends ScalarPropDefAdapter {
 				$this->determineNumDecimalDigits($entityProperty->getName(), $propSourceDef->getHangarData()));
 	}
 	
-	private function determineNumIntegerDigits($propertyName, Attributes $attributes) {
-		if ($attributes->contains(self::PROP_NAME_NUM_INTEGER_DIGITS)) {
-			return $attributes->get(self::PROP_NAME_NUM_INTEGER_DIGITS);
+	private function determineNumIntegerDigits($propertyName, DataSet $dataSet) {
+		if ($dataSet->contains(self::PROP_NAME_NUM_INTEGER_DIGITS)) {
+			return $dataSet->reqInt(self::PROP_NAME_NUM_INTEGER_DIGITS);
 		}
 		
 		switch ($propertyName) {
@@ -131,9 +131,9 @@ class FixedPointPropDef extends ScalarPropDefAdapter {
 		}
 	}
 	
-	private function determineNumDecimalDigits($propertyName, Attributes $attributes) {
-		if ($attributes->contains(self::PROP_NAME_NUM_DECIMAL_DIGITS)) {
-			return $attributes->get(self::PROP_NAME_NUM_DECIMAL_DIGITS);
+	private function determineNumDecimalDigits($propertyName, DataSet $dataSet) {
+		if ($dataSet->contains(self::PROP_NAME_NUM_DECIMAL_DIGITS)) {
+			return $dataSet->reqInt(self::PROP_NAME_NUM_DECIMAL_DIGITS);
 		}
 		
 		switch ($propertyName) {
@@ -145,5 +145,13 @@ class FixedPointPropDef extends ScalarPropDefAdapter {
 			default:
 				return $this->columnDefaults->getDefaultFixedPointNumDecimalDigits();
 		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::isBasic()
+	 */
+	public function isBasic(): bool {
+		return true;
 	}
 }

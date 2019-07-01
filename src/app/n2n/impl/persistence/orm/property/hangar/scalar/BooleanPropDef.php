@@ -21,7 +21,7 @@
  */
 namespace n2n\impl\persistence\orm\property\hangar\scalar;
 
-use n2n\util\type\attrs\Attributes;
+use n2n\util\type\attrs\DataSet;
 use n2n\persistence\meta\structure\ColumnFactory;
 use hangar\api\DbInfo;
 use hangar\api\PropSourceDef;
@@ -35,9 +35,10 @@ use n2n\impl\persistence\orm\property\BoolEntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
 use n2n\web\dispatch\mag\MagCollection;
 use n2n\persistence\meta\structure\Column;
+use n2n\impl\web\dispatch\mag\model\EnumMag;
 
 class BooleanPropDef extends ScalarPropDefAdapter {
-	
+	const PROP_NAME_DEFAULT_VALUE = 'defaultValue';
 	/**
 	 * {@inheritDoc}
 	 * @see \hangar\api\HangarPropDef::getName()
@@ -52,15 +53,22 @@ class BooleanPropDef extends ScalarPropDefAdapter {
 	 * @return MagCollection
 	 */
 	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
-		return new MagCollection();
+		$magCollection = new MagCollection();
+		$magCollection->addMag(self::PROP_NAME_DEFAULT_VALUE, 
+				new EnumMag('Default Value', [null => 'No Default', 'true' => 'true', 'false' => 'false'], 
+						(null !== $propSourceDef) ? $propSourceDef->getPhpProperty()->getValue() : null));
+		return $magCollection;
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 * @see \hangar\api\HangarPropDef::updatePropSourceDef()
 	 */
-	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
+	public function updatePropSourceDef(DataSet $dataSet, PropSourceDef $propSourceDef) {
 		$propSourceDef->setPhpTypeDef(new PhpTypeDef('bool'));
+		if (null !== ($defaultValue = $dataSet->optString(self::PROP_NAME_DEFAULT_VALUE))) {
+			$propSourceDef->getPhpProperty()->setValue($defaultValue);
+		}
 	}
 	
 	/**
@@ -95,7 +103,7 @@ class BooleanPropDef extends ScalarPropDefAdapter {
 	 */
 	public function testCompatibility(PropSourceDef $propSourceDef): int {
 		if (null === $propSourceDef->getPhpTypeDef() || $propSourceDef->getPhpTypeDef()->isBool()) {
-			if (null === $propSourceDef || $propSourceDef->getPropertyName() === 'online') {
+			if (null === $propSourceDef->getPhpTypeDef() || $propSourceDef->getPropertyName() === 'online') {
 				return CompatibilityLevel::COMMON;
 			}
 			
@@ -106,7 +114,11 @@ class BooleanPropDef extends ScalarPropDefAdapter {
 	}
 	
 	protected function createColumn(EntityProperty $entityProperty, DbInfo $dbInfo, 
-			ColumnFactory $columnFactory, $columnName, Attributes $attributes) {
+			ColumnFactory $columnFactory, $columnName, DataSet $attributes) {
 		$columnFactory->createIntegerColumn($columnName, 1, false);
+	}
+	
+	public function isBasic(): bool {
+		return true;
 	}
 }

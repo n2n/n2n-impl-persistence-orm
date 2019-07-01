@@ -23,7 +23,7 @@ namespace n2n\impl\persistence\orm\property\hangar\relation;
 
 use hangar\api\HangarPropDef;
 use hangar\api\PropSourceDef;
-use n2n\util\type\attrs\Attributes;
+use n2n\util\type\attrs\DataSet;
 use hangar\api\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
@@ -116,10 +116,10 @@ class ManyToOnePropDef implements HangarPropDef {
 	 * {@inheritDoc}
 	 * @see \hangar\api\HangarPropDef::updatePropSourceDef()
 	 */
-	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
-		$propSourceDef->getHangarData()->setAll($attributes->toArray());
+	public function updatePropSourceDef(DataSet $dataSet, PropSourceDef $propSourceDef) {
+		$propSourceDef->getHangarData()->setAll($dataSet->toArray());
 		
-		$targetEntityTypeName = $attributes->get(OrmRelationMagCollection::PROP_NAME_TARGET_ENTITY_CLASS);
+		$targetEntityTypeName = $dataSet->get(OrmRelationMagCollection::PROP_NAME_TARGET_ENTITY_CLASS);
 		
 		$propSourceDef->setPhpTypeDef(PhpTypeDef::fromTypeName($targetEntityTypeName));
 		
@@ -129,10 +129,10 @@ class ManyToOnePropDef implements HangarPropDef {
 		$propSourceDef->createPhpUse($targetEntityTypeName);
 		
 		$cascadeTypeValue = OrmRelationMagCollection::buildCascadeTypeAnnoParam(
-				$attributes->get(OrmRelationMagCollection::PROP_NAME_CASCADE_TYPE));
+				$dataSet->get(OrmRelationMagCollection::PROP_NAME_CASCADE_TYPE));
 		
 		$fetchType = OrmRelationMagCollection::buildFetchTypeAnnoParam(
-				$attributes->getString(OrmRelationMagCollection::PROP_NAME_FETCH_TYPE));
+				$dataSet->getString(OrmRelationMagCollection::PROP_NAME_FETCH_TYPE));
 
 		// Pseudo mapped by
 		if (null !== $cascadeTypeValue) {
@@ -204,5 +204,13 @@ class ManyToOnePropDef implements HangarPropDef {
 		}
 		
 		return CompatibilityLevel::NOT_COMPATIBLE;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::isBasic()
+	 */
+	public function isBasic(): bool {
+		return false;
 	}
 }

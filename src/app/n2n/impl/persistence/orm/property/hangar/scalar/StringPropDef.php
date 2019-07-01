@@ -21,7 +21,7 @@
  */
 namespace n2n\impl\persistence\orm\property\hangar\scalar;
 
-use n2n\util\type\attrs\Attributes;
+use n2n\util\type\attrs\DataSet;
 use hangar\api\DbInfo;
 use n2n\persistence\meta\structure\ColumnFactory;
 use hangar\api\PropSourceDef;
@@ -60,10 +60,10 @@ class StringPropDef extends ScalarPropDefAdapter {
 		return $optionCollection;
 	}
 	
-	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
+	public function updatePropSourceDef(DataSet $dataSet, PropSourceDef $propSourceDef) {
 		$propSourceDef->getHangarData()->setAll(
-				array(self::PROP_NAME_LENGTH => $attributes->get(self::PROP_NAME_LENGTH, false, $this->columnDefaults->getDefaultStringLength()),
-						self::PROP_NAME_CHARSET => $attributes->get(self::PROP_NAME_CHARSET, false, $this->columnDefaults->getDefaultStringCharset())));
+				array(self::PROP_NAME_LENGTH => $dataSet->get(self::PROP_NAME_LENGTH, false, $this->columnDefaults->getDefaultStringLength()),
+						self::PROP_NAME_CHARSET => $dataSet->get(self::PROP_NAME_CHARSET, false, $this->columnDefaults->getDefaultStringCharset())));
 		$propSourceDef->setPhpTypeDef(new PhpTypeDef('string'));
 	}
 	
@@ -91,18 +91,20 @@ class StringPropDef extends ScalarPropDefAdapter {
 				$this->determineCharset($propSourceDef->getHangarData()));
 	}
 	
-	protected function createColumn(EntityProperty $entityProperty, DbInfo $dbInfo, ColumnFactory $columnFactory, $columnName, Attributes $attributes) {
-		$columnFactory->createStringColumn($columnName, $this->determineLength($attributes), 
-				$this->determineCharset($attributes));
+	protected function createColumn(EntityProperty $entityProperty, DbInfo $dbInfo, ColumnFactory $columnFactory, $columnName, DataSet $dataSet) {
+		$columnFactory->createStringColumn($columnName, $this->determineLength($dataSet), 
+				$this->determineCharset($dataSet));
 	}
 	
-	private function determineLength(Attributes $attributes) {
-		return $attributes->get(self::PROP_NAME_LENGTH, 
-				false, $this->columnDefaults->getDefaultStringLength());
+	private function determineLength(DataSet $dataSet) {
+		return $dataSet->optInt(self::PROP_NAME_LENGTH, $this->columnDefaults->getDefaultStringLength());
 	}
 	
-	private function determineCharset(Attributes $attributes) {
-		return $attributes->get(self::PROP_NAME_CHARSET, 
-				false, $this->columnDefaults->getDefaultStringCharset());
+	private function determineCharset(DataSet $dataSet) {
+		return $dataSet->optInt(self::PROP_NAME_CHARSET, $this->columnDefaults->getDefaultStringCharset());
+	}
+	
+	public function isBasic(): bool {
+		return true;
 	}
 }

@@ -23,7 +23,6 @@ namespace n2n\impl\persistence\orm\property\hangar\relation;
 
 use hangar\api\HangarPropDef;
 use hangar\api\PropSourceDef;
-use n2n\util\type\attrs\Attributes;
 use hangar\api\DbInfo;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
@@ -40,6 +39,7 @@ use phpbob\representation\PhpTypeDef;
 use hangar\api\HuoContext;
 use n2n\persistence\meta\structure\Column;
 use n2n\web\dispatch\mag\MagCollection;
+use n2n\util\type\attrs\DataSet;
 
 class ManyToManyPropDef implements HangarPropDef {
 	protected $columnDefaults;
@@ -66,7 +66,6 @@ class ManyToManyPropDef implements HangarPropDef {
 	 */
 	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
 		$magCollection = new OrmRelationMagCollection($this->huoContext->getEntityModelManager());
-		
 		
 		if (null !== $propSourceDef) {
 			if ($propSourceDef->hasPhpPropertyAnno(AnnoManyToMany::class)) {
@@ -120,10 +119,10 @@ class ManyToManyPropDef implements HangarPropDef {
 	 * {@inheritDoc}
 	 * @see \hangar\api\HangarPropDef::updatePropSourceDef()
 	 */
-	public function updatePropSourceDef(Attributes $attributes, PropSourceDef $propSourceDef) {
-		$propSourceDef->getHangarData()->setAll($attributes->toArray());
+	public function updatePropSourceDef(DataSet $dataSet, PropSourceDef $propSourceDef) {
+		$propSourceDef->getHangarData()->setAll($dataSet->toArray());
 		
-		$targetEntityTypeName = $attributes->get(OrmRelationMagCollection::PROP_NAME_TARGET_ENTITY_CLASS);
+		$targetEntityTypeName = $dataSet->get(OrmRelationMagCollection::PROP_NAME_TARGET_ENTITY_CLASS);
 		$propSourceDef->setArrayLikePhpTypeDef(PhpTypeDef::fromTypeName($targetEntityTypeName));
 		$propSourceDef->setPhpTypeDef(null);
 		
@@ -133,12 +132,12 @@ class ManyToManyPropDef implements HangarPropDef {
 		$propSourceDef->createPhpUse($targetEntityTypeName);
 		
 		$cascadeTypeValue = OrmRelationMagCollection::buildCascadeTypeAnnoParam(
-				$attributes->get(OrmRelationMagCollection::PROP_NAME_CASCADE_TYPE));
+				$dataSet->get(OrmRelationMagCollection::PROP_NAME_CASCADE_TYPE));
 		
 		$fetchType = OrmRelationMagCollection::buildFetchTypeAnnoParam(
-				$attributes->getString(OrmRelationMagCollection::PROP_NAME_FETCH_TYPE));
+				$dataSet->getString(OrmRelationMagCollection::PROP_NAME_FETCH_TYPE));
 		
-		if (null !== ($mappedBy = $attributes->get(OrmRelationMagCollection::PROP_NAME_MAPPED_BY))) {
+		if (null !== ($mappedBy = $dataSet->get(OrmRelationMagCollection::PROP_NAME_MAPPED_BY))) {
 			$anno->createPhpAnnoParam($mappedBy, true);
 		} else {
 			if (null !== $cascadeTypeValue || null !== $fetchType) {
@@ -209,5 +208,13 @@ class ManyToManyPropDef implements HangarPropDef {
 		}
 		
 		return CompatibilityLevel::NOT_COMPATIBLE;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see \hangar\api\HangarPropDef::isBasic()
+	 */
+	public function isBasic(): bool {
+		return false;
 	}
 }
