@@ -103,7 +103,7 @@ class BooleanPropDef extends ScalarPropDefAdapter {
 	 */
 	public function testCompatibility(PropSourceDef $propSourceDef): int {
 		if (null === $propSourceDef->getPhpTypeDef() || $propSourceDef->getPhpTypeDef()->isBool()) {
-			if (null === $propSourceDef->getPhpTypeDef() || $propSourceDef->getPropertyName() === 'online') {
+			if (null !== $propSourceDef->getPhpTypeDef() || $propSourceDef->getPropertyName() === 'online') {
 				return CompatibilityLevel::COMMON;
 			}
 			
