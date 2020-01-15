@@ -176,7 +176,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		}
 		
 		if (null !== ($type = $parameter->getType())) {
-			switch ($type->__toString()) {
+			switch ($type->getName()) {
 				case TypeName::BOOL:
 					$classSetup->provideEntityProperty(new BoolEntityProperty($propertyAccessProxy,
 							$classSetup->requestColumn($propertyName)));
