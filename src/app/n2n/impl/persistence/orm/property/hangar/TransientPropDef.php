@@ -70,7 +70,7 @@ class TransientPropDef implements HangarPropDef {
 	}
 	
 	public function updatePropSourceDef(DataSet $dataSet, PropSourceDef $propSourceDef) {
-		if (!empty($typeName = $dataSet->getScalar(self::PROP_NAME_TYPE_NAME, false))) {
+		if (!empty($typeName = $dataSet->optString(self::PROP_NAME_TYPE_NAME))) {
 			$propSourceDef->setPhpTypeDef(PhpTypeDef::fromTypeName($typeName));
 		}
 		
