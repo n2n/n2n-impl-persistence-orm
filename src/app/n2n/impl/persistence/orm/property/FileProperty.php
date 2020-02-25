@@ -54,7 +54,8 @@ class FileProperty extends ColumnPropertyAdapter {
 		
 		if ($this->fileLocator !== null) {
 			$this->fileLocator = new SimpleFileLocator(
-					StringUtils::hyphenated($entityModel->getTableName(), false));
+					StringUtils::hyphenated($entityModel->getTableName(), false),
+					StringUtils::hyphenated($columnName, false));
 		}
 		
 		$accessProxy->setConstraint(TypeConstraint::createSimple('n2n\io\managed\File'));
