@@ -203,11 +203,11 @@ class OneToManyPropDef implements HangarPropDef {
 					null !== $annotationSet->getPropertyAnnotation($propertyName, AnnoJoinTable::class));
 			
 			$relation = $entityProperty->getRelation();
+			$database = $dbInfo->getDatabase();
 			
 			if ($joinMode == RelationFactory::JOIN_MODE_TABLE) {
 				CastUtils::assertTrue($relation instanceof JoinTableRelation);
 
-				$database = $dbInfo->getDatabase();
 				$joinTable = null;
 				$joinTableName = $relation->getJoinTableName();
 				
@@ -237,7 +237,7 @@ class OneToManyPropDef implements HangarPropDef {
 
 				if ($database->containsMetaEntityName($targetTableName)) {
 					$targetTable = $database->getMetaEntityByName($targetTableName);
-					CastUtils::assertTrue($joinTable instanceof Table);
+					CastUtils::assertTrue($targetTable instanceof Table);
 				} else {
 					$targetTable = $database->createMetaEntityFactory()->createTable($targetTableName);
 				}
