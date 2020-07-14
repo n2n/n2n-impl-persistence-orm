@@ -24,8 +24,6 @@ namespace n2n\impl\persistence\orm\property\relation;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\impl\persistence\orm\property\relation\tree\JoinColumnTreePoint;
-use n2n\util\ex\IllegalStateException;
-use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 use n2n\persistence\orm\store\action\PersistAction;
 use n2n\impl\persistence\orm\property\relation\selection\JoinColumnToManyLoader;
 use n2n\impl\persistence\orm\property\relation\selection\ToManyRelationSelection;
@@ -36,7 +34,6 @@ use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\impl\persistence\orm\property\relation\util\OrphanRemover;
 use n2n\impl\persistence\orm\property\relation\util\ToManyValueHasher;
 use n2n\impl\persistence\orm\property\relation\util\ToManyAnalyzer;
-use n2n\impl\persistence\orm\property\relation\compare\IdColumnComparableDecorator;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\util\type\ArgUtils;
 use n2n\util\col\ArrayUtils;
@@ -44,6 +41,8 @@ use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\impl\persistence\orm\property\relation\util\ToManyValueHash;
+use n2n\impl\persistence\orm\property\relation\compare\ToManyCustomComparable;
+use n2n\impl\persistence\orm\property\relation\compare\InverseJoinColumnToManyQueryItemFactory;
 
 class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToManyRelation {
 	private $inverseJoinColumnName;
@@ -98,13 +97,11 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createColumnComparable()
 	 */
 	public function createCustomComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
-		$comparisonStargegy = $metaTreePoint->requestPropertyComparisonStrategy($this->createTargetIdTreePath())
-				->getColumnComparable();
+		$toManyQueryItemFactory = new InverseJoinColumnToManyQueryItemFactory($this->targetEntityModel,
+				$this->inverseJoinColumnName);
 		
-		IllegalStateException::assertTrue($comparisonStargegy->getType() == ComparisonStrategy::TYPE_COLUMN);
-		
-		return new IdColumnComparableDecorator($comparisonStargegy->getColumnComparable(),
-				$this->targetEntityModel);
+		return new ToManyCustomComparable($metaTreePoint, $this->targetEntityModel,
+				$this->createTargetIdTreePath(), $toManyQueryItemFactory, $queryState);
 	}
 
 	public function createInverseJoinTableToManyQueryItemFactory(EntityModel $entityModel) {
