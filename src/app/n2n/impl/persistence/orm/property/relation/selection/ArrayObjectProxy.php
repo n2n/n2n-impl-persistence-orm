@@ -105,14 +105,14 @@ class ArrayObjectProxy extends \ArrayObject {
 		return parent::count();
 	}
 
-	public function asort () {
+	public function asort (int $flags = SORT_REGULAR) {
 		$this->initialize();
-		return parent::asort();
+		return parent::asort($flags);
 	}
 
-	public function ksort () {
+	public function ksort (int $flags = SORT_REGULAR) {
 		$this->initialize();
-		return parent::ksort();
+		return parent::ksort($flags);
 	}
 
 	public function uasort ($cmp_function) {
