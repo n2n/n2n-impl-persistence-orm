@@ -35,6 +35,11 @@
 			"n2n\\impl\\persistence\\orm\\" : "src/app/n2n/impl/persistence/orm"
 		}
 	},
+	"autoload-dev" : {
+		"psr-4" : {
+			"n2n\\impl\\persistence\\orm\\" : "src/test/n2n/impl/persistence/orm"
+		}
+	},
 	"require-dev" : {
 		"phpunit/phpunit" : "^9.5"
 	}
