@@ -164,11 +164,14 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	 */
 	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
 		ArgUtils::assertTrue($oldValueHash instanceof CommonValueHash);
-		
 		$valueHash = $oldValueHash->getHash();
 		
 		foreach ($this->properties as $propertyName => $property)  {
-			$propertyValue = $property->readValue($object);
+			$propertyValue = null;
+			if ($value !== null) {
+				$propertyValue = $property->readValue($value);
+			}
+			
 			$propertyValueHash = null;
 			if ($valueHash !== null) {
 				ArgUtils::assertTrue(array_key_exists($propertyName, $valueHash));
