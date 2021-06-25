@@ -178,7 +178,7 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 				$propertyValueHash = $valueHash[$propertyName];
 			}
 			
-			$property->supplyRemoveAction($propertyValue, $propertyValueHash, $removeAction);
+			$property->supplyRemoveAction($removeAction, $propertyValue, $propertyValueHash);
 		}
 	}
 
