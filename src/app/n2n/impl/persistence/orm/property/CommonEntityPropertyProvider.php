@@ -38,7 +38,7 @@ use n2n\persistence\orm\annotation\AnnoEmbedded;
 use n2n\io\orm\FileEntityProperty;
 use n2n\io\orm\ManagedFileEntityProperty;
 use n2n\io\managed\impl\SimpleFileLocator;
-use n2n\io\IoUtils;
+use n2n\util\io\IoUtils;
 use n2n\util\uri\Url;
 use n2n\persistence\orm\annotation\AnnoBool;
 use n2n\util\type\TypeName;
