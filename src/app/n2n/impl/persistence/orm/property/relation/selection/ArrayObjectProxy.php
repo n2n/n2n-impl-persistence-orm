@@ -70,92 +70,92 @@ class ArrayObjectProxy extends \ArrayObject {
 		$this->whenInitializedClosures[] = $whenInitiliazedClosure;
 	}
 
-	public function offsetExists ($index) {
+	public function offsetExists ($index): bool {
 		$this->initialize();
 		return parent::offsetExists($index);
 	}
 
-	public function offsetGet ($index) {
+	public function offsetGet ($index): mixed {
 		$this->initialize();
 		return parent::offsetGet($index);
 	}
 
-	public function offsetSet ($index, $newval) {
+	public function offsetSet ($index, $newval): void {
 		$this->initialize();
-		return parent::offsetSet($index, $newval);
+		parent::offsetSet($index, $newval);
 	}
 
-	public function offsetUnset ($index) {
+	public function offsetUnset ($index): void {
 		$this->initialize();
-		return parent::offsetUnset($index);
+		parent::offsetUnset($index);
 	}
 
-	public function append ($value) {
+	public function append ($value): void {
 		$this->initialize();
-		return parent::append($value);
+		parent::append($value);
 	}
 
-	public function getArrayCopy () {
+	public function getArrayCopy (): array {
 		$this->initialize();
 		return parent::getArrayCopy();
 	}
 
-	public function count () {
+	public function count (): int {
 		$this->initialize();
 		return parent::count();
 	}
 
-	public function asort (int $flags = SORT_REGULAR) {
+	public function asort (int $flags = SORT_REGULAR): bool {
 		$this->initialize();
 		return parent::asort($flags);
 	}
 
-	public function ksort (int $flags = SORT_REGULAR) {
+	public function ksort (int $flags = SORT_REGULAR): bool {
 		$this->initialize();
 		return parent::ksort($flags);
 	}
 
-	public function uasort ($cmp_function) {
+	public function uasort ($cmp_function): bool {
 		$this->initialize();
 		return parent::uasort($cmp_function);
 	}
 
-	public function uksort ($cmp_function) {
+	public function uksort ($cmp_function): bool {
 		$this->initialize();
 		return parent::uksort($cmp_function);
 	}
 
-	public function natsort () {
+	public function natsort (): bool {
 		$this->initialize();
 		return parent::natsort();
 	}
 
-	public function natcasesort () {
+	public function natcasesort (): bool {
 		$this->initialize();
 		return parent::natcasesort();
 	}
 
-	public function serialize () {
+	public function serialize (): string {
 		$this->initialize();
 		return parent::serialize();
 	}
 
-	public function getIterator () {
+	public function getIterator (): \Iterator {
 		$this->initialize();
 		return parent::getIterator();
 	}
 
-	public function exchangeArray ($input) {
+	public function exchangeArray ($input): array {
 		$this->initialize();
 		return parent::exchangeArray($input);
 	}
 
-	public function setIteratorClass ($iterator_class) {
+	public function setIteratorClass ($iterator_class): void {
 		$this->initialize();
-		return parent::setIteratorClass($iterator_class);
+		parent::setIteratorClass($iterator_class);
 	}
 
-	public function getIteratorClass () {
+	public function getIteratorClass (): string {
 		$this->initialize();
 		return parent::getIteratorClass();
 	}
