@@ -126,11 +126,11 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 						$classSetup->requestColumn($propertyName)));
 				return;
 			case TypeName::FLOAT:
-				$classSetup->provideEntityProperty(new IntEntityProperty($propertyAccessProxy,
+				$classSetup->provideEntityProperty(new FloatEntityProperty($propertyAccessProxy,
 						$classSetup->requestColumn($propertyName)));
 				return;
 			case TypeName::STRING:
-				$classSetup->provideEntityProperty(new IntEntityProperty($propertyAccessProxy,
+				$classSetup->provideEntityProperty(new StringEntityProperty($propertyAccessProxy,
 						$classSetup->requestColumn($propertyName)));
 				return;
 		}
