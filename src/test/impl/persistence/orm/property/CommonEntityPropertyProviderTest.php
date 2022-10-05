@@ -48,9 +48,24 @@ use n2n\persistence\orm\attribute\N2nLocale;
 use n2n\persistence\orm\attribute\File;
 use n2n\persistence\orm\attribute\ManagedFile;
 use PHPUnit\Framework\TestCase;
+use n2n\impl\persistence\orm\property\class\PersistenceTestClass;
+use n2n\impl\persistence\orm\property\class\TargetClassTest;
+use n2n\persistence\orm\model\EntityModelFactory;
 
 class CommonEntityPropertyProviderTest extends TestCase {
-	public function test() {
+	private EntityModelManager $emm;
 
+	public function setUp() {
+		$this->emm = new EntityModelManager([PersistenceTestClass::class/*, TargetClassTest::class*/],
+				new EntityModelFactory([CommonEntityPropertyProvider::class]));
+	}
+
+	function testHoleradio() {
+		$entityModel = $this->emm->getEntityModelByClass(PersistenceTestClass::class);
+
+		$this->assertTrue($entityModel->containsEntityPropertyName('dateTime'));
+		$dateTimeEntityProperty = $entityModel->getLevelEntityPropertyByName('dateTime');
+		$this->assertInstanceOf(DateTimeEntityProperty::class, $dateTimeEntityProperty);
+		$this->assertE$dateTimeEntityProperty->getColumnName()
 	}
 }

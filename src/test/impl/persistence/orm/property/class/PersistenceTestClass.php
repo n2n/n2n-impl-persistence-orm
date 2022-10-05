@@ -38,7 +38,8 @@ class PersistenceTestClass {
 	private $attributeOverrides;
 	#[Column('differentColumn')]
 	private $column;
-	#[DateTime()]
+	#[DateTime]
+	#[JoinColumn('holeradio_date_time')];
 	private $dateTime;
 
 	private $discriminatorColumn;
