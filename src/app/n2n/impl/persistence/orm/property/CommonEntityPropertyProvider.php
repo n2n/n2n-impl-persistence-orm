@@ -25,23 +25,27 @@ use n2n\persistence\orm\property\EntityPropertyProvider;
 use n2n\reflection\property\AccessProxy;
 use n2n\persistence\orm\property\ClassSetup;
 use n2n\persistence\orm\model\EntityModelManager;
-use n2n\persistence\orm\annotation\AnnoOneToOne;
-use n2n\persistence\orm\annotation\AnnoManyToOne;
-use n2n\persistence\orm\annotation\AnnoOneToMany;
 use n2n\impl\persistence\orm\property\relation\RelationFactory;
-use n2n\persistence\orm\annotation\AnnoManyToMany;
 use n2n\reflection\property\PropertiesAnalyzer;
 use n2n\reflection\ReflectionUtils;
 use n2n\persistence\orm\model\NamingStrategy;
 use n2n\util\type\ArgUtils;
-use n2n\persistence\orm\annotation\AnnoEmbedded;
 use n2n\io\orm\FileEntityProperty;
 use n2n\io\orm\ManagedFileEntityProperty;
 use n2n\io\managed\impl\SimpleFileLocator;
 use n2n\util\io\IoUtils;
 use n2n\util\uri\Url;
-use n2n\persistence\orm\annotation\AnnoBool;
 use n2n\util\type\TypeName;
+use n2n\reflection\ReflectionContext;
+use n2n\persistence\orm\attribute\DateTime;
+use n2n\persistence\orm\attribute\N2nLocale;
+use n2n\persistence\orm\attribute\File;
+use n2n\persistence\orm\attribute\ManagedFile;
+use n2n\persistence\orm\attribute\OneToOne;
+use n2n\persistence\orm\attribute\ManyToOne;
+use n2n\persistence\orm\attribute\OneToMany;
+use n2n\persistence\orm\attribute\ManyToMany;
+use n2n\persistence\orm\attribute\Embedded;
 
 class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	const PROP_FILE_NAME_SUFFIX = '.originalName';
@@ -51,68 +55,49 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	public function setupPropertyIfSuitable(AccessProxy $propertyAccessProxy,
 			ClassSetup $classSetup) {
 
-		$annotationSet = $classSetup->getAnnotationSet();
+		$attributeSet = ReflectionContext::getAttributeSet($classSetup->getClass());
+
 		$propertyName = $propertyAccessProxy->getPropertyName();
 		
-		if (null !== ($annoDateTime = $annotationSet->getPropertyAnnotation($propertyName, 
-				'n2n\persistence\orm\annotation\AnnoDateTime'))) {
+		if (null !== ($attrDateTime = $attributeSet->getPropertyAttribute($propertyName, DateTime::class))) {
 			$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy, 
-					$classSetup->requestColumn($propertyName), array($annoDateTime)));
+					$classSetup->requestColumn($propertyName), array($attrDateTime)));
 			return;
 		}
 		
-		if (null !== ($annoN2nLocale = $annotationSet->getPropertyAnnotation($propertyName, 
-				'n2n\persistence\orm\annotation\AnnoN2nLocale'))) {
+		if (null !== ($attrN2nLocale = $attributeSet->getPropertyAttribute($propertyName, N2nLocale::class))) {
 			$classSetup->provideEntityProperty(new N2nLocaleEntityProperty($propertyAccessProxy, 
-					$classSetup->requestColumn($propertyName)), array($annoN2nLocale));
+					$attrN2nLocale->getProperty()->getName()$classSetup->requestColumn($propertyName)), array($attrN2nLocale));
 			return;
 		}
 
-		if (null !== ($annoUrl = $annotationSet->getPropertyAnnotation($propertyName,
-				'n2n\persistence\orm\annotation\AnnoUrl'))) {
+		if (null !== ($attrUrl = $attributeSet->getPropertyAttribute($propertyName, \n2n\persistence\orm\attribute\Url::class))) {
 			$classSetup->provideEntityProperty(new UrlEntityProperty($propertyAccessProxy,
-					$classSetup->requestColumn($propertyName)), array($annoUrl));
+					$classSetup->requestColumn($propertyName)), array($attrUrl));
 			return;
-		}
-
-		if (null !== ($annoLob = $annotationSet->getPropertyAnnotation($propertyName,
-				'n2n\persistence\orm\annotation\AnnoLob'))) {
-				$classSetup->provideEntityProperty(new LobEntityProperty($propertyAccessProxy,
-								$classSetup->requestColumn($propertyName)),
-						array($annoLob));
-				return;
 		}
 		
-		if (null !== ($annoFile = $annotationSet->getPropertyAnnotation($propertyName, 
-				'n2n\persistence\orm\annotation\AnnoFile'))) {
+		if (null !== ($attrFile = $attributeSet->getPropertyAttribute($propertyName, File::class))) {
 			$classSetup->provideEntityProperty(new FileEntityProperty($propertyAccessProxy, 
 							$classSetup->requestColumn($propertyName), 
-							$classSetup->requestColumn($propertyName . self::PROP_FILE_NAME_SUFFIX),
-									$annoFile->getOriginalNameColumnName()), 
-					array($annoN2nLocale));
+							$classSetup->requestColumn($propertyName . self::PROP_FILE_NAME_SUFFIX)),
+					array($attrFile));
 			return;
 		}
 		
-		if (null !== ($annoManagedFile = $annotationSet->getPropertyAnnotation($propertyName, 
-				'n2n\persistence\orm\annotation\AnnoManagedFile'))) {
+		if (null !== ($attrManagedFile = $attributeSet->getPropertyAttribute($propertyName, ManagedFile::class))) {
 			$manageFileEntityProperty = new ManagedFileEntityProperty($propertyAccessProxy, 
-					$classSetup->requestColumn($propertyName), $annoManagedFile->getLookupId(),
-					$annoManagedFile->isCascadeDelete());
+					$classSetup->requestColumn($propertyName), $attrManagedFile->getLookupId(),
+					$attrManagedFile->isCascadeDelete());
 					
-			if (null !== ($fileLocator = $annoManagedFile->getFileLocator())) {
+			if (null !== ($fileLocator = $attrManagedFile->getFileLocator())) {
 				$manageFileEntityProperty->setFileLocator($fileLocator);
 			} else {
 				$manageFileEntityProperty->setFileLocator(new SimpleFileLocator(
 						mb_strtolower(IoUtils::stripSpecialChars($classSetup->getClass()->getShortName()))));
 			}
 			
-			$classSetup->provideEntityProperty($manageFileEntityProperty, array($annoN2nLocale));
-			return;
-		}
-		
-		if (null !== ($annoBool = $annotationSet->getPropertyAnnotation($propertyName, AnnoBool::class))) {
-			$classSetup->provideEntityProperty(new BoolEntityProperty($propertyAccessProxy,
-					$classSetup->requestColumn($propertyName)), array($annoBool));
+			$classSetup->provideEntityProperty($manageFileEntityProperty, array($attrManagedFile));
 			return;
 		}
 		
@@ -192,22 +177,21 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	private function checkForEmbedded(AccessProxy $propertyAccessProxy,
 			ClassSetup $classSetup) {
 		$propertyName = $propertyAccessProxy->getPropertyName();
-		$annotationSet = $classSetup->getAnnotationSet();
-		$annoEmbedded = $annotationSet->getPropertyAnnotation($propertyName, 
-				'n2n\persistence\orm\annotation\AnnoEmbedded');
-		if ($annoEmbedded === null) return false;
+		$attributeSet = $classSetup->getAttributeSet();
+		$attrEmbedded = $attributeSet->getPropertyAttribute($propertyName, Embedded::class);
+		if ($attrEmbedded === null) return false;
 		
-		ArgUtils::assertTrue($annoEmbedded instanceof AnnoEmbedded);
+		ArgUtils::assertTrue($attrEmbedded instanceof Embedded);
 		
 		$embeddedEntityProperty = new EmbeddedEntityProperty($propertyAccessProxy, 
-				$annoEmbedded->getTargetClass());	
+				$attrEmbedded->getTargetClass());
 				
 		$classSetup->provideEntityProperty($embeddedEntityProperty);
 		
 		$setupProcess = $classSetup->getSetupProcess();
-		$targetClassSetup = new ClassSetup($setupProcess, $annoEmbedded->getTargetClass(),
-				new EmbeddedNampingStrategy($classSetup->getNamingStrategy(), $annoEmbedded->getColumnPrefix(), 
-						$annoEmbedded->getColumnSuffix()),
+		$targetClassSetup = new ClassSetup($setupProcess, $attrEmbedded->getTargetClass(),
+				new EmbeddedNampingStrategy($classSetup->getNamingStrategy(), $attrEmbedded->getColumnPrefix(),
+						$attrEmbedded->getColumnSuffix()),
 				$classSetup, $propertyName);
 		$setupProcess->getEntityPropertyAnalyzer()->analyzeClass($targetClassSetup);
 
@@ -221,44 +205,40 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	private function checkForRelations(AccessProxy $propertyAccessProxy,
 			ClassSetup $classSetup) {
 		$propertyName = $propertyAccessProxy->getPropertyName();
-		$annotationSet = $classSetup->getAnnotationSet();
+		$attributeSet = $classSetup->getAttributeSet();
 		
-		if (null !== ($annoOneToOne = $annotationSet->getPropertyAnnotation($propertyName,
-				'n2n\persistence\orm\annotation\AnnoOneToOne'))) {
-			$this->provideOneToOne($propertyAccessProxy, $annoOneToOne, $classSetup);
+		if (null !== ($attrOneToOne = $attributeSet->getPropertyAttribute($propertyName, OneToOne::class))) {
+			$this->provideOneToOne($propertyAccessProxy, $attrOneToOne, $classSetup);
 			return true;
 		}
 		
-		if (null !== ($annoManyToOne = $annotationSet->getPropertyAnnotation($propertyName,
-				'n2n\persistence\orm\annotation\AnnoManyToOne'))) {
-			$this->provideManyToOne($propertyAccessProxy, $annoManyToOne, $classSetup);
+		if (null !== ($attrManyToOne = $attributeSet->getPropertyAttribute($propertyName, ManyToOne::class))) {
+			$this->provideManyToOne($propertyAccessProxy, $attrManyToOne, $classSetup);
 			return true;
 		}
 		
-		if (null !== ($annoOneToMany = $annotationSet->getPropertyAnnotation($propertyName,
-				'n2n\persistence\orm\annotation\AnnoOneToMany'))) {
-			$this->provideOneToMany($propertyAccessProxy, $annoOneToMany, $classSetup);
+		if (null !== ($attrOneToMany = $attributeSet->getPropertyAttribute($propertyName, OneToMany::class))) {
+			$this->provideOneToMany($propertyAccessProxy, $attrOneToMany, $classSetup);
 			return true;
 		}
 		
-		if (null !== ($annoManyToMany = $annotationSet->getPropertyAnnotation($propertyName,
-				'n2n\persistence\orm\annotation\AnnoManyToMany'))) {
-			$this->provideManyToMany($propertyAccessProxy, $annoManyToMany, $classSetup);
+		if (null !== ($attrManyToMany = $attributeSet->getPropertyAttribute($propertyName, ManyToMany::class))) {
+			$this->provideManyToMany($propertyAccessProxy, $attrManyToMany, $classSetup);
 			return true;
 		}
 	}
 	
 	private function provideOneToOne(AccessProxy $propertyAccessProxy, 
-			AnnoOneToOne $annoOneToOne, ClassSetup $classSetup) {
+			OneToOne $attrOneToOne, ClassSetup $classSetup) {
 		$toOneProperty = new ToOneEntityProperty($propertyAccessProxy, 
-				$annoOneToOne->getMappedBy() === null, RelationEntityProperty::TYPE_ONE_TO_ONE);
+				$attrOneToOne->getMappedBy() === null, RelationEntityProperty::TYPE_ONE_TO_ONE);
 		$classSetup->provideEntityProperty($toOneProperty);
 			
-		$relationFactory = new RelationFactory($classSetup, $toOneProperty, $annoOneToOne);
+		$relationFactory = new RelationFactory($classSetup, $toOneProperty, $attrOneToOne);
 			
 		$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
-				use ($toOneProperty, $annoOneToOne, $relationFactory) {
-			if (null !== ($mappedBy = $annoOneToOne->getMappedBy())) {
+				use ($toOneProperty, $attrOneToOne, $relationFactory) {
+			if (null !== ($mappedBy = $attrOneToOne->getMappedBy())) {
 				$toOneProperty->setRelation($relationFactory->createMappedOneToOneRelation(
 						$mappedBy, $entityModelManager));
 			} else {
@@ -269,12 +249,12 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	}
 	
 	private function provideManyToOne(AccessProxy $propertyAccessProxy, 
-			AnnoManyToOne $annoManyToOne, ClassSetup $classSetup) {
+			ManyToOne $attrManyToOne, ClassSetup $classSetup) {
 		$toOneProperty = new ToOneEntityProperty($propertyAccessProxy, true, 
 				RelationEntityProperty::TYPE_MANY_TO_ONE);
 		$classSetup->provideEntityProperty($toOneProperty);
 		
-		$relationFactory = new RelationFactory($classSetup, $toOneProperty, $annoManyToOne);
+		$relationFactory = new RelationFactory($classSetup, $toOneProperty, $attrManyToOne);
 
 		$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
 				use ($toOneProperty, $relationFactory, $classSetup) {
@@ -282,24 +262,24 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		}, true);
 	}
 	
-	private function provideOneToMany(AccessProxy $propertyAccessProxy, 
-			AnnoOneToMany $annoOneToMany, ClassSetup $classSetup) {
+	private function provideOneToMany(AccessProxy $propertyAccessProxy,
+			OneToMany $attrOneToMany, ClassSetup $classSetup) {
 		$toManyProperty = new ToManyEntityProperty($propertyAccessProxy, 
-				$annoOneToMany->getMappedBy() === null, RelationEntityProperty::TYPE_ONE_TO_MANY);
+				$attrOneToMany->getMappedBy() === null, RelationEntityProperty::TYPE_ONE_TO_MANY);
 		$classSetup->provideEntityProperty($toManyProperty);
 		
-		$relationFactory = new RelationFactory($classSetup, $toManyProperty, $annoOneToMany);
+		$relationFactory = new RelationFactory($classSetup, $toManyProperty, $attrOneToMany);
 
 		if (!$toManyProperty->isMaster()) {
 			$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
-					use ($toManyProperty, $annoOneToMany, $relationFactory) {
-						$entityModelManager->getEntityModelByClass($annoOneToMany->getTargetEntityClass());
+					use ($toManyProperty, $attrOneToMany, $relationFactory) {
+						$entityModelManager->getEntityModelByClass($attrOneToMany->getTargetEntityClass());
 			}, true);
 		}
 			
 		$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
-				use ($toManyProperty, $annoOneToMany, $relationFactory) {
-			if (null !== ($mappedBy = $annoOneToMany->getMappedBy())) {
+				use ($toManyProperty, $attrOneToMany, $relationFactory) {
+			if (null !== ($mappedBy = $attrOneToMany->getMappedBy())) {
 				$toManyProperty->setRelation($relationFactory->createMappedOneToManyRelation(
 						$mappedBy, $entityModelManager));
 			} else {
@@ -310,16 +290,16 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	}
 	
 	private function provideManyToMany(AccessProxy $propertyAccessProxy,
-			AnnoManyToMany $annoManyToMany, ClassSetup $classSetup) {
+			ManyToMany $attrManyToMany, ClassSetup $classSetup) {
 		$manyToManyProperty = new ToManyEntityProperty($propertyAccessProxy,
-				 $annoManyToMany->getMappedBy() === null, RelationEntityProperty::TYPE_MANY_TO_MANY);
+				$attrManyToMany->getMappedBy() === null, RelationEntityProperty::TYPE_MANY_TO_MANY);
 		$classSetup->provideEntityProperty($manyToManyProperty);
 			
-		$relationFactory = new RelationFactory($classSetup, $manyToManyProperty, $annoManyToMany);
+		$relationFactory = new RelationFactory($classSetup, $manyToManyProperty, $attrManyToMany);
 		
 		$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
-				use ($manyToManyProperty, $annoManyToMany, $relationFactory) {
-			if (null !== ($mappedBy = $annoManyToMany->getMappedBy())) {
+				use ($manyToManyProperty, $attrManyToMany, $relationFactory) {
+			if (null !== ($mappedBy = $attrManyToMany->getMappedBy())) {
 				$manyToManyProperty->setRelation($relationFactory->createMappedManyToManyRelation(
 						$mappedBy, $entityModelManager));
 			} else {
