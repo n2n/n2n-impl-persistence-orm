@@ -48,15 +48,14 @@ use n2n\persistence\orm\attribute\N2nLocale;
 use n2n\persistence\orm\attribute\File;
 use n2n\persistence\orm\attribute\ManagedFile;
 use PHPUnit\Framework\TestCase;
-use n2n\impl\persistence\orm\property\class\PersistenceTestClass;
-use n2n\impl\persistence\orm\property\class\TargetClassTest;
+use n2n\impl\persistence\orm\property\test\PersistenceTestClass;
 use n2n\persistence\orm\model\EntityModelFactory;
 
 class CommonEntityPropertyProviderTest extends TestCase {
 	private EntityModelManager $emm;
 
-	public function setUp() {
-		$this->emm = new EntityModelManager([PersistenceTestClass::class/*, TargetClassTest::class*/],
+	public function setUp(): void {
+		$this->emm = new EntityModelManager([PersistenceTestClass::class/*, TargetClassTest::test*/],
 				new EntityModelFactory([CommonEntityPropertyProvider::class]));
 	}
 
@@ -66,6 +65,5 @@ class CommonEntityPropertyProviderTest extends TestCase {
 		$this->assertTrue($entityModel->containsEntityPropertyName('dateTime'));
 		$dateTimeEntityProperty = $entityModel->getLevelEntityPropertyByName('dateTime');
 		$this->assertInstanceOf(DateTimeEntityProperty::class, $dateTimeEntityProperty);
-		$this->assertE$dateTimeEntityProperty->getColumnName()
 	}
 }

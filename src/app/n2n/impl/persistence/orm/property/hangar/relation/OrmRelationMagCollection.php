@@ -62,8 +62,8 @@ class OrmRelationMagCollection extends MagCollection {
 		
 		$this->addMag(self::PROP_NAME_TARGET_ENTITY_CLASS, new EnumMag('Target Entity',
 				[null => null] + $this->targetEntityClassOptions, null, true,
-				array('class' => $addMappedBy ? 'hangar-orm-relation-target-entity'  : 'hangar-autocompletion'), 
-				array('class' => 'hangar-orm-relation-target-entity-container')));
+				array('test' => $addMappedBy ? 'hangar-orm-relation-target-entity'  : 'hangar-autocompletion'),
+				array('test' => 'hangar-orm-relation-target-entity-container')));
 		
 		if ($addMappedBy) {
 			$analyzer = new PhpSourceAnalyzer();
@@ -95,16 +95,16 @@ class OrmRelationMagCollection extends MagCollection {
 			
 			$this->addMag(self::PROP_NAME_MAPPED_BY, 
 					new StringMag('Mapped By', null, false, null, false,
-							array('class' => 'hangar-orm-relation-mapped-by-container'),
-							array('class' => 'hangar-orm-relation-mapped-by', 
+							array('test' => 'hangar-orm-relation-mapped-by-container'),
+							array('test' => 'hangar-orm-relation-mapped-by',
 									'data-grouped-options' => StringUtils::jsonEncode($this->groupedMappedByOptions),
 									'data-mapped-by-options' => StringUtils::jsonEncode($this->mappedByOptions))));
 		}
 		
 		$this->addMag(OrmRelationMagCollection::PROP_NAME_CASCADE_TYPE, 
 				new MultiSelectMag('Cascade Type', self::getCascadeTypeOptions(), array(), 0, null, 
-						array('class' => 'hangar-orm-relation-cascade-type'), 
-						array('class' => 'hangar-orm-relation-cascade-type-container')));
+						array('test' => 'hangar-orm-relation-cascade-type'),
+						array('test' => 'hangar-orm-relation-cascade-type-container')));
 
 		$this->addMag(OrmRelationMagCollection::PROP_NAME_FETCH_TYPE, 
 				new EnumMag('Fetch Type', self::getFetchTypeOptions(), FetchType::LAZY, true));
@@ -267,7 +267,7 @@ class OrmRelationMagCollection extends MagCollection {
 				return mb_substr($reflClassParam, 1, -1);
 			}
 			
-			if (StringUtils::endsWith('::class', $reflClassParam)) {
+			if (StringUtils::endsWith('::test', $reflClassParam)) {
 				return mb_substr($reflClassParam, 0, -7);
 			}
 		}

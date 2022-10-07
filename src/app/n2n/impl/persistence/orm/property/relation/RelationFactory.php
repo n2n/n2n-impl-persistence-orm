@@ -327,7 +327,7 @@ class RelationFactory {
 		} catch (OrmConfigurationException $e) {
 			throw $this->classSetup->createException($this->classSetup->buildPropertyString(
 					$this->relationProperty->getName())
-					. ' is annotated with invalid target entity class.', $e,
+					. ' is annotated with invalid target entity test.', $e,
 					array($this->relationAttribute));
 		}
 		

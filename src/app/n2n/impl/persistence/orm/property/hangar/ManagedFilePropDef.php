@@ -82,7 +82,7 @@ class ManagedFilePropDef implements HangarPropDef {
 		$magCollection->addMag(self::PROP_NAME_LENGTH, new NumericMag('Length', $size, true));
 		$magCollection->addMag(self::PROP_NAME_FILE_MANAGER, new ClassNameMag('FileManager (Lookup Id)', 
 				new \ReflectionClass(FileManager::class), $fileManagerLookupId, false, null, null, 
-				['class' => 'hangar-autocompletion', 'data-suggestions' => StringUtils::jsonEncode($options),
+				['test' => 'hangar-autocompletion', 'data-suggestions' => StringUtils::jsonEncode($options),
 						'data-custom-allowed' => true]));
 		
 		return $magCollection;
@@ -135,7 +135,7 @@ class ManagedFilePropDef implements HangarPropDef {
 			$phpTypeDef = PhpTypeDef::fromTypeName($fileManagerLookupId);
 			$propSourceDef->createPhpUse($phpTypeDef->getTypeName());
 			
-			$annoManagedFile->getOrCreatePhpAnnoParam(1, $phpTypeDef->getLocalName() . '::class');
+			$annoManagedFile->getOrCreatePhpAnnoParam(1, $phpTypeDef->getLocalName() . '::test');
 		} else if ($annoManagedFile->getNumPhpAnnoParams() > 1) {
 			$annoManagedFile->getPhpAnnoParam(1)->setValue('null');
 		} else {
@@ -189,7 +189,7 @@ class ManagedFilePropDef implements HangarPropDef {
     public static function determineFileManagerStr(string $param) {
     	if ($param === 'null') return FileManager::TYPE_PUBLIC;
     	
-    	if (StringUtils::endsWith('::class', $param)) {
+    	if (StringUtils::endsWith('::test', $param)) {
     		return mb_substr($param, 0, -7);
     	}
     	

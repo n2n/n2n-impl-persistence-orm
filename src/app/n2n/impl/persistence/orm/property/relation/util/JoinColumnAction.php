@@ -27,7 +27,7 @@ namespace n2n\impl\persistence\orm\property\relation\util;
 // use n2n\persistence\meta\data\QueryPlaceMarker;
 // use n2n\persistence\meta\data\QueryComparator;
 
-// class JoinColumnAction extends ActionAdapter {
+// test JoinColumnAction extends ActionAdapter {
 // 	private $pdo;
 // 	private $tableName;
 // 	private $idColumnName;

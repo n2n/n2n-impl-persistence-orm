@@ -56,18 +56,17 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 			ClassSetup $classSetup) {
 
 		$attributeSet = ReflectionContext::getAttributeSet($classSetup->getClass());
-
 		$propertyName = $propertyAccessProxy->getPropertyName();
-		
+
 		if (null !== ($attrDateTime = $attributeSet->getPropertyAttribute($propertyName, DateTime::class))) {
 			$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy, 
-					$classSetup->requestColumn($propertyName), array($attrDateTime)));
+					$classSetup->requestColumn($propertyName)), array($attrDateTime));
 			return;
 		}
 		
 		if (null !== ($attrN2nLocale = $attributeSet->getPropertyAttribute($propertyName, N2nLocale::class))) {
 			$classSetup->provideEntityProperty(new N2nLocaleEntityProperty($propertyAccessProxy, 
-					$attrN2nLocale->getProperty()->getName()$classSetup->requestColumn($propertyName)), array($attrN2nLocale));
+					$classSetup->requestColumn($propertyName)), array($attrN2nLocale));
 			return;
 		}
 
@@ -100,7 +99,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 			$classSetup->provideEntityProperty($manageFileEntityProperty, array($attrManagedFile));
 			return;
 		}
-		
+
 		switch ($propertyAccessProxy->getConstraint()->getTypeName()) {
 			case TypeName::BOOL:
 				$classSetup->provideEntityProperty(new BoolEntityProperty($propertyAccessProxy,
@@ -138,7 +137,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		$parameters = $setterMethod->getParameters();
 		if (count($parameters) == 0) return;
 		$parameter = current($parameters);
-		
+
 		if (null !== ($paramClass = ReflectionUtils::extractParameterClass($parameter))) {
 			switch ($paramClass->getName()) {
 				case 'DateTime':
