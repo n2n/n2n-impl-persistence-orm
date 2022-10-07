@@ -38,6 +38,7 @@ use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\store\CommonValueHash;
 use n2n\util\type\TypeName;
+use n2n\util\type\TypeConstraints;
 
 class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	/**
@@ -45,9 +46,7 @@ class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 	 * @param string $columnName
 	 */
 	public function __construct(AccessProxy $accessProxy, $columnName) {
-		$accessProxy->setConstraint(TypeConstraint::createSimple(TypeName::STRING, true, true));
-		
-		parent::__construct($accessProxy, $columnName);
+		parent::__construct($accessProxy->createRestricted(TypeConstraints::string(true)), $columnName);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\ColumnComparableEntityProperty::createComparisonStrategy()

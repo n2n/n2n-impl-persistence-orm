@@ -34,8 +34,6 @@ abstract class ColumnPropertyAdapter extends EntityPropertyAdapter implements Co
 	public function __construct(AccessProxy $accessProxy, $columnName) {
 		parent::__construct($accessProxy);
 		$this->columnName = $columnName;
-		
-		$accessProxy->setForcePropertyAccess(true);
 	}
 	
 	public function getColumnName() {
