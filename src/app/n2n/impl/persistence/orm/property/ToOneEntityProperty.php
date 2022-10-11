@@ -31,15 +31,16 @@ use n2n\persistence\orm\store\operation\MergeOperation;
 use n2n\persistence\orm\CascadeType;
 use n2n\persistence\orm\store\operation\CascadeOperation;
 use n2n\persistence\orm\model\EntityPropertyCollection;
+use n2n\util\type\TypeConstraints;
 
 class ToOneEntityProperty extends RelationEntityPropertyAdapter implements ColumnComparableEntityProperty, 
 		QueryItemRepresentableEntityProperty {
 	
 	public function setRelation(ToOneRelation $relation) {
 		parent::assignRelation($relation);
-	
-		$this->accessProxy->setConstraint(TypeConstraint::createSimple($relation->getTargetEntityModel()->getClass()
-				->getName()));
+
+		$this->accessProxy = $this->accessProxy->createRestricted(TypeConstraints::namedType(
+				$relation->getTargetEntityModel()->getClass()->getName(), true));
 	}
 	
 	public function createRepresentingQueryItem(MetaTreePoint $metaTreePoint, QueryState $queryState) {

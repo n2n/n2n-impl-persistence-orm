@@ -33,12 +33,13 @@ use n2n\impl\persistence\orm\property\relation\ToManyRelation;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\property\CustomComparableEntityProperty;
+use n2n\util\type\TypeConstraints;
 
 class ToManyEntityProperty extends RelationEntityPropertyAdapter implements CustomComparableEntityProperty {
 	public function setRelation(Relation $relation) {
 		parent::assignRelation($relation);
 		ArgUtils::assertTrue($this->relation instanceof ToManyRelation);
-		$this->accessProxy->setConstraint(TypeConstraint::createArrayLike(null, true,
+		$this->accessProxy = $this->accessProxy->createRestricted(TypeConstraint::createArrayLike(null, true,
 				TypeConstraint::createSimple($relation->getTargetEntityModel()->getClass()->getName()), 
 				array('n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy')));
 	}

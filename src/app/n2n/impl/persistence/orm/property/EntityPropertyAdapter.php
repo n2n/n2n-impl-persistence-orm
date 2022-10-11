@@ -33,13 +33,11 @@ use n2n\util\type\TypeUtils;
 abstract class EntityPropertyAdapter implements EntityProperty {
 	private $entityModel;
 	private $parent;
-	protected $accessProxy;
 	
 	/**
 	 * @param AccessProxy $accessProxy
 	 */
-	public function __construct(AccessProxy $accessProxy) {
-		$this->accessProxy = $accessProxy;
+	public function __construct(protected AccessProxy $accessProxy) {
 	}
 	
 	/**
