@@ -216,49 +216,45 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		$propertyName = $propertyAccessProxy->getPropertyName();
 		$attributeSet = $classSetup->getAttributeSet();
 
-		$attrOneToOne = $attributeSet->getPropertyAttribute($propertyName, OneToOne::class);
-		if (null !== $attrOneToOne) {
-			$this->provideOneToOne($propertyAccessProxy, $attrOneToOne, $classSetup);
+		$oneToOneAttribute = $attributeSet->getPropertyAttribute($propertyName, OneToOne::class);
+		if (null !== $oneToOneAttribute) {
+			$this->provideOneToOne($propertyAccessProxy, $oneToOneAttribute, $classSetup);
 			return true;
 		}
 
-		$attrManyToOne = $attributeSet->getPropertyAttribute($propertyName, ManyToOne::class);
-		if (null !== $attrManyToOne) {
-			$this->provideManyToOne($propertyAccessProxy,
-					PropertyAttribute::fromAttribute($attrManyToOne->getAttribute(), $attrManyToOne->getProperty()),
-					$classSetup);
+		$manyToOneAttribute = $attributeSet->getPropertyAttribute($propertyName, ManyToOne::class);
+		if (null !== $manyToOneAttribute) {
+			$this->provideManyToOne($propertyAccessProxy, $manyToOneAttribute, $classSetup);
 			return true;
 		}
 
-		$attrOneToMany = $attributeSet->getPropertyAttribute($propertyName, OneToMany::class);
-		if (null !== $attrOneToMany) {
-			$this->provideOneToMany($propertyAccessProxy,
-					PropertyAttribute::fromAttribute($attrOneToMany->getAttribute(), $attrOneToMany->getProperty()),
-					$classSetup);
+		$oneToManyAttribute = $attributeSet->getPropertyAttribute($propertyName, OneToMany::class);
+		if (null !== $oneToManyAttribute) {
+			$this->provideOneToMany($propertyAccessProxy, $oneToManyAttribute, $classSetup);
 			return true;
 		}
 
-		$attrManyToMany = $attributeSet->getPropertyAttribute($propertyName, ManyToMany::class);
-		if (null !== $attrManyToMany) {
-			$this->provideManyToMany($propertyAccessProxy,
-					PropertyAttribute::fromAttribute($attrManyToMany->getAttribute(), $attrManyToMany->getProperty()),
-					$classSetup);
+		$manyToManyAttribute = $attributeSet->getPropertyAttribute($propertyName, ManyToMany::class);
+		if (null !== $manyToManyAttribute) {
+			$this->provideManyToMany($propertyAccessProxy, $manyToManyAttribute, $classSetup);
 			return true;
 		}
 	}
 	
 	private function provideOneToOne(AccessProxy $propertyAccessProxy, 
-			PropertyAttribute $attrOneToOne, ClassSetup $classSetup) {
-		$attrInstance = $attrOneToOne->getInstance();
+			PropertyAttribute $oneToOneAttribute, ClassSetup $classSetup) {
+		$oneToOne = $oneToOneAttribute->getInstance();
+		ArgUtils::assertTrue($oneToOne instanceof OneToOne);
+
 		$toOneProperty = new ToOneEntityProperty($propertyAccessProxy,
-				$attrInstance->getMappedBy() === null, RelationEntityProperty::TYPE_ONE_TO_ONE);
+				$oneToOne->getMappedBy() === null, RelationEntityProperty::TYPE_ONE_TO_ONE);
 		$classSetup->provideEntityProperty($toOneProperty);
 
-		$relationFactory = new RelationFactory($classSetup, $toOneProperty, $attrOneToOne);
+		$relationFactory = new RelationFactory($classSetup, $toOneProperty, $oneToOneAttribute);
 
 		$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
-				use ($toOneProperty, $attrInstance, $relationFactory) {
-			if (null !== ($mappedBy = $attrInstance->getMappedBy())) {
+				use ($toOneProperty, $oneToOne, $relationFactory) {
+			if (null !== ($mappedBy = $oneToOne->getMappedBy())) {
 				$toOneProperty->setRelation($relationFactory->createMappedOneToOneRelation(
 						$mappedBy, $entityModelManager));
 			} else {
@@ -269,12 +265,12 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	}
 	
 	private function provideManyToOne(AccessProxy $propertyAccessProxy, 
-			Attribute $attrManyToOne, ClassSetup $classSetup) {
+			Attribute $manyToOneAttribute, ClassSetup $classSetup) {
 		$toOneProperty = new ToOneEntityProperty($propertyAccessProxy, true, 
 				RelationEntityProperty::TYPE_MANY_TO_ONE);
 		$classSetup->provideEntityProperty($toOneProperty);
 		
-		$relationFactory = new RelationFactory($classSetup, $toOneProperty, $attrManyToOne);
+		$relationFactory = new RelationFactory($classSetup, $toOneProperty, $manyToOneAttribute);
 
 		$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
 				use ($toOneProperty, $relationFactory, $classSetup) {
@@ -283,24 +279,24 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	}
 	
 	private function provideOneToMany(AccessProxy $propertyAccessProxy,
-			Attribute $attrOneToMany, ClassSetup $classSetup) {
-		$attrInstance = $attrOneToMany->getInstance();
+			PropertyAttribute $oneToManyAttribute, ClassSetup $classSetup) {
+		$oneToMany = $oneToManyAttribute->getInstance();
 		$toManyProperty = new ToManyEntityProperty($propertyAccessProxy,
-				$attrInstance->getMappedBy() === null, RelationEntityProperty::TYPE_ONE_TO_MANY);
+				$oneToMany->getMappedBy() === null, RelationEntityProperty::TYPE_ONE_TO_MANY);
 		$classSetup->provideEntityProperty($toManyProperty);
 		
-		$relationFactory = new RelationFactory($classSetup, $toManyProperty, $attrOneToMany);
+		$relationFactory = new RelationFactory($classSetup, $toManyProperty, $oneToManyAttribute);
 
 		if (!$toManyProperty->isMaster()) {
 			$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
-					use ($toManyProperty, $attrInstance, $relationFactory) {
-						$entityModelManager->getEntityModelByClass($attrInstance->getTargetEntityClass());
+					use ($toManyProperty, $oneToMany, $relationFactory) {
+						$entityModelManager->getEntityModelByClass($oneToMany->getTargetEntityClass());
 			}, true);
 		}
 			
 		$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
-				use ($toManyProperty, $attrInstance, $relationFactory) {
-			if (null !== ($mappedBy = $attrInstance->getMappedBy())) {
+				use ($toManyProperty, $oneToMany, $relationFactory) {
+			if (null !== ($mappedBy = $oneToMany->getMappedBy())) {
 				$toManyProperty->setRelation($relationFactory->createMappedOneToManyRelation(
 						$mappedBy, $entityModelManager));
 			} else {
@@ -311,17 +307,19 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	}
 	
 	private function provideManyToMany(AccessProxy $propertyAccessProxy,
-			Attribute $attrManyToMany, ClassSetup $classSetup) {
-		$attrInstance = $attrManyToMany->getInstance();
+			PropertyAttribute $manyToManyAttribute, ClassSetup $classSetup) {
+		$manyToMany = $manyToManyAttribute->getInstance();
+		ArgUtils::assertTrue($manyToMany instanceof ManyToMany);
+
 		$manyToManyProperty = new ToManyEntityProperty($propertyAccessProxy,
-				$attrInstance->getMappedBy() === null, RelationEntityProperty::TYPE_MANY_TO_MANY);
+				$manyToMany->getMappedBy() === null, RelationEntityProperty::TYPE_MANY_TO_MANY);
 		$classSetup->provideEntityProperty($manyToManyProperty);
 			
-		$relationFactory = new RelationFactory($classSetup, $manyToManyProperty, $attrManyToMany);
+		$relationFactory = new RelationFactory($classSetup, $manyToManyProperty, $manyToManyAttribute);
 		
 		$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
-				use ($manyToManyProperty, $attrInstance, $relationFactory) {
-			if (null !== ($mappedBy = $attrInstance->getMappedBy())) {
+				use ($manyToManyProperty, $manyToMany, $relationFactory) {
+			if (null !== ($mappedBy = $manyToMany->getMappedBy())) {
 				$manyToManyProperty->setRelation($relationFactory->createMappedManyToManyRelation(
 						$mappedBy, $entityModelManager));
 			} else {
