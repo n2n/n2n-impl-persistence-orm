@@ -50,20 +50,96 @@ use n2n\persistence\orm\attribute\ManagedFile;
 use PHPUnit\Framework\TestCase;
 use n2n\impl\persistence\orm\property\test\PersistenceTestClass;
 use n2n\persistence\orm\model\EntityModelFactory;
+use n2n\impl\persistence\orm\property\test\TargetClassTest;
 
 class CommonEntityPropertyProviderTest extends TestCase {
 	private EntityModelManager $emm;
 
 	public function setUp(): void {
-		$this->emm = new EntityModelManager([PersistenceTestClass::class/*, TargetClassTest::test*/],
+		$this->emm = new EntityModelManager([PersistenceTestClass::class, TargetClassTest::class],
 				new EntityModelFactory([CommonEntityPropertyProvider::class]));
 	}
 
 	function testHoleradio() {
 		$entityModel = $this->emm->getEntityModelByClass(PersistenceTestClass::class);
 
+		$this->assertTrue($entityModel->containsEntityPropertyName('id'));
+		$idEp = $entityModel->getLevelEntityPropertyByName('id');
+		$this->assertInstanceOf(ScalarEntityProperty::class, $idEp);
+
+		$this->assertTrue($entityModel->containsEntityPropertyName('associationOverrides'));
+//		$associationOverridesEp = $entityModel->getLevelEntityPropertyByName('associationOverrides');
+//		$this->assertInstanceOf(ScalarEntityProperty::class, $associationOverridesEp);
+//
+
+		$this->assertTrue($entityModel->containsEntityPropertyName('attributeOverrides'));
+//		$attributeOverrides = $entityModel->getLevelEntityPropertyByName('attributeOverrides');
+//		$this->assertInstanceOf(ScalarEntityProperty::class, $dateTimeEp);
+
+		$this->assertTrue($entityModel->containsEntityPropertyName('column'));
+		$columnEp = $entityModel->getLevelEntityPropertyByName('column');
+		$this->assertInstanceOf(ScalarEntityProperty::class, $columnEp);
+
 		$this->assertTrue($entityModel->containsEntityPropertyName('dateTime'));
-		$dateTimeEntityProperty = $entityModel->getLevelEntityPropertyByName('dateTime');
-		$this->assertInstanceOf(DateTimeEntityProperty::class, $dateTimeEntityProperty);
+		$dateTimeEp = $entityModel->getLevelEntityPropertyByName('dateTime');
+		$this->assertInstanceOf(DateTimeEntityProperty::class, $dateTimeEp);
+
+		$this->assertTrue($entityModel->containsEntityPropertyName('discriminatorColumn'));
+		$discColumnEp = $entityModel->getLevelEntityPropertyByName('discriminatorColumn');
+		$this->assertInstanceOf(ScalarEntityProperty::class, $discColumnEp);
+
+		$this->assertTrue($entityModel->containsEntityPropertyName('discriminatorValue'));
+		$discValEp = $entityModel->getLevelEntityPropertyByName('discriminatorValue');
+		$this->assertInstanceOf(ScalarEntityProperty::class, $discValEp);
+
+//		$this->assertTrue($entityModel->containsEntityPropertyName('embedded'));
+//		$embeddedEp = $entityModel->getLevelEntityPropertyByName('embedded');
+//		$this->assertInstanceOf(ScalarEntityProperty::class, $embeddedEp);
+
+		$this->assertTrue($entityModel->containsEntityPropertyName('entityListeners'));
+		$entityListenersEp = $entityModel->getLevelEntityPropertyByName('entityListeners');
+		$this->assertInstanceOf(ScalarEntityProperty::class, $entityListenersEp);
+
+//		$this->assertTrue($entityModel->containsEntityPropertyName('file'));
+//		$fileEp = $entityModel->getLevelEntityPropertyByName('file');
+//		$this->assertInstanceOf(FileEntityProperty::class, $fileEp);
+
+		$this->assertTrue($entityModel->containsEntityPropertyName('entityListeners'));
+		$entityListenersEp = $entityModel->getLevelEntityPropertyByName('entityListeners');
+		$this->assertInstanceOf(ScalarEntityProperty::class, $entityListenersEp);
+
+
+//	#[DateTime, JoinColumn('holeradio_date_time')]
+//	private $dateTime;
+//
+//
+////	#[Embedded(TargetClassTest::class)]
+////	private $embedded;
+//
+//	#[EntityListeners([EntityListener::class])]
+//	private $entityListeners;
+//	#[File]
+//	private $file;
+//
+//	#[JoinTable('join_table', 'persistence_test_class_id')]
+//	private $joinTable;
+//	#[ManagedFile(FileManager::TYPE_PRIVATE)]
+//	private $managedFile;
+//	#[ManyToMany(TargetClassTest::class)]
+//	private $manyToMany;
+//	#[ManyToOne(TargetClassTest::class)]
+//	private $manyToOne;
+//	#[N2nLocale]
+//	private $n2nLocale;
+//	#[OneToMany(TargetClassTest::class)]
+//	private $oneToMany;
+//	#[OneToOne(TargetClassTest::class)]
+//	private $oneToOne;
+//	#[OrderBy(['orderIndex' => 'ASC'])]
+//	private $orderBy;
+//	#[Transient]
+//	private $transient;
+//	#[Url]
+//	private $url;
 	}
 }

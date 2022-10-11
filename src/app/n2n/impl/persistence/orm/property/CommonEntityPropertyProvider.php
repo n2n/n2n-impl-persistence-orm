@@ -46,6 +46,8 @@ use n2n\persistence\orm\attribute\ManyToOne;
 use n2n\persistence\orm\attribute\OneToMany;
 use n2n\persistence\orm\attribute\ManyToMany;
 use n2n\persistence\orm\attribute\Embedded;
+use n2n\reflection\attribute\PropertyAttribute;
+use n2n\reflection\attribute\Attribute;
 
 class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	const PROP_FILE_NAME_SUFFIX = '.originalName';
@@ -57,6 +59,12 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 
 		$attributeSet = ReflectionContext::getAttributeSet($classSetup->getClass());
 		$propertyName = $propertyAccessProxy->getPropertyName();
+		if ($propertyName === 'dateTime') {
+			foreach($attributeSet->getPropertyAttributes() as $propertyAttribute) {
+				//var_dump($propertyAttribute->getAttribute()->getName());
+			}
+			var_dump($attributeSet->getPropertyAttribute($propertyName, DateTime::class));
+		}
 
 		if (null !== ($attrDateTime = $attributeSet->getPropertyAttribute($propertyName, DateTime::class))) {
 			$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy, 
@@ -76,15 +84,16 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 			return;
 		}
 		
-		if (null !== ($attrFile = $attributeSet->getPropertyAttribute($propertyName, File::class))) {
-			$classSetup->provideEntityProperty(new FileEntityProperty($propertyAccessProxy, 
-							$classSetup->requestColumn($propertyName), 
-							$classSetup->requestColumn($propertyName . self::PROP_FILE_NAME_SUFFIX)),
-					array($attrFile));
-			return;
-		}
-		
-		if (null !== ($attrManagedFile = $attributeSet->getPropertyAttribute($propertyName, ManagedFile::class))) {
+//		if (null !== ($attrFile = $attributeSet->getPropertyAttribute($propertyName, File::class))) {
+//			$classSetup->provideEntityProperty(new FileEntityProperty($propertyAccessProxy,
+//					$classSetup->requestColumn($propertyName),
+//					$classSetup->requestColumn($propertyName . self::PROP_FILE_NAME_SUFFIX),
+//					$attrFile->getInstance()->getOriginalNameColumnName()->getOriginalNameColumnName()),
+//					array($attrFile->getInstance()));
+//		}
+
+		$attrManagedFile = $attributeSet->getPropertyAttribute($propertyName, ManagedFile::class)?->getInstance();
+		if (null !== $attrManagedFile) {
 			$manageFileEntityProperty = new ManagedFileEntityProperty($propertyAccessProxy, 
 					$classSetup->requestColumn($propertyName), $attrManagedFile->getLookupId(),
 					$attrManagedFile->isCascadeDelete());
@@ -177,18 +186,19 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 			ClassSetup $classSetup) {
 		$propertyName = $propertyAccessProxy->getPropertyName();
 		$attributeSet = $classSetup->getAttributeSet();
-		$attrEmbedded = $attributeSet->getPropertyAttribute($propertyName, Embedded::class);
+		$attrEmbedded = $attributeSet->getPropertyAttribute($propertyName, Embedded::class)?->getInstance();
 		if ($attrEmbedded === null) return false;
-		
+
 		ArgUtils::assertTrue($attrEmbedded instanceof Embedded);
-		
-		$embeddedEntityProperty = new EmbeddedEntityProperty($propertyAccessProxy, 
-				$attrEmbedded->getTargetClass());
+
+		$targetClass = new \ReflectionClass($attrEmbedded->getTargetClass());
+
+		$embeddedEntityProperty = new EmbeddedEntityProperty($propertyAccessProxy, $targetClass);
 				
 		$classSetup->provideEntityProperty($embeddedEntityProperty);
 		
 		$setupProcess = $classSetup->getSetupProcess();
-		$targetClassSetup = new ClassSetup($setupProcess, $attrEmbedded->getTargetClass(),
+		$targetClassSetup = new ClassSetup($setupProcess, $targetClass,
 				new EmbeddedNampingStrategy($classSetup->getNamingStrategy(), $attrEmbedded->getColumnPrefix(),
 						$attrEmbedded->getColumnSuffix()),
 				$classSetup, $propertyName);
@@ -205,39 +215,50 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 			ClassSetup $classSetup) {
 		$propertyName = $propertyAccessProxy->getPropertyName();
 		$attributeSet = $classSetup->getAttributeSet();
-		
-		if (null !== ($attrOneToOne = $attributeSet->getPropertyAttribute($propertyName, OneToOne::class))) {
+
+		$attrOneToOne = $attributeSet->getPropertyAttribute($propertyName, OneToOne::class);
+		if (null !== $attrOneToOne) {
 			$this->provideOneToOne($propertyAccessProxy, $attrOneToOne, $classSetup);
 			return true;
 		}
-		
-		if (null !== ($attrManyToOne = $attributeSet->getPropertyAttribute($propertyName, ManyToOne::class))) {
-			$this->provideManyToOne($propertyAccessProxy, $attrManyToOne, $classSetup);
+
+		$attrManyToOne = $attributeSet->getPropertyAttribute($propertyName, ManyToOne::class);
+		if (null !== $attrManyToOne) {
+			$this->provideManyToOne($propertyAccessProxy,
+					PropertyAttribute::fromAttribute($attrManyToOne->getAttribute(), $attrManyToOne->getProperty()),
+					$classSetup);
 			return true;
 		}
-		
-		if (null !== ($attrOneToMany = $attributeSet->getPropertyAttribute($propertyName, OneToMany::class))) {
-			$this->provideOneToMany($propertyAccessProxy, $attrOneToMany, $classSetup);
+
+		$attrOneToMany = $attributeSet->getPropertyAttribute($propertyName, OneToMany::class);
+		if (null !== $attrOneToMany) {
+			$this->provideOneToMany($propertyAccessProxy,
+					PropertyAttribute::fromAttribute($attrOneToMany->getAttribute(), $attrOneToMany->getProperty()),
+					$classSetup);
 			return true;
 		}
-		
-		if (null !== ($attrManyToMany = $attributeSet->getPropertyAttribute($propertyName, ManyToMany::class))) {
-			$this->provideManyToMany($propertyAccessProxy, $attrManyToMany, $classSetup);
+
+		$attrManyToMany = $attributeSet->getPropertyAttribute($propertyName, ManyToMany::class);
+		if (null !== $attrManyToMany) {
+			$this->provideManyToMany($propertyAccessProxy,
+					PropertyAttribute::fromAttribute($attrManyToMany->getAttribute(), $attrManyToMany->getProperty()),
+					$classSetup);
 			return true;
 		}
 	}
 	
 	private function provideOneToOne(AccessProxy $propertyAccessProxy, 
-			OneToOne $attrOneToOne, ClassSetup $classSetup) {
-		$toOneProperty = new ToOneEntityProperty($propertyAccessProxy, 
-				$attrOneToOne->getMappedBy() === null, RelationEntityProperty::TYPE_ONE_TO_ONE);
+			PropertyAttribute $attrOneToOne, ClassSetup $classSetup) {
+		$attrInstance = $attrOneToOne->getInstance();
+		$toOneProperty = new ToOneEntityProperty($propertyAccessProxy,
+				$attrInstance->getMappedBy() === null, RelationEntityProperty::TYPE_ONE_TO_ONE);
 		$classSetup->provideEntityProperty($toOneProperty);
-			
+
 		$relationFactory = new RelationFactory($classSetup, $toOneProperty, $attrOneToOne);
-			
+
 		$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
-				use ($toOneProperty, $attrOneToOne, $relationFactory) {
-			if (null !== ($mappedBy = $attrOneToOne->getMappedBy())) {
+				use ($toOneProperty, $attrInstance, $relationFactory) {
+			if (null !== ($mappedBy = $attrInstance->getMappedBy())) {
 				$toOneProperty->setRelation($relationFactory->createMappedOneToOneRelation(
 						$mappedBy, $entityModelManager));
 			} else {
@@ -248,7 +269,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	}
 	
 	private function provideManyToOne(AccessProxy $propertyAccessProxy, 
-			ManyToOne $attrManyToOne, ClassSetup $classSetup) {
+			Attribute $attrManyToOne, ClassSetup $classSetup) {
 		$toOneProperty = new ToOneEntityProperty($propertyAccessProxy, true, 
 				RelationEntityProperty::TYPE_MANY_TO_ONE);
 		$classSetup->provideEntityProperty($toOneProperty);
@@ -262,23 +283,24 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	}
 	
 	private function provideOneToMany(AccessProxy $propertyAccessProxy,
-			OneToMany $attrOneToMany, ClassSetup $classSetup) {
-		$toManyProperty = new ToManyEntityProperty($propertyAccessProxy, 
-				$attrOneToMany->getMappedBy() === null, RelationEntityProperty::TYPE_ONE_TO_MANY);
+			Attribute $attrOneToMany, ClassSetup $classSetup) {
+		$attrInstance = $attrOneToMany->getInstance();
+		$toManyProperty = new ToManyEntityProperty($propertyAccessProxy,
+				$attrInstance->getMappedBy() === null, RelationEntityProperty::TYPE_ONE_TO_MANY);
 		$classSetup->provideEntityProperty($toManyProperty);
 		
 		$relationFactory = new RelationFactory($classSetup, $toManyProperty, $attrOneToMany);
 
 		if (!$toManyProperty->isMaster()) {
 			$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
-					use ($toManyProperty, $attrOneToMany, $relationFactory) {
-						$entityModelManager->getEntityModelByClass($attrOneToMany->getTargetEntityClass());
+					use ($toManyProperty, $attrInstance, $relationFactory) {
+						$entityModelManager->getEntityModelByClass($attrInstance->getTargetEntityClass());
 			}, true);
 		}
 			
 		$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
-				use ($toManyProperty, $attrOneToMany, $relationFactory) {
-			if (null !== ($mappedBy = $attrOneToMany->getMappedBy())) {
+				use ($toManyProperty, $attrInstance, $relationFactory) {
+			if (null !== ($mappedBy = $attrInstance->getMappedBy())) {
 				$toManyProperty->setRelation($relationFactory->createMappedOneToManyRelation(
 						$mappedBy, $entityModelManager));
 			} else {
@@ -289,16 +311,17 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	}
 	
 	private function provideManyToMany(AccessProxy $propertyAccessProxy,
-			ManyToMany $attrManyToMany, ClassSetup $classSetup) {
+			Attribute $attrManyToMany, ClassSetup $classSetup) {
+		$attrInstance = $attrManyToMany->getInstance();
 		$manyToManyProperty = new ToManyEntityProperty($propertyAccessProxy,
-				$attrManyToMany->getMappedBy() === null, RelationEntityProperty::TYPE_MANY_TO_MANY);
+				$attrInstance->getMappedBy() === null, RelationEntityProperty::TYPE_MANY_TO_MANY);
 		$classSetup->provideEntityProperty($manyToManyProperty);
 			
 		$relationFactory = new RelationFactory($classSetup, $manyToManyProperty, $attrManyToMany);
 		
 		$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
-				use ($manyToManyProperty, $attrManyToMany, $relationFactory) {
-			if (null !== ($mappedBy = $attrManyToMany->getMappedBy())) {
+				use ($manyToManyProperty, $attrInstance, $relationFactory) {
+			if (null !== ($mappedBy = $attrInstance->getMappedBy())) {
 				$manyToManyProperty->setRelation($relationFactory->createMappedManyToManyRelation(
 						$mappedBy, $entityModelManager));
 			} else {

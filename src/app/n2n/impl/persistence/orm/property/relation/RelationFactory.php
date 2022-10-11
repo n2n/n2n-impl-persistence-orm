@@ -40,6 +40,7 @@ use n2n\persistence\orm\attribute\OrderBy;
 use n2n\persistence\orm\attribute\AssociationOverrides;
 use n2n\persistence\orm\attribute\OneToMany;
 use n2n\persistence\orm\attribute\OneToOne;
+use n2n\reflection\attribute\Attribute;
 
 class RelationFactory {
 	private $classSetup;
@@ -50,11 +51,11 @@ class RelationFactory {
 	private $attrOrderBy;
 
 	public function __construct(ClassSetup $classSetup, RelationEntityProperty $relationProperty,
-			OrmRelationAttribute $relationAttribute) {
+			Attribute $relationAttribute) {
 		$this->classSetup = $classSetup;
 		$this->relationProperty = $relationProperty;
 		$this->relationAttribute = $relationAttribute;
-		
+
 		$attributeSet = $classSetup->getAttributeSet();
 		
 		$this->determineAssociations($classSetup, array($relationProperty->getName()));
@@ -138,11 +139,12 @@ class RelationFactory {
 	}
 	
 	private function completeRelation(Relation $relation) {
-		$relation->setCascadeType($this->relationAttribute->getCascadeType());
-		$relation->setFetchType($this->relationAttribute->getFetchType());
+		$attrInstance = $this->relationAttribute->getInstance();
+		$relation->setCascadeType($attrInstance->getCascadeType());
+		$relation->setFetchType($attrInstance->getFetchType());
 		
-		if ($this->relationAttribute instanceof OneToMany || $this->relationAttribute instanceof OneToOne) {
-			$relation->setOrphanRemoval($this->relationAttribute->isOrphanRemoval());
+		if ($attrInstance instanceof OneToMany || $attrInstance instanceof OneToOne) {
+			$relation->setOrphanRemoval($attrInstance->isOrphanRemoval());
 		}
 	}
 
@@ -215,7 +217,7 @@ class RelationFactory {
 	}
 
 	public function createMasterToOneRelation(EntityModelManager $entityModelManager) {
-		$targetEntityModel = $this->determineTargetEntityModel($entityModelManager, true);
+		$targetEntityModel = $this->determineTargetEntityModel($entityModelManager);
 		$namingStrategy = $this->classSetup->getNamingStrategy();
 
 		if (null !== $this->attrJoinTable) {
@@ -322,25 +324,28 @@ class RelationFactory {
 
 	private function determineTargetEntityModel(EntityModelManager $entityModelManager) {
 		$targetEntityModel = null;
+		$relationAttrInstance = $this->relationAttribute?->getInstance();
 		try {
-			$targetEntityModel = $entityModelManager->getEntityModelByClass($this->relationAttribute->getTargetEntityClass());
+			$targetEntityModel = $entityModelManager->getEntityModelByClass($relationAttrInstance?->getTargetEntityClass());
 		} catch (OrmConfigurationException $e) {
+			var_dump($e->getMessage());
+			die('woekd');
 			throw $this->classSetup->createException($this->classSetup->buildPropertyString(
 					$this->relationProperty->getName())
 					. ' is annotated with invalid target entity test.', $e,
-					array($this->relationAttribute));
+					array($relationAttrInstance));
 		}
 		
 		$type = $this->relationProperty->getType();
 		if (($type == RelationEntityProperty::TYPE_MANY_TO_ONE || $type == RelationEntityProperty::TYPE_ONE_TO_ONE)
 				&& $targetEntityModel->hasSubEntityModels()
-				&& ($this->relationAttribute === null || $this->relationAttribute->getFetchType() !== FetchType::EAGER)) {
+				&& ($relationAttrInstance === null || $relationAttrInstance->getFetchType() !== FetchType::EAGER)) {
 			throw $this->classSetup->createException('Lazy fetch disallowed for ' 
 							. $this->classSetup->buildPropertyString($this->relationProperty->getName())
 							. '. ' . $this->relationProperty->getType() 
 							. ' properties which refer to entities which are inherited by other entities must be eager'
 							. ' fetched (FetchType::EAGER).', 
-					null, array($this->relationAttribute));
+					null, array($relationAttrInstance));
 		}
 		
 		return $targetEntityModel;

@@ -30,6 +30,7 @@ use n2n\io\managed\FileManager;
 use n2n\persistence\orm\attribute\MappedSuperclass;
 use n2n\persistence\orm\model\HyphenatedNamingStrategy;
 use n2n\reflection\ObjectAdapter;
+use n2n\impl\persistence\orm\property\class\EntityListener;
 
 #[DiscriminatorColumn('discColumn')]
 #[DiscriminatorValue('discValue')]
@@ -38,6 +39,8 @@ use n2n\reflection\ObjectAdapter;
 #[MappedSuperclass]
 #[NamingStrategy(HyphenatedNamingStrategy::class)]
 class PersistenceTestClass extends ObjectAdapter {
+	#[Id]
+	private $id;
 
 	#[AssociationOverrides([], [])]
 	private $associationOverrides;
@@ -52,15 +55,14 @@ class PersistenceTestClass extends ObjectAdapter {
 	private $discriminatorColumn;
 	private $discriminatorValue;
 
-	#[Embedded(TargetClassTest::class)]
-	private $embedded;
+//	#[Embedded(TargetClassTest::class)]
+//	private $embedded;
 
 	#[EntityListeners([EntityListener::class])]
 	private $entityListeners;
 	#[File]
 	private $file;
-	#[Id(false, '[sequence here]')]
-	private $id;
+
 	#[JoinTable('join_table', 'persistence_test_class_id')]
 	private $joinTable;
 	#[ManagedFile(FileManager::TYPE_PRIVATE)]
