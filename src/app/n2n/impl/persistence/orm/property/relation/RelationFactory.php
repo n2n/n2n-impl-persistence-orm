@@ -41,39 +41,36 @@ use n2n\persistence\orm\attribute\AssociationOverrides;
 use n2n\persistence\orm\attribute\OneToMany;
 use n2n\persistence\orm\attribute\OneToOne;
 use n2n\reflection\attribute\Attribute;
+use n2n\util\ex\IllegalStateException;
 
 class RelationFactory {
-	private $classSetup;
-	private $relationProperty;
-	private $relationAttribute;
-	private $attrJoinColumn;
-	private $attrJoinTable;
-	private $attrOrderBy;
 
-	public function __construct(ClassSetup $classSetup, RelationEntityProperty $relationProperty,
-			Attribute $relationAttribute) {
-		$this->classSetup = $classSetup;
-		$this->relationProperty = $relationProperty;
-		$this->relationAttribute = $relationAttribute;
+	private ?Attribute $joinColumnAttribute = null;
+	private ?Attribute $joinTableAttribute = null;
+	private ?Attribute $orderByAttribute = null;
+
+	public function __construct(private ClassSetup $classSetup, private RelationEntityProperty $relationProperty,
+			private Attribute $relationAttribute) {
+
 
 		$attributeSet = $classSetup->getAttributeSet();
 		
 		$this->determineAssociations($classSetup, array($relationProperty->getName()));
 		
-		if ($this->attrJoinColumn === null && $this->attrJoinTable === null) {
-			$this->attrJoinColumn = $attributeSet->getPropertyAttribute($relationProperty->getName(), JoinColumn::class);
+		if ($this->joinColumnAttribute === null && $this->joinTableAttribute === null) {
+			$this->joinColumnAttribute = $attributeSet->getPropertyAttribute($relationProperty->getName(), JoinColumn::class);
 			
-			$this->attrJoinTable = $attributeSet->getPropertyAttribute($relationProperty->getName(), JoinTable::class);
+			$this->joinTableAttribute = $attributeSet->getPropertyAttribute($relationProperty->getName(), JoinTable::class);
 		}
 
-		if ($this->attrJoinColumn !== null && $this->attrJoinTable !== null) {
+		if ($this->joinColumnAttribute !== null && $this->joinTableAttribute !== null) {
 			throw $classSetup->createException('Conflicting attributes: JoinColumn and JoinTable'
 							. ' defined for entity property' . $this->classSetup->getClass()->getName()
 							. '::$' . $relationProperty->getName() . '.',
-					null, array($this->attrJoinColumn, $this->attrJoinTable));
+					null, array($this->joinColumnAttribute, $this->joinTableAttribute));
 		}
 		
-		$this->attrOrderBy = $attributeSet->getPropertyAttribute($relationProperty->getName(), OrderBy::class);
+		$this->orderByAttribute = $attributeSet->getPropertyAttribute($relationProperty->getName(), OrderBy::class);
 	}
 	
 	private function determineAssociations(ClassSetup $classSetup, array $propertyNames) {
@@ -89,7 +86,7 @@ class RelationFactory {
 		
 		$this->determineAssociations($parentClassSetup, $newPropertyNames);
 		
-		if ($this->attrJoinColumn !== null && $this->attrJoinTable !== null) {
+		if ($this->joinColumnAttribute !== null && $this->joinTableAttribute !== null) {
 			return;
 		}
 		
@@ -108,13 +105,13 @@ class RelationFactory {
 		ArgUtils::assertTrue($attrAssociationOverrides->getInstance() instanceof AssociationOverrides);
 
 		$attrJoinColumn = $attrAssociationOverrides->getInstance()->getJoinColumn();
-		if ($this->attrJoinColumn === null && isset($attrJoinColumn[$associationPropertyName])) {
-			$this->attrJoinColumn = $attrJoinColumn[$associationPropertyName];
+		if ($this->joinColumnAttribute === null && isset($attrJoinColumn[$associationPropertyName])) {
+			$this->joinColumnAttribute = $attrJoinColumn[$associationPropertyName];
 		}
 		
 		$attrJoinTables = $attrAssociationOverrides->getJoinTables();
-		if ($this->attrJoinTable === null && isset($attrJoinTables[$associationPropertyName])) {
-			$this->attrJoinTable = $attrJoinTables[$associationPropertyName];
+		if ($this->joinTableAttribute === null && isset($attrJoinTables[$associationPropertyName])) {
+			$this->joinTableAttribute = $attrJoinTables[$associationPropertyName];
 		}
 	}
 
@@ -190,16 +187,16 @@ class RelationFactory {
 	}
 
 	private function rejectJoinAttrs() {
-		if ($this->attrJoinColumn !== null) {
+		if ($this->joinColumnAttribute !== null) {
 			throw $this->classSetup->createException('Join column annotated to mapped property:'
 					. $this->relationProperty->toPropertyString(),
-					null, array($this->attrJoinColumn));
+					null, array($this->joinColumnAttribute));
 		}
 
-		if ($this->attrJoinTable !== null) {
+		if ($this->joinTableAttribute !== null) {
 			throw $this->classSetup->createException('Join table annotated to mapped property:'
 					. $this->relationProperty->toPropertyString(),
-					null, array($this->attrJoinTable));
+					null, array($this->joinTableAttribute));
 		}
 	}
 
@@ -220,25 +217,25 @@ class RelationFactory {
 		$targetEntityModel = $this->determineTargetEntityModel($entityModelManager);
 		$namingStrategy = $this->classSetup->getNamingStrategy();
 
-		if (null !== $this->attrJoinTable) {
+		if (null !== $this->joinTableAttribute) {
 			$entityModel = $this->relationProperty->getEntityModel();
 			$class = $entityModel->getClass();
 				
 			$relation = new JoinTableToOneRelation($this->relationProperty, $targetEntityModel);
 			$relation->setJoinTableName($namingStrategy->buildJunctionTableName($entityModel->getTableName(),
-					$this->relationProperty->getName(), $this->attrJoinTable->getName()));
+					$this->relationProperty->getName(), $this->joinTableAttribute->getName()));
 			$relation->setJoinColumnName($namingStrategy->buildJunctionJoinColumnName($class, $entityModel->getIdDef()->getPropertyName(),
-					$this->attrJoinTable->getJoinColumnName()));
+					$this->joinTableAttribute->getJoinColumnName()));
 			$relation->setInverseJoinColumnName($namingStrategy->buildJunctionJoinColumnName($targetEntityModel->getClass(),
 					$targetEntityModel->getIdDef()->getPropertyName(),
-					$this->attrJoinTable->getInverseJoinColumnName()));
+					$this->joinTableAttribute->getInverseJoinColumnName()));
 			$this->completeRelation($relation);
 			return $relation;
 		}
 
 		$joinColumnName = null;
-		if (null !== $this->attrJoinColumn) {
-			$joinColumnName = $this->attrJoinColumn->getName();
+		if (null !== $this->joinColumnAttribute) {
+			$joinColumnName = $this->joinColumnAttribute->getName();
 		}
 		
 		$joinColumnName = $namingStrategy->buildJoinColumnName($this->relationProperty->getName(), 
@@ -246,7 +243,7 @@ class RelationFactory {
 
 		$relation = new JoinColumnToOneRelation($this->relationProperty, $targetEntityModel);
 		$relation->setJoinColumnName($this->classSetup->requestColumn($this->relationProperty->getName(),
-				$joinColumnName, array($this->attrJoinColumn)));
+				$joinColumnName, array($this->joinColumnAttribute)));
 		
 		$this->completeRelation($relation);
 		return $relation;
@@ -279,13 +276,13 @@ class RelationFactory {
 		
 		$orderDirectives = $this->determineOrderDirectives($targetEntityModel);
 
-		if (null !== $this->attrJoinColumn) {
+		if (null !== $this->joinColumnAttribute) {
 			if ($this->relationProperty->getType() != RelationEntityProperty::TYPE_ONE_TO_MANY) {
 				throw $this->classSetup->createException('Invalid attribute for ' . $this->relationProperty->getType()
-						. ' property', null, array($this->attrJoinColumn));
+						. ' property', null, array($this->joinColumnAttribute));
 			}
 
-			$joinColumnName = $this->attrJoinColumn->getName();
+			$joinColumnName = $this->joinColumnAttribute->getName();
 			if ($joinColumnName === null) {
 				$namingStrategy->buildJunctionJoinColumnName($targetEntityModel->getClass(),
 						$targetEntityModel->getIdDef()->getPropertyName(), $joinColumnName);
@@ -301,10 +298,11 @@ class RelationFactory {
 		$joinTableName = null;
 		$joinColumnName = null;
 		$inverseJoinColumnName = null;
-		if (null !== $this->attrJoinTable) {
-			$joinTableName = $this->attrJoinTable->getName();
-			$joinColumnName = $this->attrJoinTable->getJoinColumnName();
-			$inverseJoinColumnName = $this->attrJoinTable->getInverseJoinColumnName();
+		if (null !== $this->joinTableAttribute) {
+			$joinTable = $this->joinTableAttribute->getInstance();
+			$joinTableName = $joinTable->getName();
+			$joinColumnName = $joinTable->getJoinColumnName();
+			$inverseJoinColumnName = $joinTable->getInverseJoinColumnName();
 		}
 
 		$entityModel = $this->relationProperty->getEntityModel();
@@ -373,10 +371,13 @@ class RelationFactory {
 	}
 
 	private function determineOrderDirectives(EntityModel $targetEntityModel) {
-		if ($this->attrOrderBy === null) return array();
-	
+		if ($this->orderByAttribute === null) return array();
+
+		$orderBy = $this->orderByAttribute->getInstance();
+		IllegalStateException::assertTrue($orderBy instanceof OrderBy);
+
 		$orderDirectives = array();
-		foreach ($this->attrOrderBy->getOrderDefs() as $propertyExpression => $direction) {
+		foreach ($orderBy->getOrderDefs() as $propertyExpression => $direction) {
 			try {
 				$propertyNames = array();
 				$targetEntityProperty = $this->determineEntityProperty($propertyExpression, 
@@ -389,11 +390,11 @@ class RelationFactory {
 				
 				throw $this->classSetup->createException('Property '
 								. $this->relationProperty->toPropertyString() . ' can not be used in order directives.',
-						null, array($this->attrOrderBy));
+						null, array($this->orderByAttribute));
 			} catch (UnknownEntityPropertyException $e) {
 				throw $this->classSetup->createException($this->classSetup->getClass()->getName() . '::$'
 						. $this->relationProperty->getName() . ' is ordered by unknown entity property \''
-						. $propertyExpression . '\'.', $e, array($this->attrOrderBy));
+						. $propertyExpression . '\'.', $e, array($this->orderByAttribute));
 			}
 		}
 		return $orderDirectives;
