@@ -163,7 +163,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		$embedded = $attrEmbedded->getInstance();
 		ArgUtils::assertTrue($embedded instanceof Embedded);
 
-		$targetClass = RelationFactory::readTargetClass($attrEmbedded);
+		$targetClass = RelationFactory::readTargetClass($attrEmbedded, $embedded->getTargetEntity());
 		$embeddedEntityProperty = new EmbeddedEntityProperty($propertyAccessProxy, $targetClass);
 				
 		$classSetup->provideEntityProperty($embeddedEntityProperty);

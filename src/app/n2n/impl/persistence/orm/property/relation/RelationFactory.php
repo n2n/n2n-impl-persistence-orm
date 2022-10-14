@@ -43,7 +43,7 @@ use n2n\reflection\attribute\Attribute;
 use n2n\util\ex\IllegalStateException;
 use n2n\reflection\attribute\PropertyAttribute;
 use n2n\util\ex\err\ConfigurationError;
-use n2n\persistence\orm\property\AttributeWithTarget;
+use n2n\persistence\orm\attribute\OrmRelationAttribute;
 
 class RelationFactory {
 
@@ -326,9 +326,12 @@ class RelationFactory {
 
 	private function determineTargetEntityModel(EntityModelManager $entityModelManager) {
 		$targetEntityModel = null;
+
 		$relationAttrInstance = $this->relationAttribute?->getInstance();
+		ArgUtils::valType($relationAttrInstance, OrmRelationAttribute::class);
+
 		try {
-			$targetClass = self::readTargetClass($this->relationAttribute);
+			$targetClass = self::readTargetClass($this->relationAttribute, $relationAttrInstance->getTargetEntity());
 			$targetEntityModel = $entityModelManager->getEntityModelByClass($targetClass);
 		} catch (OrmConfigurationException $e) {
 			throw $this->classSetup->createException($this->classSetup->buildPropertyString(
@@ -425,19 +428,20 @@ class RelationFactory {
 		}
 	}
 
-	public static function readTargetClass(PropertyAttribute $propertyAttribute) {
-		$instance = $propertyAttribute->getInstance();
+	public static function readTargetClass(PropertyAttribute $propertyAttribute, ?string $attributeTargetClassName) {
+		$targetEntityName = $attributeTargetClassName ?? (string) $propertyAttribute->getProperty()->getType();
 
-		ArgUtils::assertTrue($instance instanceof AttributeWithTarget);
-
-		if ($instance->getTargetEntity() !== null) {
-			return new \ReflectionClass($instance->getTargetEntity());
+		if ($targetEntityName === null) {
+			throw new ConfigurationError('TargetEntity not declared for: ' . TypeUtils::prettyReflPropName($propertyAttribute->getProperty()),
+					$propertyAttribute->getFile(), $propertyAttribute->getLine());
 		}
 
-		if ($propertyAttribute->getProperty()->getType() !== null) {
-			return new \ReflectionClass($propertyAttribute->getProperty()->getType());
+		try {
+			return new \ReflectionClass($targetEntityName);
+		} catch (\ReflectionException $e) {
+			throw new ConfigurationError('TargetEntity invalid: ' .
+					TypeUtils::prettyReflPropName($propertyAttribute->getProperty()), $propertyAttribute->getFile(),
+					$propertyAttribute->getLine(), null, null, $e);
 		}
-
-		throw new ConfigurationError('TargetClass not declared for: ' . TypeUtils::prettyReflPropName($propertyAttribute));
 	}
 }
