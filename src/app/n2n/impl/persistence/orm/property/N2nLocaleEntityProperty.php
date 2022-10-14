@@ -39,12 +39,13 @@ use n2n\persistence\orm\store\operation\MergeOperation;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\store\CommonValueHash;
+use n2n\util\type\TypeConstraints;
 
 class N2nLocaleEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	public function __construct(AccessProxy $accessProxy, $columnName) {
-		$accessProxy->setConstraint(TypeConstraint::createSimple('n2n\l10n\N2nLocale', true));
-		
-		parent::__construct($accessProxy, $columnName);
+		parent::__construct(
+				$accessProxy->createRestricted(TypeConstraints::namedType(N2nLocale::class, true)),
+				$columnName);
 	}
 	
 	public function supplyPersistAction(PersistAction $persistingJob, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
