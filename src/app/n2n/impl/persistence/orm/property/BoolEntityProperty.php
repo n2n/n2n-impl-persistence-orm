@@ -37,6 +37,7 @@ use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\store\CommonValueHash;
 use n2n\persistence\orm\criteria\compare\ScalarColumnComparable;
 use n2n\persistence\orm\query\select\SimpleSelection;
+use n2n\util\type\TypeConstraints;
 
 class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	/**
@@ -44,9 +45,7 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	 * @param string $columnName
 	 */
 	public function __construct(AccessProxy $accessProxy, $columnName) {
-		$accessProxy->setConstraint(TypeConstraint::createSimple('bool', true, true));
-
-		parent::__construct($accessProxy, $columnName);
+		parent::__construct($accessProxy->createRestricted(TypeConstraints::bool(true)), $columnName);
 	}
 
 	/**
