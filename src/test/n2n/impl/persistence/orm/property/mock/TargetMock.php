@@ -5,7 +5,7 @@ use n2n\persistence\orm\attribute\OneToOne;
 use n2n\persistence\orm\attribute\Id;
 
 class TargetMock {
-	#[OneToOne(PersistenceMock::class)]
+	#[OneToOne(EntityPropertiesMock::class)]
 	public $oneToOne;
 
 	#[Id]

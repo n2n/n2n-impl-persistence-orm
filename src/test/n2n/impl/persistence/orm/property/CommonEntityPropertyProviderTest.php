@@ -24,21 +24,26 @@ namespace n2n\impl\persistence\orm\property;
 use n2n\persistence\orm\model\EntityModelManager;
 use n2n\io\orm\ManagedFileEntityProperty;
 use PHPUnit\Framework\TestCase;
-use n2n\impl\persistence\orm\property\mock\PersistenceMock;
+use n2n\impl\persistence\orm\property\mock\EntityPropertiesMock;
 use n2n\persistence\orm\model\EntityModelFactory;
 use n2n\impl\persistence\orm\property\mock\TargetMock;
 use n2n\io\managed\FileManager;
+use n2n\persistence\orm\attribute\Embedded;
+use n2n\impl\persistence\orm\property\mock\EmbeddedMock;
+use n2n\impl\persistence\orm\property\mock\NoTypeManyToOneMock;
+use n2n\util\ex\err\ConfigurationError;
+use n2n\impl\persistence\orm\property\mock\TargetEntityNotFoundMock;
 
 class CommonEntityPropertyProviderTest extends TestCase {
 	private EntityModelManager $emm;
 
 	public function setUp(): void {
-		$this->emm = new EntityModelManager([PersistenceMock::class, TargetMock::class],
+		$this->emm = new EntityModelManager([EntityPropertiesMock::class, TargetMock::class],
 				new EntityModelFactory([CommonEntityPropertyProvider::class]));
 	}
 
 	function testPropertyAttributesSet() {
-		$entityModel = $this->emm->getEntityModelByClass(PersistenceMock::class);
+		$entityModel = $this->emm->getEntityModelByClass(EntityPropertiesMock::class);
 
 		$idEp = $entityModel->getLevelEntityPropertyByName('id');
 		$this->assertInstanceOf(ScalarEntityProperty::class, $idEp);
@@ -66,6 +71,7 @@ class CommonEntityPropertyProviderTest extends TestCase {
 		$this->assertTrue($entityModel->containsEntityPropertyName('embedded'));
 		$embeddedEp = $entityModel->getLevelEntityPropertyByName('embedded');
 		$this->assertInstanceOf(EmbeddedEntityProperty::class, $embeddedEp);
+		$this->assertEquals(EmbeddedMock::class, $embeddedEp->getTargetClass()->getName());
 
 		$this->assertTrue($entityModel->containsEntityPropertyName('entityListeners'));
 		$entityListenersEp = $entityModel->getLevelEntityPropertyByName('entityListeners');
@@ -117,5 +123,19 @@ class CommonEntityPropertyProviderTest extends TestCase {
 //
 //	#[JoinTable('join_table', 'persistence_test_class_id')]
 //	private $joinTable;
+	}
+
+	function testNoTypeManyToOneMock() {
+		$this->emm = new EntityModelManager([NoTypeManyToOneMock::class],
+				new EntityModelFactory([CommonEntityPropertyProvider::class]));
+		$this->expectException(ConfigurationError::class);
+		$this->emm->getEntityModelByClass(NoTypeManyToOneMock::class);
+	}
+
+	function testTypeNotFoundMock() {
+		$this->emm = new EntityModelManager([TargetEntityNotFoundMock::class],
+				new EntityModelFactory([CommonEntityPropertyProvider::class]));
+		$this->expectException(ConfigurationError::class);
+		$this->emm->getEntityModelByClass(TargetEntityNotFoundMock::class);
 	}
 }

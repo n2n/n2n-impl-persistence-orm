@@ -27,7 +27,6 @@ use n2n\persistence\orm\property\ClassSetup;
 use n2n\persistence\orm\model\EntityModelManager;
 use n2n\impl\persistence\orm\property\relation\RelationFactory;
 use n2n\reflection\property\PropertiesAnalyzer;
-use n2n\reflection\ReflectionUtils;
 use n2n\persistence\orm\model\NamingStrategy;
 use n2n\util\type\ArgUtils;
 use n2n\io\orm\FileEntityProperty;
@@ -39,7 +38,6 @@ use n2n\util\type\TypeName;
 use n2n\reflection\ReflectionContext;
 use n2n\persistence\orm\attribute\DateTime;
 use n2n\persistence\orm\attribute\N2nLocale;
-use n2n\persistence\orm\attribute\File;
 use n2n\persistence\orm\attribute\ManagedFile;
 use n2n\persistence\orm\attribute\OneToOne;
 use n2n\persistence\orm\attribute\ManyToOne;
@@ -49,7 +47,6 @@ use n2n\persistence\orm\attribute\Embedded;
 use n2n\reflection\attribute\PropertyAttribute;
 use n2n\reflection\attribute\Attribute;
 use n2n\reflection\property\PropertyAccessProxy;
-use n2n\impl\persistence\orm\property\relation\Relation;
 use n2n\util\type\TypeConstraints;
 
 class CommonEntityPropertyProvider implements EntityPropertyProvider {

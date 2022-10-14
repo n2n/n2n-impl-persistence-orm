@@ -25,7 +25,6 @@ use n2n\persistence\orm\property\ClassSetup;
 use n2n\impl\persistence\orm\property\RelationEntityProperty;
 use n2n\persistence\orm\model\EntityModelManager;
 use n2n\persistence\orm\model\EntityModel;
-use n2n\persistence\orm\OrmConfigurationException;
 use n2n\persistence\orm\model\UnknownEntityPropertyException;
 use n2n\impl\persistence\orm\property\relation\util\OrderDirective;
 use n2n\persistence\orm\property\QueryItemRepresentableEntityProperty;
@@ -327,18 +326,12 @@ class RelationFactory {
 	private function determineTargetEntityModel(EntityModelManager $entityModelManager) {
 		$targetEntityModel = null;
 
-		$relationAttrInstance = $this->relationAttribute?->getInstance();
-		ArgUtils::valType($relationAttrInstance, OrmRelationAttribute::class);
+		$relationAttrInstance = $this->relationAttribute->getInstance();
+		IllegalStateException::assertTrue($relationAttrInstance instanceof OrmRelationAttribute);
 
-		try {
-			$targetClass = self::readTargetClass($this->relationAttribute, $relationAttrInstance->getTargetEntity());
-			$targetEntityModel = $entityModelManager->getEntityModelByClass($targetClass);
-		} catch (OrmConfigurationException $e) {
-			throw $this->classSetup->createException($this->classSetup->buildPropertyString(
-							$this->relationProperty->getName())
-					. ' is annotated with invalid target entity.', $e,
-					array($relationAttrInstance));
-		}
+
+		$targetClass = self::readTargetClass($this->relationAttribute, $relationAttrInstance->getTargetEntity());
+		$targetEntityModel = $entityModelManager->getEntityModelByClass($targetClass);
 
 		$type = $this->relationProperty->getType();
 		if (($type == RelationEntityProperty::TYPE_MANY_TO_ONE || $type == RelationEntityProperty::TYPE_ONE_TO_ONE)
@@ -349,7 +342,7 @@ class RelationFactory {
 					. '. ' . $this->relationProperty->getType()
 					. ' properties which refer to entities which are inherited by other entities must be eager'
 					. ' fetched (FetchType::EAGER).',
-					null, array($relationAttrInstance));
+					null, array($this->relationAttribute));
 		}
 
 		return $targetEntityModel;
@@ -429,15 +422,14 @@ class RelationFactory {
 	}
 
 	public static function readTargetClass(PropertyAttribute $propertyAttribute, ?string $attributeTargetClassName) {
-		$targetEntityName = $attributeTargetClassName ?? (string) $propertyAttribute->getProperty()->getType();
-
+		$targetEntityName = $attributeTargetClassName ?? $propertyAttribute->getProperty()->getType();
 		if ($targetEntityName === null) {
 			throw new ConfigurationError('TargetEntity not declared for: ' . TypeUtils::prettyReflPropName($propertyAttribute->getProperty()),
 					$propertyAttribute->getFile(), $propertyAttribute->getLine());
 		}
 
 		try {
-			return new \ReflectionClass($targetEntityName);
+			return new \ReflectionClass((string) $targetEntityName);
 		} catch (\ReflectionException $e) {
 			throw new ConfigurationError('TargetEntity invalid: ' .
 					TypeUtils::prettyReflPropName($propertyAttribute->getProperty()), $propertyAttribute->getFile(),

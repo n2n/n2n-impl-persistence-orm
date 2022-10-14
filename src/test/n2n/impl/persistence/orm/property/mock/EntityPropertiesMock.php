@@ -23,7 +23,7 @@ use n2n\io\managed\FileManager;
 use n2n\reflection\ObjectAdapter;
 use n2n\impl\persistence\orm\property\class\EntityListener;
 
-class PersistenceMock extends ObjectAdapter {
+class EntityPropertiesMock extends ObjectAdapter {
 	#[Id]
 	private $id;
 
@@ -37,10 +37,10 @@ class PersistenceMock extends ObjectAdapter {
 	#[DateTime, JoinColumn('holeradio_date_time')]
 	private $dateTime;
 
-	#[Embedded(EmbeddedMock::class)]
-	private $embedded;
+	#[Embedded]
+	private EmbeddedMock $embedded;
 
-	#[EntityListeners([EntityListener::class])]
+	#[EntityListeners(EntityListener::class)]
 	private $entityListeners;
 
 	#[JoinTable('join_table', 'persistence_test_class_id')]
@@ -48,15 +48,15 @@ class PersistenceMock extends ObjectAdapter {
 	#[ManagedFile(FileManager::TYPE_PRIVATE)]
 	private $managedFile;
 	#[ManyToMany(TargetMock::class)]
-	private $manyToMany;
-	#[ManyToOne(TargetMock::class)]
-	private $manyToOne;
+	private \ArrayObject $manyToMany;
+	#[ManyToOne]
+	private TargetMock $manyToOne;
 	#[N2nLocale]
 	private $n2nLocale;
 	#[OneToMany(TargetMock::class)]
-	private $oneToMany;
-	#[OneToOne(TargetMock::class)]
-	private $oneToOne;
+	private \ArrayObject $oneToMany;
+	#[OneToOne]
+	private TargetMock $oneToOne;
 	#[OrderBy(['orderIndex' => 'ASC'])]
 	private $orderBy;
 	#[Transient]
