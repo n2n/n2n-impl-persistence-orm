@@ -43,7 +43,7 @@ use n2n\reflection\attribute\Attribute;
 use n2n\util\ex\IllegalStateException;
 use n2n\reflection\attribute\PropertyAttribute;
 use n2n\util\ex\err\ConfigurationError;
-use n2n\persistence\orm\property\AttributeWithTarget;
+use n2n\persistence\orm\attribute\OrmRelationAttribute;
 
 class RelationFactory {
 
@@ -56,44 +56,44 @@ class RelationFactory {
 
 
 		$attributeSet = $classSetup->getAttributeSet();
-		
+
 		$this->determineAssociations($classSetup, array($relationProperty->getName()));
-		
+
 		if ($this->joinColumnAttribute === null && $this->joinTableAttribute === null) {
 			$this->joinColumnAttribute = $attributeSet->getPropertyAttribute($relationProperty->getName(), JoinColumn::class);
-			
+
 			$this->joinTableAttribute = $attributeSet->getPropertyAttribute($relationProperty->getName(), JoinTable::class);
 		}
 
 		if ($this->joinColumnAttribute !== null && $this->joinTableAttribute !== null) {
 			throw $classSetup->createException('Conflicting attributes: JoinColumn and JoinTable'
-							. ' defined for entity property' . $this->classSetup->getClass()->getName()
-							. '::$' . $relationProperty->getName() . '.',
+					. ' defined for entity property' . $this->classSetup->getClass()->getName()
+					. '::$' . $relationProperty->getName() . '.',
 					null, array($this->joinColumnAttribute, $this->joinTableAttribute));
 		}
-		
+
 		$this->orderByAttribute = $attributeSet->getPropertyAttribute($relationProperty->getName(), OrderBy::class);
 	}
-	
+
 	private function determineAssociations(ClassSetup $classSetup, array $propertyNames) {
 		$parentPropertyName = $classSetup->getParentPropertyName();
-		
+
 		$parentClassSetup = $classSetup->getParentClassSetup();
 		if ($parentClassSetup === null) return;
-		
+
 		$newPropertyNames = $propertyNames;
 		if ($parentPropertyName !== null) {
 			$newPropertyNames[] = $parentPropertyName;
 		}
-		
+
 		$this->determineAssociations($parentClassSetup, $newPropertyNames);
-		
+
 		if ($this->joinColumnAttribute !== null && $this->joinTableAttribute !== null) {
 			return;
 		}
-		
+
 		$parentAttributeSet = $parentClassSetup->getAttributeSet();
-		
+
 		$attrAssociationOverrides = null;
 		if (null !== $parentPropertyName) {
 			$attrAssociationOverrides = $parentAttributeSet->getPropertyAttribute($parentPropertyName, AssociationOverrides::class);
@@ -112,7 +112,7 @@ class RelationFactory {
 		if ($this->joinColumnAttribute === null && isset($attrJoinColumn[$associationPropertyName])) {
 			$this->joinColumnAttribute = $attrJoinColumn[$associationPropertyName];
 		}
-		
+
 		$attrJoinTables = $associationOverrides->getJoinTables();
 		if ($this->joinTableAttribute === null && isset($attrJoinTables[$associationPropertyName])) {
 			$this->joinTableAttribute = $attrJoinTables[$associationPropertyName];
@@ -132,18 +132,18 @@ class RelationFactory {
 		}
 
 		$this->rejectJoinAttrs();
-			
-		$relation = new PropertyMappedOneToOneRelation($this->relationProperty, $targetEntityModel, 
+
+		$relation = new PropertyMappedOneToOneRelation($this->relationProperty, $targetEntityModel,
 				$targetEntityProperty);
 		$this->completeRelation($relation);
 		return $relation;
 	}
-	
+
 	private function completeRelation(Relation $relation) {
 		$attrInstance = $this->relationAttribute->getInstance();
 		$relation->setCascadeType($attrInstance->getCascade());
 		$relation->setFetchType($attrInstance->getFetch());
-		
+
 		if ($attrInstance instanceof OneToMany || $attrInstance instanceof OneToOne) {
 			$relation->setOrphanRemoval($attrInstance->isOrphanRemoval());
 		}
@@ -162,7 +162,7 @@ class RelationFactory {
 		}
 
 		$this->rejectJoinAttrs();
-		
+
 		$relation = new PropertyMappedToManyRelation($this->relationProperty, $targetEntityModel, $targetEntityProperty);
 		$this->completeRelation($relation);
 		$relation->setOrderDirectives($this->determineOrderDirectives($targetEntityModel));
@@ -183,7 +183,7 @@ class RelationFactory {
 
 		$this->rejectJoinAttrs();
 
-		$relation = new PropertyMappedToManyRelation($this->relationProperty, $targetEntityModel, 
+		$relation = new PropertyMappedToManyRelation($this->relationProperty, $targetEntityModel,
 				$targetEntityProperty);
 		$relation->setOrderDirectives($this->determineOrderDirectives($targetEntityModel));
 		$this->completeRelation($relation);
@@ -212,8 +212,8 @@ class RelationFactory {
 
 	private function createMappedToNonMasterException(EntityProperty $targetEntityProperty) {
 		throw $this->classSetup->createException('Illegal attempt to associate mapped relation property '
-						. $this->relationProperty->toPropertyString() . ' with non-master property '
-						. $targetEntityProperty->toPropertyString() . '.',
+				. $this->relationProperty->toPropertyString() . ' with non-master property '
+				. $targetEntityProperty->toPropertyString() . '.',
 				null, array($this->relationAttribute));
 	}
 
@@ -224,7 +224,7 @@ class RelationFactory {
 		if (null !== $this->joinTableAttribute) {
 			$entityModel = $this->relationProperty->getEntityModel();
 			$class = $entityModel->getClass();
-				
+
 			$relation = new JoinTableToOneRelation($this->relationProperty, $targetEntityModel);
 			$relation->setJoinTableName($namingStrategy->buildJunctionTableName($entityModel->getTableName(),
 					$this->relationProperty->getName(), $this->joinTableAttribute->getName()));
@@ -241,24 +241,24 @@ class RelationFactory {
 		if (null !== $this->joinColumnAttribute) {
 			$joinColumnName = $this->joinColumnAttribute->getName();
 		}
-		
-		$joinColumnName = $namingStrategy->buildJoinColumnName($this->relationProperty->getName(), 
+
+		$joinColumnName = $namingStrategy->buildJoinColumnName($this->relationProperty->getName(),
 				$targetEntityModel->getIdDef()->getPropertyName(), $joinColumnName);
 
 		$relation = new JoinColumnToOneRelation($this->relationProperty, $targetEntityModel);
 		$relation->setJoinColumnName($this->classSetup->requestColumn($this->relationProperty->getName(),
 				$joinColumnName, array($this->joinColumnAttribute)));
-		
+
 		$this->completeRelation($relation);
 		return $relation;
 	}
 
 	const JOIN_MODE_COLUMN = 'joinColumn';
 	const JOIN_MODE_TABLE = 'joinTable';
-	
+
 	public static function detectJoinMode($type, bool $attrJoinColumnAvailable,
 			bool $attrJoinTableAvailable): string {
-		
+
 		switch ($type) {
 			case RelationEntityProperty::TYPE_MANY_TO_ONE:
 			case RelationEntityProperty::TYPE_ONE_TO_ONE:
@@ -272,12 +272,12 @@ class RelationFactory {
 				throw new \InvalidArgumentException();
 		}
 	}
-	
+
 	public function createMasterToManyRelation(EntityModelManager $entityModelManager) {
 		$targetEntityModel = $this->determineTargetEntityModel($entityModelManager);
 
 		$namingStrategy = $this->classSetup->getNamingStrategy();
-		
+
 		$orderDirectives = $this->determineOrderDirectives($targetEntityModel);
 
 		if (null !== $this->joinColumnAttribute) {
@@ -291,7 +291,7 @@ class RelationFactory {
 				$namingStrategy->buildJunctionJoinColumnName($targetEntityModel->getClass(),
 						$targetEntityModel->getIdDef()->getPropertyName(), $joinColumnName);
 			}
-				
+
 			$relation = new InverseJoinColumnOneToManyRelation($this->relationProperty, $targetEntityModel);
 			$relation->setInverseJoinColumnName($joinColumnName);
 			$relation->setOrderDirectives($orderDirectives);
@@ -326,29 +326,32 @@ class RelationFactory {
 
 	private function determineTargetEntityModel(EntityModelManager $entityModelManager) {
 		$targetEntityModel = null;
+
 		$relationAttrInstance = $this->relationAttribute?->getInstance();
+		ArgUtils::valType($relationAttrInstance, OrmRelationAttribute::class);
+
 		try {
-			$targetClass = self::readTargetClass($this->relationAttribute);
+			$targetClass = self::readTargetClass($this->relationAttribute, $relationAttrInstance->getTargetEntity());
 			$targetEntityModel = $entityModelManager->getEntityModelByClass($targetClass);
 		} catch (OrmConfigurationException $e) {
 			throw $this->classSetup->createException($this->classSetup->buildPropertyString(
-					$this->relationProperty->getName())
+							$this->relationProperty->getName())
 					. ' is annotated with invalid target entity.', $e,
-					array($this->relationAttribute));
+					array($relationAttrInstance));
 		}
-		
+
 		$type = $this->relationProperty->getType();
 		if (($type == RelationEntityProperty::TYPE_MANY_TO_ONE || $type == RelationEntityProperty::TYPE_ONE_TO_ONE)
 				&& $targetEntityModel->hasSubEntityModels()
 				&& ($relationAttrInstance === null || $relationAttrInstance->getFetchType() !== FetchType::EAGER)) {
-			throw $this->classSetup->createException('Lazy fetch disallowed for ' 
-							. $this->classSetup->buildPropertyString($this->relationProperty->getName())
-							. '. ' . $this->relationProperty->getType() 
-							. ' properties which refer to entities which are inherited by other entities must be eager'
-							. ' fetched (FetchType::EAGER).', 
+			throw $this->classSetup->createException('Lazy fetch disallowed for '
+					. $this->classSetup->buildPropertyString($this->relationProperty->getName())
+					. '. ' . $this->relationProperty->getType()
+					. ' properties which refer to entities which are inherited by other entities must be eager'
+					. ' fetched (FetchType::EAGER).',
 					null, array($relationAttrInstance));
 		}
-		
+
 		return $targetEntityModel;
 	}
 
@@ -361,14 +364,14 @@ class RelationFactory {
 		try {
 			$targetEntityProperty = $this->determineEntityProperty($mappedBy, $targetEntityModel);
 			if ($targetEntityProperty instanceof RelationEntityProperty) return $targetEntityProperty;
-				
+
 			throw $this->classSetup->createException('Illegal attempt to associate relation property '
-							. $this->relationProperty->toPropertyString() . ' with non relation property.',
+					. $this->relationProperty->toPropertyString() . ' with non relation property.',
 					null, array($this->relationAttribute));
 		} catch (UnknownEntityPropertyException $e) {
 			throw $this->classSetup->createException($this->classSetup->getClass()->getName() . '::$'
 					. $this->relationProperty->getName() . ' is mapped by unknown entity property '
-					. TypeUtils::prettyClassPropName($targetEntityModel->getClass(), $mappedBy) 
+					. TypeUtils::prettyClassPropName($targetEntityModel->getClass(), $mappedBy)
 					. '.', $e, array($this->relationAttribute));
 		}
 	}
@@ -383,16 +386,16 @@ class RelationFactory {
 		foreach ($orderBy->getOrderDefs() as $propertyExpression => $direction) {
 			try {
 				$propertyNames = array();
-				$targetEntityProperty = $this->determineEntityProperty($propertyExpression, 
+				$targetEntityProperty = $this->determineEntityProperty($propertyExpression,
 						$targetEntityModel, $propertyNames);
 
 				if ($targetEntityProperty instanceof QueryItemRepresentableEntityProperty) {
 					$orderDirectives[] = new OrderDirective($propertyNames, $direction);
 					continue;
 				}
-				
+
 				throw $this->classSetup->createException('Property '
-								. $this->relationProperty->toPropertyString() . ' can not be used in order directives.',
+						. $this->relationProperty->toPropertyString() . ' can not be used in order directives.',
 						null, array($this->orderByAttribute));
 			} catch (UnknownEntityPropertyException $e) {
 				throw $this->classSetup->createException($this->classSetup->getClass()->getName() . '::$'
@@ -402,42 +405,43 @@ class RelationFactory {
 		}
 		return $orderDirectives;
 	}
-	
+
 	private function determineEntityProperty($propertyExpression, EntityModel $entityModel, array &$propertyNames = array()) {
 		$nextPropertyNames = explode(self::PROPERTY_NAME_SEPARATOR, $propertyExpression);
 		$entityPropertyCollection = $entityModel;
-		
+
 		while (null !== ($propertyName = array_shift($nextPropertyNames))) {
 			$propertyNames[] = $propertyName;
 			$entityProperty = $entityPropertyCollection->getEntityPropertyByName($propertyName);
 			if (empty($nextPropertyNames)) {
-				return $entityProperty;					
+				return $entityProperty;
 			}
-	
+
 			if ($entityProperty->hasEmbeddedEntityPropertyCollection()) {
 				$entityPropertyCollection = $entityProperty->getEmbeddedEntityPropertyCollection();
 				continue;
 			}
-	
+
 			throw new UnknownEntityPropertyException('Unresolvable entity property: '
 					. $this->relationProperty->getEntityModel()->getClass()->getName() . '::$'
 					. implode('::$', $propertyNames));
 		}
 	}
 
-	public static function readTargetClass(PropertyAttribute $propertyAttribute) {
-		$instance = $propertyAttribute->getInstance();
+	public static function readTargetClass(PropertyAttribute $propertyAttribute, ?string $attributeTargetClassName) {
+		$targetEntityName = $attributeTargetClassName ?? (string) $propertyAttribute->getProperty()->getType();
 
-		ArgUtils::assertTrue($instance instanceof AttributeWithTarget);
-
-		if ($instance->getTargetEntity() !== null) {
-			return new \ReflectionClass($instance->getTargetEntity());
+		if ($targetEntityName === null) {
+			throw new ConfigurationError('TargetEntity not declared for: ' . TypeUtils::prettyReflPropName($propertyAttribute->getProperty()),
+					$propertyAttribute->getFile(), $propertyAttribute->getLine());
 		}
 
-		if ($propertyAttribute->getProperty()->getType() !== null) {
-			return new \ReflectionClass($propertyAttribute->getProperty()->getType()->getName());
+		try {
+			return new \ReflectionClass($targetEntityName);
+		} catch (\ReflectionException $e) {
+			throw new ConfigurationError('TargetEntity invalid: ' .
+					TypeUtils::prettyReflPropName($propertyAttribute->getProperty()), $propertyAttribute->getFile(),
+					$propertyAttribute->getLine(), null, null, $e);
 		}
-
-		throw new ConfigurationError('TargetClass not declared for: ' . TypeUtils::prettyReflPropName($propertyAttribute));
 	}
 }
