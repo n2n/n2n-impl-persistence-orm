@@ -50,6 +50,7 @@ use n2n\reflection\attribute\PropertyAttribute;
 use n2n\reflection\attribute\Attribute;
 use n2n\reflection\property\PropertyAccessProxy;
 use n2n\impl\persistence\orm\property\relation\Relation;
+use n2n\util\type\TypeConstraints;
 
 class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	const PROP_FILE_NAME_SUFFIX = '.originalName';
@@ -113,42 +114,46 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 			return;
 		}
 
-		switch ($propertyAccessProxy->getConstraint()->getTypeName()) {
-			case TypeName::BOOL:
-				$classSetup->provideEntityProperty(new BoolEntityProperty($propertyAccessProxy,
-						$classSetup->requestColumn($propertyName)));
-				return;
-			case TypeName::INT:
-				$classSetup->provideEntityProperty(new IntEntityProperty($propertyAccessProxy,
-						$classSetup->requestColumn($propertyName)));
-				return;
-			case TypeName::FLOAT:
-				$classSetup->provideEntityProperty(new FloatEntityProperty($propertyAccessProxy,
-						$classSetup->requestColumn($propertyName)));
-				return;
-			case TypeName::STRING:
-				$classSetup->provideEntityProperty(new StringEntityProperty($propertyAccessProxy,
-						$classSetup->requestColumn($propertyName)));
-				return;
-			case \DateTime::class:
-				$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy,
-						$classSetup->requestColumn($propertyName)));
-				return;
-			case \n2n\l10n\N2nLocale::class:
-				$classSetup->provideEntityProperty(new N2nLocaleEntityProperty($propertyAccessProxy,
-						$classSetup->requestColumn($propertyName)));
-				return;
-			case \n2n\io\managed\File::class:
-				$classSetup->provideEntityProperty(new FileEntityProperty($propertyAccessProxy,
-						$classSetup->requestColumn($propertyName), null));
-				return;
-			case Url::class:
-				$classSetup->provideEntityProperty(new UrlEntityProperty($propertyAccessProxy,
-						$classSetup->requestColumn($propertyName)));
-				return;
-			case TypeName::PSEUDO_MIXED:
-				$classSetup->provideEntityProperty(new ScalarEntityProperty($propertyAccessProxy,
-						$classSetup->requestColumn($propertyName)));
+		foreach ($this->determineTypeNames($propertyAccessProxy, $classSetup) as $typeName) {
+
+			switch ($typeName) {
+				case TypeName::BOOL:
+					$classSetup->provideEntityProperty(new BoolEntityProperty($propertyAccessProxy,
+							$classSetup->requestColumn($propertyName)));
+					return;
+				case TypeName::INT:
+					$classSetup->provideEntityProperty(new IntEntityProperty($propertyAccessProxy,
+							$classSetup->requestColumn($propertyName)));
+					return;
+				case TypeName::FLOAT:
+					$classSetup->provideEntityProperty(new FloatEntityProperty($propertyAccessProxy,
+							$classSetup->requestColumn($propertyName)));
+					return;
+				case TypeName::STRING:
+					$classSetup->provideEntityProperty(new StringEntityProperty($propertyAccessProxy,
+							$classSetup->requestColumn($propertyName)));
+					return;
+				case \DateTime::class:
+					$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy,
+							$classSetup->requestColumn($propertyName)));
+					return;
+				case \n2n\l10n\N2nLocale::class:
+					$classSetup->provideEntityProperty(new N2nLocaleEntityProperty($propertyAccessProxy,
+							$classSetup->requestColumn($propertyName)));
+					return;
+				case \n2n\io\managed\File::class:
+					$classSetup->provideEntityProperty(new FileEntityProperty($propertyAccessProxy,
+							$classSetup->requestColumn($propertyName), null));
+					return;
+				case Url::class:
+					$classSetup->provideEntityProperty(new UrlEntityProperty($propertyAccessProxy,
+							$classSetup->requestColumn($propertyName)));
+					return;
+				case TypeName::PSEUDO_SCALAR:
+					$classSetup->provideEntityProperty(new ScalarEntityProperty($propertyAccessProxy,
+							$classSetup->requestColumn($propertyName)));
+					return;
+			}
 		}
 	}
 	
@@ -298,6 +303,39 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 						$entityModelManager));
 			}
 		}, $manyToManyProperty->isMaster());
+	}
+
+	private function determineTypeNames(PropertyAccessProxy $propertyAccessProxy, ClassSetup $classSetup): array {
+		foreach ($propertyAccessProxy->getSetterConstraint()->getNamedTypeConstraints() as $namedTypeConstraint) {
+			$typeName = $namedTypeConstraint->getTypeName();
+
+			if ($typeName !== TypeName::PSEUDO_MIXED) {
+				return [$typeName];
+			}
+		}
+
+		$setterMethodName = PropertiesAnalyzer::buildSetterName($propertyAccessProxy->getPropertyName());
+		$class = $classSetup->getClass();
+
+		if (!$class->hasMethod($setterMethodName)) {
+			return [TypeName::PSEUDO_SCALAR];
+		}
+		$setterMethod = $class->getMethod($setterMethodName);
+
+		$parameters = $setterMethod->getParameters();
+		if (count($parameters) == 0) {
+			return [TypeName::PSEUDO_SCALAR];
+		}
+
+		foreach (TypeConstraints::type(current($parameters))->getNamedTypeConstraints() as $namedTypeConstraint) {
+			$typeName = $namedTypeConstraint->getTypeName();
+
+			if ($typeName !== TypeName::PSEUDO_MIXED) {
+				return [$typeName, TypeName::PSEUDO_SCALAR];
+			}
+		}
+
+		return [TypeName::PSEUDO_SCALAR];
 	}
 }
 

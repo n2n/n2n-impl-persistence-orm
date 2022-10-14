@@ -334,7 +334,7 @@ class RelationFactory {
 			throw $this->classSetup->createException($this->classSetup->buildPropertyString(
 					$this->relationProperty->getName())
 					. ' is annotated with invalid target entity.', $e,
-					array($relationAttrInstance));
+					array($this->relationAttribute));
 		}
 		
 		$type = $this->relationProperty->getType();
@@ -435,7 +435,7 @@ class RelationFactory {
 		}
 
 		if ($propertyAttribute->getProperty()->getType() !== null) {
-			return new \ReflectionClass($propertyAttribute->getProperty()->getType());
+			return new \ReflectionClass($propertyAttribute->getProperty()->getType()->getName());
 		}
 
 		throw new ConfigurationError('TargetClass not declared for: ' . TypeUtils::prettyReflPropName($propertyAttribute));
