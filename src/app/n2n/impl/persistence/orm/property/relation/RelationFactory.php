@@ -33,7 +33,6 @@ use n2n\persistence\orm\property\EntityProperty;
 use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\FetchType;
 use n2n\util\type\TypeUtils;
-use n2n\persistence\orm\attribute\OrmRelationAttribute;
 use n2n\persistence\orm\attribute\JoinColumn;
 use n2n\persistence\orm\attribute\JoinTable;
 use n2n\persistence\orm\attribute\OrderBy;
@@ -42,6 +41,9 @@ use n2n\persistence\orm\attribute\OneToMany;
 use n2n\persistence\orm\attribute\OneToOne;
 use n2n\reflection\attribute\Attribute;
 use n2n\util\ex\IllegalStateException;
+use n2n\reflection\attribute\AttributeUtils;
+use n2n\reflection\attribute\PropertyAttribute;
+use n2n\util\ex\err\ConfigurationError;
 
 class RelationFactory {
 
@@ -50,7 +52,7 @@ class RelationFactory {
 	private ?Attribute $orderByAttribute = null;
 
 	public function __construct(private ClassSetup $classSetup, private RelationEntityProperty $relationProperty,
-			private Attribute $relationAttribute) {
+			private PropertyAttribute $relationAttribute) {
 
 
 		$attributeSet = $classSetup->getAttributeSet();
@@ -98,18 +100,20 @@ class RelationFactory {
 		} else {
 			$attrAssociationOverrides = $parentAttributeSet->getClassAttribute(AssociationOverrides::class);
 		}
-		
+
 		if ($attrAssociationOverrides === null) return;
 
-		$associationPropertyName = implode(self::PROPERTY_NAME_SEPARATOR, $propertyNames);
-		ArgUtils::assertTrue($attrAssociationOverrides->getInstance() instanceof AssociationOverrides);
+		$associationOverrides = $attrAssociationOverrides->getInstance();
+		ArgUtils::assertTrue($associationOverrides instanceof AssociationOverrides);
 
-		$attrJoinColumn = $attrAssociationOverrides->getInstance()->getJoinColumn();
+		$associationPropertyName = implode(self::PROPERTY_NAME_SEPARATOR, $propertyNames);
+
+		$attrJoinColumn = $associationOverrides->getJoinColumn();
 		if ($this->joinColumnAttribute === null && isset($attrJoinColumn[$associationPropertyName])) {
 			$this->joinColumnAttribute = $attrJoinColumn[$associationPropertyName];
 		}
 		
-		$attrJoinTables = $attrAssociationOverrides->getJoinTables();
+		$attrJoinTables = $associationOverrides->getJoinTables();
 		if ($this->joinTableAttribute === null && isset($attrJoinTables[$associationPropertyName])) {
 			$this->joinTableAttribute = $attrJoinTables[$associationPropertyName];
 		}
@@ -137,8 +141,8 @@ class RelationFactory {
 	
 	private function completeRelation(Relation $relation) {
 		$attrInstance = $this->relationAttribute->getInstance();
-		$relation->setCascadeType($attrInstance->getCascadeType());
-		$relation->setFetchType($attrInstance->getFetchType());
+		$relation->setCascadeType($attrInstance->getCascade());
+		$relation->setFetchType($attrInstance->getFetch());
 		
 		if ($attrInstance instanceof OneToMany || $attrInstance instanceof OneToOne) {
 			$relation->setOrphanRemoval($attrInstance->isOrphanRemoval());
@@ -324,13 +328,12 @@ class RelationFactory {
 		$targetEntityModel = null;
 		$relationAttrInstance = $this->relationAttribute?->getInstance();
 		try {
-			$targetEntityModel = $entityModelManager->getEntityModelByClass($relationAttrInstance?->getTargetEntityClass());
+			$targetClass = self::readTargetClass($this->relationAttribute);
+			$targetEntityModel = $entityModelManager->getEntityModelByClass($targetClass);
 		} catch (OrmConfigurationException $e) {
-			var_dump($e->getMessage());
-			die('woekd');
 			throw $this->classSetup->createException($this->classSetup->buildPropertyString(
 					$this->relationProperty->getName())
-					. ' is annotated with invalid target entity test.', $e,
+					. ' is annotated with invalid target entity.', $e,
 					array($relationAttrInstance));
 		}
 		
@@ -420,5 +423,18 @@ class RelationFactory {
 					. $this->relationProperty->getEntityModel()->getClass()->getName() . '::$'
 					. implode('::$', $propertyNames));
 		}
+	}
+
+	public static function readTargetClass(PropertyAttribute $propertyAttribute) {
+		$instance = $propertyAttribute->getInstance();
+		if ($instance->getTargetEntity() !== null) {
+			return new \ReflectionClass($instance->getTargetEntity());
+		}
+
+		if ($propertyAttribute->getProperty()->getType() !== null) {
+			return new \ReflectionClass($propertyAttribute->getProperty()->getType());
+		}
+
+		throw new ConfigurationError('TargetClass not declared for: ' . TypeUtils::prettyReflPropName($propertyAttribute));
 	}
 }

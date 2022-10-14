@@ -1,12 +1,13 @@
 <?php
-namespace n2n\impl\persistence\orm\property\test;
+namespace n2n\impl\persistence\orm\property\mock;
 
 use n2n\persistence\orm\attribute\OneToOne;
 use n2n\persistence\orm\attribute\Id;
 
-class TargetClassTest {
-	#[OneToOne(PersistenceTestClass::class)]
+class TargetMock {
+	#[OneToOne(PersistenceMock::class)]
 	public $oneToOne;
 
+	#[Id]
 	public $id;
 }

@@ -48,6 +48,7 @@ use n2n\persistence\orm\attribute\ManyToMany;
 use n2n\persistence\orm\attribute\Embedded;
 use n2n\reflection\attribute\PropertyAttribute;
 use n2n\reflection\attribute\Attribute;
+use n2n\reflection\property\PropertyAccessProxy;
 
 class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	const PROP_FILE_NAME_SUFFIX = '.originalName';
@@ -59,12 +60,6 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 
 		$attributeSet = ReflectionContext::getAttributeSet($classSetup->getClass());
 		$propertyName = $propertyAccessProxy->getPropertyName();
-		if ($propertyName === 'dateTime') {
-			foreach($attributeSet->getPropertyAttributes() as $propertyAttribute) {
-				//var_dump($propertyAttribute->getAttribute()->getName());
-			}
-			var_dump($attributeSet->getPropertyAttribute($propertyName, DateTime::class));
-		}
 
 		if (null !== ($attrDateTime = $attributeSet->getPropertyAttribute($propertyName, DateTime::class))) {
 			$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy, 
@@ -109,6 +104,14 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 			return;
 		}
 
+		if ($this->checkForRelations($propertyAccessProxy, $classSetup)) {
+			return;
+		}
+		
+		if ($this->checkForEmbedded($propertyAccessProxy, $classSetup)) {
+			return;
+		}
+
 		switch ($propertyAccessProxy->getConstraint()->getTypeName()) {
 			case TypeName::BOOL:
 				$classSetup->provideEntityProperty(new BoolEntityProperty($propertyAccessProxy,
@@ -126,81 +129,54 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 				$classSetup->provideEntityProperty(new StringEntityProperty($propertyAccessProxy,
 						$classSetup->requestColumn($propertyName)));
 				return;
-		}
-
-		if ($this->checkForRelations($propertyAccessProxy, $classSetup)) {
-			return;
-		}
-		
-		if ($this->checkForEmbedded($propertyAccessProxy, $classSetup)) {
-			return;
-		}
-		
-		$setterMethodName = PropertiesAnalyzer::buildSetterName($propertyName);
-		$class = $classSetup->getClass();
-		
-		if (!$class->hasMethod($setterMethodName)) return;
-		
-		$setterMethod = $class->getMethod($setterMethodName);
-		
-		$parameters = $setterMethod->getParameters();
-		if (count($parameters) == 0) return;
-		$parameter = current($parameters);
-
-		if (null !== ($paramClass = ReflectionUtils::extractParameterClass($parameter))) {
-			switch ($paramClass->getName()) {
-				case 'DateTime':
-					$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy,
-							$classSetup->requestColumn($propertyName)));
-					break;
-				case 'n2n\l10n\N2nLocale':
-					$classSetup->provideEntityProperty(new N2nLocaleEntityProperty($propertyAccessProxy,
-							$classSetup->requestColumn($propertyName)));
-					break;
-				case 'n2n\io\managed\File':
-					$classSetup->provideEntityProperty(new FileEntityProperty($propertyAccessProxy,
-							$classSetup->requestColumn($propertyName), null));
-					break;
-				case Url::class:
-					$classSetup->provideEntityProperty(new UrlEntityProperty($propertyAccessProxy,
-							$classSetup->requestColumn($propertyName)));
-					break;
-			}
-		}
-		
-		if (null !== ($type = $parameter->getType())) {
-			switch ($type->getName()) {
-				case TypeName::BOOL:
-					$classSetup->provideEntityProperty(new BoolEntityProperty($propertyAccessProxy,
-							$classSetup->requestColumn($propertyName)));
-					break;
-				case TypeName::INT:
-					$classSetup->provideEntityProperty(new IntEntityProperty($propertyAccessProxy,
-							$classSetup->requestColumn($propertyName)));
-					break;
-			}
+			case \DateTime::class:
+				$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy,
+						$classSetup->requestColumn($propertyName)));
+				return;
+			case \n2n\l10n\N2nLocale::class:
+				$classSetup->provideEntityProperty(new N2nLocaleEntityProperty($propertyAccessProxy,
+						$classSetup->requestColumn($propertyName)));
+				return;
+			case \n2n\io\managed\File::class:
+				$classSetup->provideEntityProperty(new FileEntityProperty($propertyAccessProxy,
+						$classSetup->requestColumn($propertyName), null));
+				return;
+			case Url::class:
+				$classSetup->provideEntityProperty(new UrlEntityProperty($propertyAccessProxy,
+						$classSetup->requestColumn($propertyName)));
+				return;
+			case TypeName::PSEUDO_MIXED:
+				$classSetup->provideEntityProperty(new ScalarEntityProperty($propertyAccessProxy,
+						$classSetup->requestColumn($propertyName)));
 		}
 	}
 	
-	private function checkForEmbedded(AccessProxy $propertyAccessProxy,
+	private function checkForEmbedded(PropertyAccessProxy $propertyAccessProxy,
 			ClassSetup $classSetup) {
 		$propertyName = $propertyAccessProxy->getPropertyName();
 		$attributeSet = $classSetup->getAttributeSet();
-		$attrEmbedded = $attributeSet->getPropertyAttribute($propertyName, Embedded::class)?->getInstance();
+		$attrEmbedded = $attributeSet->getPropertyAttribute($propertyName, Embedded::class);
 		if ($attrEmbedded === null) return false;
+		ArgUtils::assertTrue($attrEmbedded instanceof PropertyAttribute);
 
-		ArgUtils::assertTrue($attrEmbedded instanceof Embedded);
+		$embedded = $attrEmbedded->getInstance();
+		ArgUtils::assertTrue($embedded instanceof Embedded);
 
-		$targetClass = new \ReflectionClass($attrEmbedded->getTargetClass());
+		$targetClass = null;
+		if ($embedded->getTargetClass() !== null) {
+			$targetClass = new \ReflectionClass($embedded->getTargetClass());
+		} else {
+			$targetClass = new \ReflectionClass((string) $attrEmbedded->getProperty()->getType());
+		}
 
 		$embeddedEntityProperty = new EmbeddedEntityProperty($propertyAccessProxy, $targetClass);
 				
 		$classSetup->provideEntityProperty($embeddedEntityProperty);
-		
+
 		$setupProcess = $classSetup->getSetupProcess();
 		$targetClassSetup = new ClassSetup($setupProcess, $targetClass,
-				new EmbeddedNampingStrategy($classSetup->getNamingStrategy(), $attrEmbedded->getColumnPrefix(),
-						$attrEmbedded->getColumnSuffix()),
+				new EmbeddedNampingStrategy($classSetup->getNamingStrategy(), $embedded->getColumnPrefix(),
+						$embedded->getColumnSuffix()),
 				$classSetup, $propertyName);
 		$setupProcess->getEntityPropertyAnalyzer()->analyzeClass($targetClassSetup);
 
@@ -290,7 +266,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		if (!$toManyProperty->isMaster()) {
 			$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
 					use ($toManyProperty, $oneToMany, $relationFactory) {
-						$entityModelManager->getEntityModelByClass($oneToMany->getTargetEntityClass());
+						$entityModelManager->getEntityModelByClass($oneToMany->getTargetEntity());
 			}, true);
 		}
 			
