@@ -49,6 +49,7 @@ use n2n\persistence\orm\attribute\Embedded;
 use n2n\reflection\attribute\PropertyAttribute;
 use n2n\reflection\attribute\Attribute;
 use n2n\reflection\property\PropertyAccessProxy;
+use n2n\impl\persistence\orm\property\relation\Relation;
 
 class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	const PROP_FILE_NAME_SUFFIX = '.originalName';
@@ -162,13 +163,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		$embedded = $attrEmbedded->getInstance();
 		ArgUtils::assertTrue($embedded instanceof Embedded);
 
-		$targetClass = null;
-		if ($embedded->getTargetClass() !== null) {
-			$targetClass = new \ReflectionClass($embedded->getTargetClass());
-		} else {
-			$targetClass = new \ReflectionClass((string) $attrEmbedded->getProperty()->getType());
-		}
-
+		$targetClass = RelationFactory::readTargetClass($attrEmbedded);
 		$embeddedEntityProperty = new EmbeddedEntityProperty($propertyAccessProxy, $targetClass);
 				
 		$classSetup->provideEntityProperty($embeddedEntityProperty);

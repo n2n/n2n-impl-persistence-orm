@@ -41,9 +41,9 @@ use n2n\persistence\orm\attribute\OneToMany;
 use n2n\persistence\orm\attribute\OneToOne;
 use n2n\reflection\attribute\Attribute;
 use n2n\util\ex\IllegalStateException;
-use n2n\reflection\attribute\AttributeUtils;
 use n2n\reflection\attribute\PropertyAttribute;
 use n2n\util\ex\err\ConfigurationError;
+use n2n\persistence\orm\property\AttributeWithTarget;
 
 class RelationFactory {
 
@@ -427,6 +427,9 @@ class RelationFactory {
 
 	public static function readTargetClass(PropertyAttribute $propertyAttribute) {
 		$instance = $propertyAttribute->getInstance();
+
+		ArgUtils::assertTrue($instance instanceof AttributeWithTarget);
+
 		if ($instance->getTargetEntity() !== null) {
 			return new \ReflectionClass($instance->getTargetEntity());
 		}
