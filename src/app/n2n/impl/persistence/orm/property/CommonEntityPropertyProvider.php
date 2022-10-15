@@ -303,7 +303,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	}
 
 	private function determineTypeNames(PropertyAccessProxy $propertyAccessProxy, ClassSetup $classSetup): array {
-		foreach ($propertyAccessProxy->getSetterConstraint()->getNamedTypeConstraints() as $namedTypeConstraint) {
+		foreach ($propertyAccessProxy->getGetterConstraint()->getNamedTypeConstraints() as $namedTypeConstraint) {
 			$typeName = $namedTypeConstraint->getTypeName();
 
 			if ($typeName !== TypeName::PSEUDO_MIXED) {
