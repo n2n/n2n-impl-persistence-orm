@@ -285,7 +285,7 @@ class RelationFactory {
 						. ' property', null, array($this->joinColumnAttribute));
 			}
 
-			$joinColumnName = $this->joinColumnAttribute->getName();
+			$joinColumnName = $this->joinColumnAttribute->getInstance()->getName();
 			if ($joinColumnName === null) {
 				$namingStrategy->buildJunctionJoinColumnName($targetEntityModel->getClass(),
 						$targetEntityModel->getIdDef()->getPropertyName(), $joinColumnName);
@@ -336,7 +336,7 @@ class RelationFactory {
 		$type = $this->relationProperty->getType();
 		if (($type == RelationEntityProperty::TYPE_MANY_TO_ONE || $type == RelationEntityProperty::TYPE_ONE_TO_ONE)
 				&& $targetEntityModel->hasSubEntityModels()
-				&& ($relationAttrInstance === null || $relationAttrInstance->getFetchType() !== FetchType::EAGER)) {
+				&& ($relationAttrInstance === null || $relationAttrInstance->getFetch() !== FetchType::EAGER)) {
 			throw $this->classSetup->createException('Lazy fetch disallowed for '
 					. $this->classSetup->buildPropertyString($this->relationProperty->getName())
 					. '. ' . $this->relationProperty->getType()
