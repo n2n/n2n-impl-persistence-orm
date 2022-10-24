@@ -54,27 +54,27 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityPropertyProvider::setupPropertyIfSuitable()
 	 */
-	public function setupPropertyIfSuitable(AccessProxy $propertyAccessProxy,
-			ClassSetup $classSetup) {
+	public function setupPropertyIfSuitable(AccessProxy $propertyAccessProxy, ClassSetup $classSetup) {
 
 		$attributeSet = ReflectionContext::getAttributeSet($classSetup->getClass());
 		$propertyName = $propertyAccessProxy->getPropertyName();
 
-		if (null !== ($attrDateTime = $attributeSet->getPropertyAttribute($propertyName, DateTime::class))) {
+		if (null !== ($dateTimeAttribute = $attributeSet->getPropertyAttribute($propertyName, DateTime::class))) {
 			$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy, 
-					$classSetup->requestColumn($propertyName)), array($attrDateTime));
+					$classSetup->requestColumn($propertyName)), array($dateTimeAttribute));
 			return;
 		}
 		
-		if (null !== ($attrN2nLocale = $attributeSet->getPropertyAttribute($propertyName, N2nLocale::class))) {
+		if (null !== ($n2nLocaleAttribute = $attributeSet->getPropertyAttribute($propertyName, N2nLocale::class))) {
 			$classSetup->provideEntityProperty(new N2nLocaleEntityProperty($propertyAccessProxy, 
-					$classSetup->requestColumn($propertyName)), array($attrN2nLocale));
+					$classSetup->requestColumn($propertyName)), array($n2nLocaleAttribute));
 			return;
 		}
 
-		if (null !== ($attrUrl = $attributeSet->getPropertyAttribute($propertyName, \n2n\persistence\orm\attribute\Url::class))) {
+		if (null !== ($urlAttribute = $attributeSet->getPropertyAttribute($propertyName,
+						\n2n\persistence\orm\attribute\Url::class))) {
 			$classSetup->provideEntityProperty(new UrlEntityProperty($propertyAccessProxy,
-					$classSetup->requestColumn($propertyName)), array($attrUrl));
+					$classSetup->requestColumn($propertyName)), array($urlAttribute));
 			return;
 		}
 		
@@ -86,20 +86,20 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 //					array($attrFile->getInstance()));
 //		}
 
-		$attrManagedFile = $attributeSet->getPropertyAttribute($propertyName, ManagedFile::class)?->getInstance();
-		if (null !== $attrManagedFile) {
+		$managedFileAttribute = $attributeSet->getPropertyAttribute($propertyName, ManagedFile::class)?->getInstance();
+		if (null !== $managedFileAttribute) {
 			$manageFileEntityProperty = new ManagedFileEntityProperty($propertyAccessProxy, 
-					$classSetup->requestColumn($propertyName), $attrManagedFile->getLookupId(),
-					$attrManagedFile->isCascadeDelete());
+					$classSetup->requestColumn($propertyName), $managedFileAttribute->getLookupId(),
+					$managedFileAttribute->isCascadeDelete());
 					
-			if (null !== ($fileLocator = $attrManagedFile->getFileLocator())) {
+			if (null !== ($fileLocator = $managedFileAttribute->getFileLocator())) {
 				$manageFileEntityProperty->setFileLocator($fileLocator);
 			} else {
 				$manageFileEntityProperty->setFileLocator(new SimpleFileLocator(
 						mb_strtolower(IoUtils::stripSpecialChars($classSetup->getClass()->getShortName()))));
 			}
 			
-			$classSetup->provideEntityProperty($manageFileEntityProperty, array($attrManagedFile));
+			$classSetup->provideEntityProperty($manageFileEntityProperty, array($managedFileAttribute));
 			return;
 		}
 
@@ -112,7 +112,6 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		}
 
 		foreach ($this->determineTypeNames($propertyAccessProxy, $classSetup) as $typeName) {
-
 			switch ($typeName) {
 				case TypeName::BOOL:
 					$classSetup->provideEntityProperty(new BoolEntityProperty($propertyAccessProxy,
@@ -165,7 +164,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		$embedded = $attrEmbedded->getInstance();
 		ArgUtils::assertTrue($embedded instanceof Embedded);
 
-		$targetClass = RelationFactory::readTargetClass($attrEmbedded, $embedded->getTargetEntity());
+		$targetClass = RelationFactory::readTargetClass($attrEmbedded, $embedded->getTargetEntity(), $classSetup);
 		$embeddedEntityProperty = new EmbeddedEntityProperty($propertyAccessProxy, $targetClass);
 				
 		$classSetup->provideEntityProperty($embeddedEntityProperty);
