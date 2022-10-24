@@ -9,11 +9,12 @@
 	],
 	"homepage" : "http://n2n.rocks/",
 	"license" : "LGPL-3.0-or-later",
-	"authors" : [{
+	"authors" : [
+      {
 			"name" : "Andreas von Burg",
 			"email" : "a@von-burg.net",
 			"homepage" : "https://www.von-burg.net/"
-		}
+      }
 	],
 	"minimum-stability" : "dev",
 	"prefer-stable": true,
@@ -24,8 +25,8 @@
 		}
 	},
 	"require" : {
-		"n2n/n2n-composer-module-installer": "^7.1",
-		"n2n/n2n-persistence" : "dev-develop",
+		"n2n/n2n-composer-module-installer": "^7.1.5",
+		"n2n/n2n-persistence" : "^7.3",
 		"n2n/n2n-io" : "^7.3",
 		"n2n/n2n-l10n": "^7.3",
 		"n2n/n2n-reflection" : "^7.3",
