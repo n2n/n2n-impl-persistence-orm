@@ -28,11 +28,13 @@ use n2n\impl\persistence\orm\property\mock\EntityPropertiesMock;
 use n2n\persistence\orm\model\EntityModelFactory;
 use n2n\impl\persistence\orm\property\mock\TargetMock;
 use n2n\io\managed\FileManager;
-use n2n\persistence\orm\attribute\Embedded;
 use n2n\impl\persistence\orm\property\mock\EmbeddedMock;
 use n2n\impl\persistence\orm\property\mock\NoTypeManyToOneMock;
 use n2n\util\ex\err\ConfigurationError;
 use n2n\impl\persistence\orm\property\mock\TargetEntityNotFoundMock;
+use n2n\impl\persistence\orm\property\relation\JoinTableToOneRelation;
+use n2n\impl\persistence\orm\property\relation\JoinColumnToOneRelation;
+use n2n\impl\persistence\orm\property\relation\JoinTableToManyRelation;
 
 class CommonEntityPropertyProviderTest extends TestCase {
 	private EntityModelManager $emm;
@@ -46,11 +48,11 @@ class CommonEntityPropertyProviderTest extends TestCase {
 		$entityModel = $this->emm->getEntityModelByClass(EntityPropertiesMock::class);
 
 		$idEp = $entityModel->getLevelEntityPropertyByName('id');
-		$this->assertInstanceOf(ScalarEntityProperty::class, $idEp);
+		$this->assertInstanceOf(IntEntityProperty::class, $idEp);
 
 		$this->assertTrue($entityModel->containsEntityPropertyName('id'));
 		$idEp = $entityModel->getLevelEntityPropertyByName('id');
-		$this->assertInstanceOf(ScalarEntityProperty::class, $idEp);
+		$this->assertInstanceOf(IntEntityProperty::class, $idEp);
 
 		$this->assertTrue($entityModel->containsEntityPropertyName('associationOverrides'));
 		$associationOverridesEp = $entityModel->getLevelEntityPropertyByName('associationOverrides');
@@ -76,10 +78,6 @@ class CommonEntityPropertyProviderTest extends TestCase {
 		$this->assertTrue($entityModel->containsEntityPropertyName('entityListeners'));
 		$entityListenersEp = $entityModel->getLevelEntityPropertyByName('entityListeners');
 		$this->assertInstanceOf(ScalarEntityProperty::class, $entityListenersEp);
-
-//		$this->assertTrue($entityModel->containsEntityPropertyName('file'));
-//		$fileEp = $entityModel->getLevelEntityPropertyByName('file');
-//		$this->assertInstanceOf(FileEntityProperty::class, $fileEp);
 
 		$this->assertTrue($entityModel->containsEntityPropertyName('managedFile'));
 		$managedFileEp = $entityModel->getLevelEntityPropertyByName('managedFile');
@@ -120,9 +118,32 @@ class CommonEntityPropertyProviderTest extends TestCase {
 		$urlEp = $entityModel->getLevelEntityPropertyByName('url');
 		$this->assertInstanceOf(UrlEntityProperty::class, $urlEp);
 
-//
-//	#[JoinTable('join_table', 'persistence_test_class_id')]
-//	private $joinTable;
+		$this->assertTrue($entityModel->containsEntityPropertyName('joinTable'));
+		$joinTableEp = $entityModel->getLevelEntityPropertyByName('joinTable');
+		$this->assertInstanceOf(ToOneEntityProperty::class, $joinTableEp);
+
+		$relation = $joinTableEp->getRelation();
+		$this->assertInstanceOf(JoinTableToOneRelation::class, $relation);
+		$this->assertEquals($relation->getJoinTableName(), 'join_table');
+		$this->assertEquals($relation->getJoinColumnName(), 'persistence_test_class_id');
+		$this->assertEquals($relation->getInverseJoinColumnName(), 'test_id');
+
+		$this->assertTrue($entityModel->containsEntityPropertyName('joinColumn'));
+		$joinColumnEp = $entityModel->getLevelEntityPropertyByName('joinColumn');
+		$this->assertInstanceOf(ToOneEntityProperty::class, $joinColumnEp);
+
+		$this->assertTrue($entityModel->containsEntityPropertyName('joinTables'));
+		$joinTablesEp = $entityModel->getLevelEntityPropertyByName('joinTables');
+		$this->assertInstanceOf(ToManyEntityProperty::class, $joinTablesEp);
+		$joinTablesEp->getRelation();
+
+		$relation = $joinTablesEp->getRelation();
+		$this->assertInstanceOf(JoinTableToManyRelation::class, $relation);
+		$this->assertEquals($relation->getJoinColumnName(), 'table_ids');
+
+		$relation = $joinColumnEp->getRelation();
+		$this->assertInstanceOf(JoinColumnToOneRelation::class, $relation);
+		$this->assertEquals($relation->getJoinColumnName(), 'join_column');
 	}
 
 	function testNoTypeManyToOneMock() {
@@ -136,6 +157,7 @@ class CommonEntityPropertyProviderTest extends TestCase {
 		$this->emm = new EntityModelManager([TargetEntityNotFoundMock::class],
 				new EntityModelFactory([CommonEntityPropertyProvider::class]));
 		$this->expectException(ConfigurationError::class);
+
 		$this->emm->getEntityModelByClass(TargetEntityNotFoundMock::class);
 	}
 }

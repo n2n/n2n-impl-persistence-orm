@@ -25,7 +25,19 @@ use n2n\impl\persistence\orm\property\class\EntityListener;
 
 class EntityPropertiesMock extends ObjectAdapter {
 	#[Id]
-	private $id;
+	private int $id;
+
+	#[ManyToOne]
+	#[JoinTable('join_table', 'persistence_test_class_id', 'test_id')]
+	private TargetMock $joinTable;
+
+	#[ManyToMany(TargetMock::class)]
+	#[JoinTable('join_tables', 'table_ids', 'test_ids')]
+	private $joinTables;
+
+	#[OneToOne]
+	#[JoinColumn('join_column')]
+	private TargetMock $joinColumn;
 
 	#[AssociationOverrides(['column1'], ['table1'])]
 	private $associationOverrides;
@@ -34,7 +46,7 @@ class EntityPropertiesMock extends ObjectAdapter {
 	#[Column('differentColumn')]
 	private string $column;
 
-	#[DateTime, JoinColumn('holeradio_date_time')]
+	#[DateTime]
 	private $dateTime;
 
 	#[Embedded]
@@ -43,8 +55,6 @@ class EntityPropertiesMock extends ObjectAdapter {
 	#[EntityListeners(EntityListener::class)]
 	private $entityListeners;
 
-	#[JoinTable('join_table', 'persistence_test_class_id')]
-	private $joinTable;
 	#[ManagedFile(FileManager::TYPE_PRIVATE)]
 	private $managedFile;
 	#[ManyToMany(TargetMock::class)]

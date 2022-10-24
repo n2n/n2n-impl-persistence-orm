@@ -226,22 +226,23 @@ class RelationFactory {
 		if (null !== $this->joinTableAttribute) {
 			$entityModel = $this->relationProperty->getEntityModel();
 			$class = $entityModel->getClass();
+			$joinTableAttributeInstance = $this->joinTableAttribute->getInstance();
 
 			$relation = new JoinTableToOneRelation($this->relationProperty, $targetEntityModel);
 			$relation->setJoinTableName($namingStrategy->buildJunctionTableName($entityModel->getTableName(),
-					$this->relationProperty->getName(), $this->joinTableAttribute->getName()));
+					$this->relationProperty->getName(), $joinTableAttributeInstance->getName()));
 			$relation->setJoinColumnName($namingStrategy->buildJunctionJoinColumnName($class, $entityModel->getIdDef()->getPropertyName(),
-					$this->joinTableAttribute->getJoinColumnName()));
+					$joinTableAttributeInstance->getJoinColumnName()));
 			$relation->setInverseJoinColumnName($namingStrategy->buildJunctionJoinColumnName($targetEntityModel->getClass(),
 					$targetEntityModel->getIdDef()->getPropertyName(),
-					$this->joinTableAttribute->getInverseJoinColumnName()));
+					$joinTableAttributeInstance->getInverseJoinColumnName()));
 			$this->completeRelation($relation);
 			return $relation;
 		}
 
 		$joinColumnName = null;
 		if (null !== $this->joinColumnAttribute) {
-			$joinColumnName = $this->joinColumnAttribute->getName();
+			$joinColumnName = $this->joinColumnAttribute->getInstance()->getName();
 		}
 
 		$joinColumnName = $namingStrategy->buildJoinColumnName($this->relationProperty->getName(),
