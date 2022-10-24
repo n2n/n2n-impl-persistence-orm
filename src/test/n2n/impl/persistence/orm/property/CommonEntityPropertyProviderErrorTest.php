@@ -46,7 +46,6 @@ class CommonEntityPropertyProviderErrorTest extends TestCase {
 		$emm = new EntityModelManager([RelationUnionErrorMock::class],
 				new EntityModelFactory([CommonEntityPropertyProvider::class]));
 
-
 		try {
 			$emm->getEntityModelByClass(RelationUnionErrorMock::class);
 			$this->fail();
