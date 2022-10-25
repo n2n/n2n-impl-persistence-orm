@@ -46,7 +46,7 @@ class IntEntityProperty extends ColumnPropertyAdapter implements BasicEntityProp
 	 * @param string $columnName
 	 */
 	public function __construct(AccessProxy $accessProxy, $columnName) {
-		parent::__construct($accessProxy->createRestricted(TypeConstraints::int(true)), $columnName);
+		parent::__construct($accessProxy->createRestricted(TypeConstraints::int(true, true)), $columnName);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\ColumnComparableEntityProperty::createComparisonStrategy()

@@ -45,7 +45,7 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	 * @param string $columnName
 	 */
 	public function __construct(AccessProxy $accessProxy, $columnName) {
-		parent::__construct($accessProxy->createRestricted(TypeConstraints::bool(true)), $columnName);
+		parent::__construct($accessProxy->createRestricted(TypeConstraints::bool(true, true)), $columnName);
 	}
 
 	/**

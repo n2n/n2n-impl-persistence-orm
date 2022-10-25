@@ -46,7 +46,7 @@ class FloatEntityProperty extends ColumnPropertyAdapter implements BasicEntityPr
 	 * @param string $columnName
 	 */
 	public function __construct(AccessProxy $accessProxy, $columnName) {
-		parent::__construct($accessProxy->createRestricted(TypeConstraints::float(true)), $columnName);
+		parent::__construct($accessProxy->createRestricted(TypeConstraints::float(true, true)), $columnName);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\ColumnComparableEntityProperty::createComparisonStrategy()

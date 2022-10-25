@@ -46,7 +46,7 @@ class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 	 * @param string $columnName
 	 */
 	public function __construct(AccessProxy $accessProxy, $columnName) {
-		parent::__construct($accessProxy->createRestricted(TypeConstraints::string(true)), $columnName);
+		parent::__construct($accessProxy->createRestricted(TypeConstraints::string(true, true)), $columnName);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\ColumnComparableEntityProperty::createComparisonStrategy()
