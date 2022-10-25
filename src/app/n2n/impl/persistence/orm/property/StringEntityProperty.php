@@ -46,7 +46,10 @@ class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 	 * @param string $columnName
 	 */
 	public function __construct(AccessProxy $accessProxy, $columnName) {
-		parent::__construct($accessProxy->createRestricted(TypeConstraints::string(true, true)), $columnName);
+		parent::__construct(
+				$accessProxy->createRestricted(TypeConstraints::string(true, true),
+						TypeConstraints::string($accessProxy->getSetterConstraint()->allowsNull())),
+				$columnName);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\ColumnComparableEntityProperty::createComparisonStrategy()
@@ -60,7 +63,7 @@ class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
 		return new ScalarColumnComparable($queryItem, $queryState);
 	}
-	
+
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
 		return new SimpleSelection($this->createQueryColumn($metaTreePoint->getMeta()), TypeName::STRING);
 	}
@@ -73,7 +76,7 @@ class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 		ArgUtils::valScalar($value);
 		return (string) $value;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::repToValue()
@@ -81,7 +84,7 @@ class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 	public function repToValue(string $rep) {
 		return $rep;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
@@ -94,7 +97,7 @@ class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $mappedValue/*, $pdoDataType*/);
 	}
 
-	
+
 	/**
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
@@ -123,8 +126,13 @@ class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::parseValue()
 	 */
 	public function parseValue($raw, Pdo $pdo) {
-		return $raw;
+		ArgUtils::valScalar($raw);
+		if ($raw === null) {
+			return null;
+		}
+		return (string) $raw;
 	}
+
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::buildRaw()
 	 */
@@ -139,17 +147,17 @@ class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 	}
 
 
-	
+
 // 	public function getTypeConstraint() {
 //  		return $this->getAccessProxy()->getConstraint();
 // 	}
-	
+
 // 	public function buildComparableValue($value) {
 // 		return $value;
 // 	}
-	
+
 // 	public static function areConstraintsTypical(TypeConstraint $constraints = null) {
-// 		return is_null($constraints) 
-// 				|| (is_null($constraints->getParamClass()) && !$constraints->isArray());		
+// 		return is_null($constraints)
+// 				|| (is_null($constraints->getParamClass()) && !$constraints->isArray());
 // 	}
 }

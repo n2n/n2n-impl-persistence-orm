@@ -46,7 +46,10 @@ class FloatEntityProperty extends ColumnPropertyAdapter implements BasicEntityPr
 	 * @param string $columnName
 	 */
 	public function __construct(AccessProxy $accessProxy, $columnName) {
-		parent::__construct($accessProxy->createRestricted(TypeConstraints::float(true, true)), $columnName);
+		parent::__construct(
+				$accessProxy->createRestricted(TypeConstraints::float(true, true),
+						TypeConstraints::float($accessProxy->getSetterConstraint()->allowsNull())),
+				$columnName);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\ColumnComparableEntityProperty::createComparisonStrategy()
@@ -60,7 +63,7 @@ class FloatEntityProperty extends ColumnPropertyAdapter implements BasicEntityPr
 	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
 		return new ScalarColumnComparable($queryItem, $queryState);
 	}
-	
+
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
 		return new SimpleSelection($this->createQueryColumn($metaTreePoint->getMeta()), TypeName::FLOAT);
 	}
@@ -73,7 +76,7 @@ class FloatEntityProperty extends ColumnPropertyAdapter implements BasicEntityPr
 		ArgUtils::valScalar($value);
 		return (string) $value;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::repToValue()
@@ -82,7 +85,7 @@ class FloatEntityProperty extends ColumnPropertyAdapter implements BasicEntityPr
 		ArgUtils::assertTrue(is_numeric($rep));
 		return (float) $rep;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
@@ -95,7 +98,7 @@ class FloatEntityProperty extends ColumnPropertyAdapter implements BasicEntityPr
 		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $mappedValue/*, $pdoDataType*/);
 	}
 
-	
+
 	/**
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
@@ -124,7 +127,11 @@ class FloatEntityProperty extends ColumnPropertyAdapter implements BasicEntityPr
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::parseValue()
 	 */
 	public function parseValue($raw, Pdo $pdo) {
-		return $raw;
+		ArgUtils::valScalar($raw);
+		if ($raw === null) {
+			return null;
+		}
+		return (float) $raw;
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::buildRaw()
@@ -140,17 +147,17 @@ class FloatEntityProperty extends ColumnPropertyAdapter implements BasicEntityPr
 	}
 
 
-	
+
 // 	public function getTypeConstraint() {
 //  		return $this->getAccessProxy()->getConstraint();
 // 	}
-	
+
 // 	public function buildComparableValue($value) {
 // 		return $value;
 // 	}
-	
+
 // 	public static function areConstraintsTypical(TypeConstraint $constraints = null) {
-// 		return is_null($constraints) 
-// 				|| (is_null($constraints->getParamClass()) && !$constraints->isArray());		
+// 		return is_null($constraints)
+// 				|| (is_null($constraints->getParamClass()) && !$constraints->isArray());
 // 	}
 }

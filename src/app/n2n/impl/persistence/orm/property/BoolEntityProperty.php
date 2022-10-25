@@ -45,7 +45,10 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	 * @param string $columnName
 	 */
 	public function __construct(AccessProxy $accessProxy, $columnName) {
-		parent::__construct($accessProxy->createRestricted(TypeConstraints::bool(true, true)), $columnName);
+		parent::__construct(
+				$accessProxy->createRestricted(TypeConstraints::bool(true, true),
+						TypeConstraints::bool($accessProxy->getSetterConstraint()->allowsNull())),
+				$columnName);
 	}
 
 	/**
@@ -63,7 +66,7 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
 		return new ScalarColumnComparable($queryItem, $queryState, 'bool');
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::createSelection()
@@ -78,7 +81,7 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	 */
 	public function valueToRep($value): string {
 		ArgUtils::assertTrue(is_bool($value));
-		
+
 		return (string) (int) $value;
 	}
 
@@ -86,11 +89,11 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::repToValue()
 	 */
-	public function repToValue(string $rep) {		
+	public function repToValue(string $rep) {
 		ArgUtils::assertTrue(is_numeric($rep));
 		return (bool) $rep;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
@@ -129,7 +132,7 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	 */
 	public function parseValue($raw, Pdo $pdo) {
 		if ($raw === null) return null;
-		
+
 		return (bool) $raw;
 	}
 
