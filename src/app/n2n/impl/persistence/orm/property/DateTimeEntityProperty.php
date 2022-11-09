@@ -37,12 +37,14 @@ use n2n\persistence\orm\store\action\RemoveAction;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\store\CommonValueHash;
+use n2n\util\type\TypeConstraints;
+use n2n\l10n\N2nLocale;
 
 class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	public function __construct(AccessProxy $accessProxy, $columnName) {
-		$accessProxy->setConstraint(TypeConstraint::createSimple('DateTime', true));
-
-		parent::__construct($accessProxy, $columnName);
+		parent::__construct(
+				$accessProxy->createRestricted(TypeConstraints::namedType(\DateTime::class, true)),
+				$columnName);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\ColumnComparableEntityProperty::createComparisonStrategy()
