@@ -37,8 +37,6 @@ use n2n\persistence\orm\store\action\RemoveAction;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\store\CommonValueHash;
-use n2n\util\type\TypeConstraints;
-use n2n\l10n\N2nLocale;
 
 class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	public function __construct(AccessProxy $accessProxy, $columnName) {
@@ -46,15 +44,11 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 				$accessProxy->createRestricted(TypeConstraints::namedType(\DateTime::class, true)),
 				$columnName);
 	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\ColumnComparableEntityProperty::createComparisonStrategy()
-	 */
+
 	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
 		return new DateTimeColumnComparable($this->createQueryColumn($metaTreePoint->getMeta()), $queryState);
 	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\BasicEntityProperty::createColumnComparableFromQueryItem()
-	 */
+
 	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
 		return new DateTimeColumnComparable($queryItem, $queryState);
 	}
@@ -64,17 +58,13 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 				$queryState->getEntityManager()->getPdo()->getMetaData()
 						->getDialect()->getOrmDialectConfig());
 	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\BasicEntityProperty::valueToRep()
-	 */
+
 	public function valueToRep($value): string {
 		ArgUtils::assertTrue($value instanceof \DateTime);
 		
 		return $value->getTimestamp();
 	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\BasicEntityProperty::repToValue()
-	 */
+
 	public function repToValue(string $rep) {		
 		ArgUtils::assertTrue(is_numeric($rep));
 		$value = new \DateTime();
@@ -87,16 +77,12 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 		
 		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $rawValue);
 	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
-	 */
+
 	public function createValueHash($value, EntityManager $em): ValueHash {
 		if ($value === null) return new CommonValueHash(null);
 		return new CommonValueHash($this->valueToRep($value));
 	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\EntityProperty::mergeValue()
-	 */
+
 	public function mergeValue($value, $sameEntity, MergeOperation $mergeOperation) {
 		if ($sameEntity || $value === null) {
 			return $value;
@@ -105,26 +91,18 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 		ArgUtils::assertTrue($value instanceof \DateTime);
 		return clone $value;
 	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\EntityProperty::supplyRemoveAction()
-	 */
+
 	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $valueHash = null) {
 	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\BasicEntityProperty::parseValue()
-	 */
+
 	public function parseValue($raw, Pdo $pdo) {
 		return $pdo->getMetaData()->getDialect()->getOrmDialectConfig()->parseDateTime($raw);
 	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\BasicEntityProperty::buildRaw()
-	 */
+
 	public function buildRaw($value, Pdo $pdo) {
 		return $pdo->getMetaData()->getDialect()->getOrmDialectConfig()->buildDateTimeRawValue($value);
 	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\BasicEntityProperty::createSelectionFromQueryItem()
-	 */
+
 	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
 		return new DateTimeSelection($queryItem, $queryState->getEntityManager()->getPdo()->getMetaData()
 				->getDialect()->getOrmDialectConfig());
