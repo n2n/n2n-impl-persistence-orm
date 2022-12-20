@@ -35,6 +35,7 @@ use phpbob\representation\PhpTypeDef;
 use n2n\web\dispatch\mag\MagCollection;
 use n2n\persistence\meta\structure\Column;
 use hangar\api\CompatibilityLevel;
+use n2n\impl\persistence\orm\property\StringEntityProperty;
 
 class StringPropDef extends ScalarPropDefAdapter {
 	const PROP_NAME_LENGTH = 'length';
@@ -84,7 +85,8 @@ class StringPropDef extends ScalarPropDefAdapter {
 	 * @return Column
 	 */
 	public function createMetaColumn(EntityProperty $entityProperty, PropSourceDef $propSourceDef): Column {
-		ArgUtils::assertTrue($entityProperty instanceof ScalarEntityProperty);
+		ArgUtils::assertTrue($entityProperty instanceof ScalarEntityProperty
+				|| $entityProperty instanceof StringEntityProperty);
 	
 		return new CommonStringColumn($entityProperty->getColumnName(),
 				$this->determineLength($propSourceDef->getHangarData()),
