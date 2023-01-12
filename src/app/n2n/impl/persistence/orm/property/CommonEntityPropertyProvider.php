@@ -295,8 +295,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 				$manyToManyProperty->setRelation($relationFactory->createMappedManyToManyRelation(
 						$mappedBy, $entityModelManager));
 			} else {
-				$manyToManyProperty->setRelation($relationFactory->createMasterToManyRelation(
-						$entityModelManager));
+				$manyToManyProperty->setRelation($relationFactory->createMasterToManyRelation($entityModelManager));
 			}
 		}, $manyToManyProperty->isMaster());
 	}
