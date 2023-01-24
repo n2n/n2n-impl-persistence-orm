@@ -38,12 +38,14 @@ use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\criteria\JoinType;
+use n2n\impl\persistence\orm\property\relation\LazyRelation;
 
 abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter implements RelationEntityProperty, 
 		CascadableEntityProperty {
 	protected $master;
 	protected $type;
-	protected $relation;
+	private LazyRelation $lazyRelation;
+	private ?Relation $relation = null;
 	
 	public function __construct(AccessProxy $accessProxy, bool $master, string $type) {
 		parent::__construct($accessProxy);
@@ -66,26 +68,37 @@ abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter imple
 	public function copy($value) {
 		return $value;
 	}
-	
-	/* (non-PHPdoc)
-	 * @see n2n\persistence\orm\property.RelationEntityProperty::getRelation()
-	 */
-	public function getRelation(): Relation {
-		if ($this->relation === null) {
+
+	public function getLazyRelation(): LazyRelation {
+		if (!isset($this->lazyRelation)) {
 			throw new IllegalStateException('No relation assigned for ' . $this->__toString());
 		}
-		
-		return $this->relation;
+
+		return $this->lazyRelation;
 	}
-	
-	protected function assignRelation(Relation $relation) {
+
+
+	public function getRelation(): Relation {
+		if ($this->relation !== null) {
+			return $this->relation;
+		}
+
+		$relation = $this->getLazyRelation()->obtainRelation();
+
 		if ($this->master) {
 			ArgUtils::assertTrue($relation instanceof MasterRelation);
 		} else {
 			ArgUtils::assertTrue($relation instanceof MappedRelation);
 		}
-		
+
 		$this->relation = $relation;
+		unset($this->lazyRelation);
+
+		return $this->relation;
+	}
+	
+	protected function assignLazyRelation(LazyRelation $lazyRelation) {
+		$this->lazyRelation = $lazyRelation;
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::createSelection()
@@ -137,7 +150,7 @@ abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter imple
 	}
 	
 	public function getTargetEntityModel(): EntityModel {
-		return $this->getRelation()->getTargetEntityModel();
+		return $this->relation?->getTargetEntityModel() ?? $this->getLazyRelation()->getTargetEntityModel();
 	}
 	
 	/**

@@ -47,7 +47,7 @@ class CommonEntityPropertyProviderErrorTest extends TestCase {
 				new EntityModelFactory([CommonEntityPropertyProvider::class]));
 
 		try {
-			$emm->getEntityModelByClass(RelationUnionErrorMock::class);
+			$emm->getEntityModelByClass(RelationUnionErrorMock::class)->ensureInit();
 			$this->fail();
 		} catch (ConfigurationError $e) {
 			$this->assertEquals(
@@ -62,7 +62,7 @@ class CommonEntityPropertyProviderErrorTest extends TestCase {
 				new EntityModelFactory([CommonEntityPropertyProvider::class]));
 
 		try {
-			$emm->getEntityModelByClass(RelationUnregisteredErrorMock::class);
+			$emm->getEntityModelByClass(RelationUnregisteredErrorMock::class)->ensureInit();
 			$this->fail();
 		} catch (ConfigurationError $e) {
 			$this->assertEquals(30, $e->getLine());
