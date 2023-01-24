@@ -212,7 +212,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 			return true;
 		}
 
-		return false:
+		return false;
 	}
 	
 	private function provideOneToOne(AccessProxy $propertyAccessProxy, 
