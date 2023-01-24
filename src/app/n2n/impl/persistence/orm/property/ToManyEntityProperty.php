@@ -34,13 +34,14 @@ use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\property\CustomComparableEntityProperty;
 use n2n\util\type\TypeConstraints;
+use n2n\impl\persistence\orm\property\relation\LazyRelation;
 
 class ToManyEntityProperty extends RelationEntityPropertyAdapter implements CustomComparableEntityProperty {
-	public function setRelation(Relation $relation) {
-		parent::assignRelation($relation);
-		ArgUtils::assertTrue($this->relation instanceof ToManyRelation);
+	public function setLazyRelation(LazyRelation $lazyRelation) {
+		parent::assignLazyRelation($lazyRelation);
+//		ArgUtils::assertTrue($this->relation instanceof ToManyRelation);
 		$this->accessProxy = $this->accessProxy->createRestricted(TypeConstraint::createArrayLike(null, true,
-				TypeConstraint::createSimple($relation->getTargetEntityModel()->getClass()->getName()), 
+				TypeConstraint::createSimple($lazyRelation->getTargetEntityModel()->getClass()->getName()),
 				array('n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy')));
 	}
 	
@@ -66,7 +67,7 @@ class ToManyEntityProperty extends RelationEntityPropertyAdapter implements Cust
 		if ($value instanceof ArrayObjectProxy && !$value->isInitialized()) return $value;
 		
 		$mergedEntities = new \ArrayObject();
-		if ($this->relation->getCascadeType() & CascadeType::MERGE) {
+		if ($this->getRelation()->getCascadeType() & CascadeType::MERGE) {
 			foreach ($value as $key => $targetEntity) {
 				$mergedEntities[$key] = $mergeOperation->mergeEntity($targetEntity);
 			}
@@ -75,7 +76,7 @@ class ToManyEntityProperty extends RelationEntityPropertyAdapter implements Cust
 	}
 
 	public function createCustomComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
-		return $this->relation->createCustomComparable($metaTreePoint, $queryState);
+		return $this->getRelation()->createCustomComparable($metaTreePoint, $queryState);
 	}
 	
 // 	public function readValue($object) {

@@ -150,7 +150,7 @@ class CommonEntityPropertyProviderTest extends TestCase {
 		$this->emm = new EntityModelManager([NoTypeManyToOneMock::class],
 				new EntityModelFactory([CommonEntityPropertyProvider::class]));
 		$this->expectException(ConfigurationError::class);
-		$this->emm->getEntityModelByClass(NoTypeManyToOneMock::class);
+		$this->emm->getEntityModelByClass(NoTypeManyToOneMock::class)->ensureInit();
 	}
 
 	function testTypeNotFoundMock() {
@@ -158,6 +158,6 @@ class CommonEntityPropertyProviderTest extends TestCase {
 				new EntityModelFactory([CommonEntityPropertyProvider::class]));
 		$this->expectException(ConfigurationError::class);
 
-		$this->emm->getEntityModelByClass(TargetEntityNotFoundMock::class);
+		$this->emm->getEntityModelByClass(TargetEntityNotFoundMock::class)->ensureInit();
 	}
 }

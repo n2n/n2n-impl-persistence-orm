@@ -211,6 +211,8 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 			$this->provideManyToMany($propertyAccessProxy, $manyToManyAttribute, $classSetup);
 			return true;
 		}
+
+		return false:
 	}
 	
 	private function provideOneToOne(AccessProxy $propertyAccessProxy, 
@@ -227,10 +229,10 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
 				use ($toOneProperty, $oneToOne, $relationFactory) {
 			if (null !== ($mappedBy = $oneToOne->getMappedBy())) {
-				$toOneProperty->setRelation($relationFactory->createMappedOneToOneRelation(
+				$toOneProperty->setLazyRelation($relationFactory->createMappedOneToOneRelation(
 						$mappedBy, $entityModelManager));
 			} else {
-				$toOneProperty->setRelation($relationFactory
+				$toOneProperty->setLazyRelation($relationFactory
 						->createMasterToOneRelation($entityModelManager));
 			}
 		}, $toOneProperty->isMaster());
@@ -246,7 +248,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 
 		$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
 				use ($toOneProperty, $relationFactory, $classSetup) {
-			$toOneProperty->setRelation($relationFactory->createMasterToOneRelation($entityModelManager));
+			$toOneProperty->setLazyRelation($relationFactory->createMasterToOneRelation($entityModelManager));
 		}, true);
 	}
 	
@@ -269,10 +271,10 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
 				use ($toManyProperty, $oneToMany, $relationFactory) {
 			if (null !== ($mappedBy = $oneToMany->getMappedBy())) {
-				$toManyProperty->setRelation($relationFactory->createMappedOneToManyRelation(
+				$toManyProperty->setLazyRelation($relationFactory->createMappedOneToManyRelation(
 						$mappedBy, $entityModelManager));
 			} else {
-				$toManyProperty->setRelation($relationFactory
+				$toManyProperty->setLazyRelation($relationFactory
 						->createMasterToManyRelation($entityModelManager));
 			}
 		}, $toManyProperty->isMaster());
@@ -292,10 +294,10 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		$classSetup->onFinalize(function (EntityModelManager $entityModelManager)
 				use ($manyToManyProperty, $manyToMany, $relationFactory) {
 			if (null !== ($mappedBy = $manyToMany->getMappedBy())) {
-				$manyToManyProperty->setRelation($relationFactory->createMappedManyToManyRelation(
+				$manyToManyProperty->setLazyRelation($relationFactory->createMappedManyToManyRelation(
 						$mappedBy, $entityModelManager));
 			} else {
-				$manyToManyProperty->setRelation($relationFactory->createMasterToManyRelation($entityModelManager));
+				$manyToManyProperty->setLazyRelation($relationFactory->createMasterToManyRelation($entityModelManager));
 			}
 		}, $manyToManyProperty->isMaster());
 	}

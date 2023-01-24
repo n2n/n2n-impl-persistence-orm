@@ -123,22 +123,24 @@ class RelationFactory {
 
 	public function createMappedOneToOneRelation($mappedBy, EntityModelManager $entityModelManager) {
 		$targetEntityModel = $this->determineTargetEntityModel($entityModelManager, true);
-		$targetEntityProperty = $this->determineTargetEntityProperty($mappedBy, $targetEntityModel);
+		return new LazyRelation($targetEntityModel, function () use ($targetEntityModel, $mappedBy) {
+			$targetEntityProperty = $this->determineTargetEntityProperty($mappedBy, $targetEntityModel);
 
-		if ($targetEntityProperty->getType() != RelationEntityProperty::TYPE_ONE_TO_ONE) {
-			throw $this->createAssociationException('one-to-one', 'one-to-one');
-		}
+			if ($targetEntityProperty->getType() != RelationEntityProperty::TYPE_ONE_TO_ONE) {
+				throw $this->createAssociationException('one-to-one', 'one-to-one');
+			}
 
-		if (!$targetEntityProperty->isMaster()) {
-			throw $this->createMappedToNonMasterException($targetEntityProperty);
-		}
+			if (!$targetEntityProperty->isMaster()) {
+				throw $this->createMappedToNonMasterException($targetEntityProperty);
+			}
 
-		$this->rejectJoinAttrs();
+			$this->rejectJoinAttrs();
 
-		$relation = new PropertyMappedOneToOneRelation($this->relationProperty, $targetEntityModel,
-				$targetEntityProperty);
-		$this->completeRelation($relation);
-		return $relation;
+			$relation = new PropertyMappedOneToOneRelation($this->relationProperty, $targetEntityModel,
+					$targetEntityProperty);
+			$this->completeRelation($relation);
+			return $relation;
+		});
 	}
 
 	private function completeRelation(Relation $relation) {
@@ -153,43 +155,49 @@ class RelationFactory {
 
 	public function createMappedOneToManyRelation($mappedBy, EntityModelManager $entityModelManager) {
 		$targetEntityModel = $this->determineTargetEntityModel($entityModelManager, true);
-		$targetEntityProperty = $this->determineTargetEntityProperty($mappedBy, $targetEntityModel);
 
-		if ($targetEntityProperty->getType() != RelationEntityProperty::TYPE_MANY_TO_ONE) {
-			throw $this->createAssociationException('one-to-many', 'many-to-one');
-		}
+		return new LazyRelation($targetEntityModel, function () use ($mappedBy, $targetEntityModel) {
+			$targetEntityProperty = $this->determineTargetEntityProperty($mappedBy, $targetEntityModel);
 
-		if (!$targetEntityProperty->isMaster()) {
-			throw $this->createMappedToNonMasterException($targetEntityProperty);
-		}
+			if ($targetEntityProperty->getType() != RelationEntityProperty::TYPE_MANY_TO_ONE) {
+				throw $this->createAssociationException('one-to-many', 'many-to-one');
+			}
 
-		$this->rejectJoinAttrs();
+			if (!$targetEntityProperty->isMaster()) {
+				throw $this->createMappedToNonMasterException($targetEntityProperty);
+			}
 
-		$relation = new PropertyMappedToManyRelation($this->relationProperty, $targetEntityModel, $targetEntityProperty);
-		$this->completeRelation($relation);
-		$relation->setOrderDirectives($this->determineOrderDirectives($targetEntityModel));
-		return $relation;
+			$this->rejectJoinAttrs();
+
+			$relation = new PropertyMappedToManyRelation($this->relationProperty, $targetEntityModel, $targetEntityProperty);
+			$this->completeRelation($relation);
+			$relation->setOrderDirectives($this->determineOrderDirectives($targetEntityModel));
+			return $relation;
+		});
 	}
 
 	public function createMappedManyToManyRelation($mappedBy, EntityModelManager $entityModelManager) {
 		$targetEntityModel = $this->determineTargetEntityModel($entityModelManager, true);
-		$targetEntityProperty = $this->determineTargetEntityProperty($mappedBy, $targetEntityModel);
 
-		if ($targetEntityProperty->getType() != RelationEntityProperty::TYPE_MANY_TO_MANY) {
-			throw $this->createAssociationException('many-to-many', 'many-to-many');
-		}
+		return new LazyRelation($targetEntityModel, function () use ($mappedBy, $targetEntityModel) {
+			$targetEntityProperty = $this->determineTargetEntityProperty($mappedBy, $targetEntityModel);
 
-		if (!$targetEntityProperty->isMaster()) {
-			throw $this->createMappedToNonMasterException($targetEntityProperty);
-		}
+			if ($targetEntityProperty->getType() != RelationEntityProperty::TYPE_MANY_TO_MANY) {
+				throw $this->createAssociationException('many-to-many', 'many-to-many');
+			}
 
-		$this->rejectJoinAttrs();
+			if (!$targetEntityProperty->isMaster()) {
+				throw $this->createMappedToNonMasterException($targetEntityProperty);
+			}
 
-		$relation = new PropertyMappedToManyRelation($this->relationProperty, $targetEntityModel,
-				$targetEntityProperty);
-		$relation->setOrderDirectives($this->determineOrderDirectives($targetEntityModel));
-		$this->completeRelation($relation);
-		return $relation;
+			$this->rejectJoinAttrs();
+
+			$relation = new PropertyMappedToManyRelation($this->relationProperty, $targetEntityModel,
+					$targetEntityProperty);
+			$relation->setOrderDirectives($this->determineOrderDirectives($targetEntityModel));
+			$this->completeRelation($relation);
+			return $relation;
+		});
 	}
 
 	private function rejectJoinAttrs() {
@@ -221,39 +229,42 @@ class RelationFactory {
 
 	public function createMasterToOneRelation(EntityModelManager $entityModelManager) {
 		$targetEntityModel = $this->determineTargetEntityModel($entityModelManager);
-		$namingStrategy = $this->classSetup->getNamingStrategy();
 
-		if (null !== $this->joinTableAttribute) {
-			$entityModel = $this->relationProperty->getEntityModel();
-			$class = $entityModel->getClass();
-			$joinTableAttributeInstance = $this->joinTableAttribute->getInstance();
+		return new LazyRelation($targetEntityModel, function () use ($targetEntityModel) {
+			$namingStrategy = $this->classSetup->getNamingStrategy();
 
-			$relation = new JoinTableToOneRelation($this->relationProperty, $targetEntityModel);
-			$relation->setJoinTableName($namingStrategy->buildJunctionTableName($entityModel->getTableName(),
-					$this->relationProperty->getName(), $joinTableAttributeInstance->getName()));
-			$relation->setJoinColumnName($namingStrategy->buildJunctionJoinColumnName($class, $entityModel->getIdDef()->getPropertyName(),
-					$joinTableAttributeInstance->getJoinColumnName()));
-			$relation->setInverseJoinColumnName($namingStrategy->buildJunctionJoinColumnName($targetEntityModel->getClass(),
-					$targetEntityModel->getIdDef()->getPropertyName(),
-					$joinTableAttributeInstance->getInverseJoinColumnName()));
+			if (null !== $this->joinTableAttribute) {
+				$entityModel = $this->relationProperty->getEntityModel();
+				$class = $entityModel->getClass();
+				$joinTableAttributeInstance = $this->joinTableAttribute->getInstance();
+
+				$relation = new JoinTableToOneRelation($this->relationProperty, $targetEntityModel);
+				$relation->setJoinTableName($namingStrategy->buildJunctionTableName($entityModel->getTableName(),
+						$this->relationProperty->getName(), $joinTableAttributeInstance->getName()));
+				$relation->setJoinColumnName($namingStrategy->buildJunctionJoinColumnName($class, $entityModel->getIdDef()->getPropertyName(),
+						$joinTableAttributeInstance->getJoinColumnName()));
+				$relation->setInverseJoinColumnName($namingStrategy->buildJunctionJoinColumnName($targetEntityModel->getClass(),
+						$targetEntityModel->getIdDef()->getPropertyName(),
+						$joinTableAttributeInstance->getInverseJoinColumnName()));
+				$this->completeRelation($relation);
+				return $relation;
+			}
+
+			$joinColumnName = null;
+			if (null !== $this->joinColumnAttribute) {
+				$joinColumnName = $this->joinColumnAttribute->getInstance()->getName();
+			}
+
+			$joinColumnName = $namingStrategy->buildJoinColumnName($this->relationProperty->getName(),
+					$targetEntityModel->getIdDef()->getPropertyName(), $joinColumnName);
+
+			$relation = new JoinColumnToOneRelation($this->relationProperty, $targetEntityModel);
+			$relation->setJoinColumnName($this->classSetup->requestColumn($this->relationProperty->getName(),
+					$joinColumnName, array($this->joinColumnAttribute)));
+
 			$this->completeRelation($relation);
 			return $relation;
-		}
-
-		$joinColumnName = null;
-		if (null !== $this->joinColumnAttribute) {
-			$joinColumnName = $this->joinColumnAttribute->getInstance()->getName();
-		}
-
-		$joinColumnName = $namingStrategy->buildJoinColumnName($this->relationProperty->getName(),
-				$targetEntityModel->getIdDef()->getPropertyName(), $joinColumnName);
-
-		$relation = new JoinColumnToOneRelation($this->relationProperty, $targetEntityModel);
-		$relation->setJoinColumnName($this->classSetup->requestColumn($this->relationProperty->getName(),
-				$joinColumnName, array($this->joinColumnAttribute)));
-
-		$this->completeRelation($relation);
-		return $relation;
+		});
 	}
 
 	const JOIN_MODE_COLUMN = 'joinColumn';
@@ -279,52 +290,54 @@ class RelationFactory {
 	public function createMasterToManyRelation(EntityModelManager $entityModelManager) {
 		$targetEntityModel = $this->determineTargetEntityModel($entityModelManager);
 
-		$namingStrategy = $this->classSetup->getNamingStrategy();
+		return new LazyRelation($targetEntityModel, function () use ($targetEntityModel) {
+			$namingStrategy = $this->classSetup->getNamingStrategy();
 
-		$orderDirectives = $this->determineOrderDirectives($targetEntityModel);
+			$orderDirectives = $this->determineOrderDirectives($targetEntityModel);
 
-		if (null !== $this->joinColumnAttribute) {
-			if ($this->relationProperty->getType() != RelationEntityProperty::TYPE_ONE_TO_MANY) {
-				throw $this->classSetup->createException('Invalid attribute for ' . $this->relationProperty->getType()
-						. ' property', null, array($this->joinColumnAttribute));
+			if (null !== $this->joinColumnAttribute) {
+				if ($this->relationProperty->getType() != RelationEntityProperty::TYPE_ONE_TO_MANY) {
+					throw $this->classSetup->createException('Invalid attribute for ' . $this->relationProperty->getType()
+							. ' property', null, array($this->joinColumnAttribute));
+				}
+
+				$joinColumnName = $this->joinColumnAttribute->getInstance()->getName();
+				if ($joinColumnName === null) {
+					$namingStrategy->buildJunctionJoinColumnName($targetEntityModel->getClass(),
+							$targetEntityModel->getIdDef()->getPropertyName(), $joinColumnName);
+				}
+
+				$relation = new InverseJoinColumnOneToManyRelation($this->relationProperty, $targetEntityModel);
+				$relation->setInverseJoinColumnName($joinColumnName);
+				$relation->setOrderDirectives($orderDirectives);
+				$this->completeRelation($relation);
+				return $relation;
 			}
 
-			$joinColumnName = $this->joinColumnAttribute->getInstance()->getName();
-			if ($joinColumnName === null) {
-				$namingStrategy->buildJunctionJoinColumnName($targetEntityModel->getClass(),
-						$targetEntityModel->getIdDef()->getPropertyName(), $joinColumnName);
+			$joinTableName = null;
+			$joinColumnName = null;
+			$inverseJoinColumnName = null;
+			if (null !== $this->joinTableAttribute) {
+				$joinTable = $this->joinTableAttribute->getInstance();
+				$joinTableName = $joinTable->getName();
+				$joinColumnName = $joinTable->getJoinColumnName();
+				$inverseJoinColumnName = $joinTable->getInverseJoinColumnName();
 			}
 
-			$relation = new InverseJoinColumnOneToManyRelation($this->relationProperty, $targetEntityModel);
-			$relation->setInverseJoinColumnName($joinColumnName);
+			$entityModel = $this->relationProperty->getEntityModel();
+			$class = $entityModel->getClass();
+
+			$relation = new JoinTableToManyRelation($this->relationProperty, $targetEntityModel);
+			$relation->setJoinTableName($namingStrategy->buildJunctionTableName($entityModel->getTableName(),
+					$this->relationProperty->getName(), $joinTableName));
+			$relation->setJoinColumnName($namingStrategy->buildJunctionJoinColumnName($class, $entityModel->getIdDef()->getPropertyName(),
+					$joinColumnName));
+			$relation->setInverseJoinColumnName($namingStrategy->buildJunctionJoinColumnName($targetEntityModel->getClass(),
+					$targetEntityModel->getIdDef()->getPropertyName(), $inverseJoinColumnName));
 			$relation->setOrderDirectives($orderDirectives);
 			$this->completeRelation($relation);
 			return $relation;
-		}
-
-		$joinTableName = null;
-		$joinColumnName = null;
-		$inverseJoinColumnName = null;
-		if (null !== $this->joinTableAttribute) {
-			$joinTable = $this->joinTableAttribute->getInstance();
-			$joinTableName = $joinTable->getName();
-			$joinColumnName = $joinTable->getJoinColumnName();
-			$inverseJoinColumnName = $joinTable->getInverseJoinColumnName();
-		}
-
-		$entityModel = $this->relationProperty->getEntityModel();
-		$class = $entityModel->getClass();
-
-		$relation = new JoinTableToManyRelation($this->relationProperty, $targetEntityModel);
-		$relation->setJoinTableName($namingStrategy->buildJunctionTableName($entityModel->getTableName(),
-				$this->relationProperty->getName(), $joinTableName));
-		$relation->setJoinColumnName($namingStrategy->buildJunctionJoinColumnName($class, $entityModel->getIdDef()->getPropertyName(),
-				$joinColumnName));
-		$relation->setInverseJoinColumnName($namingStrategy->buildJunctionJoinColumnName($targetEntityModel->getClass(),
-				$targetEntityModel->getIdDef()->getPropertyName(), $inverseJoinColumnName));
-		$relation->setOrderDirectives($orderDirectives);
-		$this->completeRelation($relation);
-		return $relation;
+		});
 	}
 
 	private function determineTargetEntityModel(EntityModelManager $entityModelManager) {
@@ -399,7 +412,7 @@ class RelationFactory {
 				}
 
 				throw $this->classSetup->createException('Property '
-						. $this->relationProperty->toPropertyString() . ' can not be used in order directives.',
+								. $this->relationProperty->toPropertyString() . ' can not be used in order directives.',
 						null, array($this->orderByAttribute));
 			} catch (UnknownEntityPropertyException $e) {
 				throw $this->classSetup->createException($this->classSetup->getClass()->getName() . '::$'
