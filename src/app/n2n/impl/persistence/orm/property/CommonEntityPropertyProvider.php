@@ -150,6 +150,12 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 							$classSetup->requestColumn($propertyName)));
 					return;
 			}
+
+			if (enum_exists($typeName)) {
+				$classSetup->provideEntityProperty(new EnumEntityProperty($propertyAccessProxy,
+						$classSetup->requestColumn($propertyName), new \ReflectionEnum($typeName)));
+				return;
+			}
 		}
 	}
 	
