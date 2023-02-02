@@ -19,7 +19,7 @@
  * Bert Hofmänner.......: Idea, Frontend UI, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\impl\persistence\orm\query\select;
+namespace n2n\impl\persistence\orm\property\select;
 
 use n2n\persistence\meta\data\QueryItem;
 use n2n\persistence\PdoStatement;

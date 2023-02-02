@@ -35,10 +35,9 @@ use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\store\CommonValueHash;
 use n2n\util\type\TypeConstraints;
-use n2n\impl\persistence\orm\compare\EnumColumnComparable;
-use n2n\persistence\orm\query\select\DateTimeSelection;
 use n2n\util\EnumUtils;
-use n2n\impl\persistence\orm\query\select\EnumSelection;
+use n2n\impl\persistence\orm\property\compare\EnumColumnComparable;
+use n2n\impl\persistence\orm\property\select\EnumSelection;
 
 class EnumEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 

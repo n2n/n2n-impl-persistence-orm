@@ -19,7 +19,7 @@
  * Bert Hofmänner.......: Idea, Frontend UI, Community Leader, Marketing
  * Thomas Günther.......: Developer, Hangar
  */
-namespace n2n\impl\persistence\orm\compare;
+namespace n2n\impl\persistence\orm\property\compare;
 
 use n2n\util\type\ArgUtils;
 use n2n\persistence\meta\data\QueryItem;
