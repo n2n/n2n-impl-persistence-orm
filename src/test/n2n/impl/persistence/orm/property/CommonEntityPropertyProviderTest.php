@@ -35,6 +35,8 @@ use n2n\impl\persistence\orm\property\mock\TargetEntityNotFoundMock;
 use n2n\impl\persistence\orm\property\relation\JoinTableToOneRelation;
 use n2n\impl\persistence\orm\property\relation\JoinColumnToOneRelation;
 use n2n\impl\persistence\orm\property\relation\JoinTableToManyRelation;
+use n2n\impl\persistence\orm\property\mock\EnumEntityMock;
+use n2n\persistence\orm\model\EntityModel;
 
 class CommonEntityPropertyProviderTest extends TestCase {
 	private EntityModelManager $emm;
@@ -159,5 +161,18 @@ class CommonEntityPropertyProviderTest extends TestCase {
 		$this->expectException(ConfigurationError::class);
 
 		$this->emm->getEntityModelByClass(TargetEntityNotFoundMock::class)->ensureInit();
+	}
+
+	function testEnum() {
+		$this->emm = new EntityModelManager([EnumEntityMock::class],
+				new EntityModelFactory([CommonEntityPropertyProvider::class]));
+
+		$entityModel = $this->emm->getEntityModelByClass(EnumEntityMock::class);
+		$entityModel->ensureInit();
+		$entityProperties = $entityModel->getEntityProperties();
+
+		$this->assertCount(3, $entityProperties);
+
+
 	}
 }
