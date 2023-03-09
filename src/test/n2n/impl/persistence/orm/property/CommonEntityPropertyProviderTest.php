@@ -36,7 +36,9 @@ use n2n\impl\persistence\orm\property\relation\JoinTableToOneRelation;
 use n2n\impl\persistence\orm\property\relation\JoinColumnToOneRelation;
 use n2n\impl\persistence\orm\property\relation\JoinTableToManyRelation;
 use n2n\impl\persistence\orm\property\mock\EnumEntityMock;
-use n2n\persistence\orm\model\EntityModel;
+use n2n\impl\persistence\orm\live\mock\EmbeddedContainerMock;
+use n2n\impl\persistence\orm\property\relation\InverseJoinColumnOneToManyRelation;
+use n2n\impl\persistence\orm\live\mock\SimpleTargetMock;
 
 class CommonEntityPropertyProviderTest extends TestCase {
 	private EntityModelManager $emm;
@@ -172,7 +174,46 @@ class CommonEntityPropertyProviderTest extends TestCase {
 		$entityProperties = $entityModel->getEntityProperties();
 
 		$this->assertCount(3, $entityProperties);
+	}
+
+	function testEmbedded() {
+		$this->emm = new EntityModelManager([EmbeddedContainerMock::class, SimpleTargetMock::class],
+				new EntityModelFactory([CommonEntityPropertyProvider::class]));
+
+		$entityModel = $this->emm->getEntityModelByClass(EmbeddedContainerMock::class);
+		$entityModel->ensureInit();
+		$entityProperties = $entityModel->getEntityProperties();
+
+		$this->assertCount(2, $entityProperties);
+
+		/**
+		 * @var EmbeddedEntityProperty $embeddedEntityProperty
+		 */
+		$embeddedEntityProperty = $entityProperties[1];
+		$this->assertInstanceOf(EmbeddedEntityProperty::class, $embeddedEntityProperty);
+
+		$embeddableEntityProperties = $embeddedEntityProperty->getEmbeddedEntityPropertyCollection()->getEntityProperties();
 
 
+		/**
+		 * @var StringEntityProperty $nameEntityProperty
+		 */
+		$nameEntityProperty = $embeddableEntityProperties['name'];
+		$this->assertInstanceOf(StringEntityProperty::class, $nameEntityProperty);
+		$this->assertEquals('holeradio_name', $nameEntityProperty->getColumnName());
+
+
+		/**
+		 * @var ToManyEntityProperty $toManyEntityProperty
+		 */
+		$simpleTargetsEntityProperty = $embeddableEntityProperties['simpleTargetMocks'];
+		$this->assertInstanceOf(ToManyEntityProperty::class, $simpleTargetsEntityProperty);
+
+		/**
+		 * @var InverseJoinColumnOneToManyRelation $relation
+		 */
+		$relation = $simpleTargetsEntityProperty->getRelation();
+		$this->assertInstanceOf(InverseJoinColumnOneToManyRelation::class, $relation);
+		$this->assertEquals('holeradio_embeddable_mock_id', $relation->getInverseJoinColumnName());
 	}
 }

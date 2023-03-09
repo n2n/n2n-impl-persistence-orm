@@ -46,6 +46,10 @@ use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\meta\data\QueryItem;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\store\CommonValueHash;
+use n2n\persistence\orm\store\operation\CascadeOperation;
+use n2n\persistence\orm\CascadeType;
+use n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy;
+use n2n\util\col\ArrayUtils;
 
 class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComparableEntityProperty, 
 		EntityPropertyCollection, JoinableEntityProperty {
@@ -207,16 +211,20 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	public function getEmbeddedEntityPropertyCollection(): EntityPropertyCollection {
 		return $this;
 	}
-	
+
+	function getEmbeddedCascadeEntityObj(mixed $entityObj): mixed {
+		return $this->readValue($entityObj);
+	}
+
 	public function getAvailableJoinTypes(): array {
 		return [JoinType::INNER];
 	}
-
 }
 
 class EmbeddedTreePoint extends ExtendableTreePoint implements JoinedTreePoint {
 	private $embeddedEntityProperty;
-	
+
+		
 	public function __construct(QueryState $queryState, TreePointMeta $treePointMeta, 
 			EmbeddedEntityProperty $embeddedEntityProperty) {
 		parent::__construct($queryState, $embeddedEntityProperty, $treePointMeta);

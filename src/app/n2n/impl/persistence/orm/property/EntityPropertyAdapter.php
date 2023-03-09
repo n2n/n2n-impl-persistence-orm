@@ -135,6 +135,10 @@ abstract class EntityPropertyAdapter implements EntityProperty {
 	public function getEmbeddedEntityPropertyCollection(): EntityPropertyCollection {
 		throw new IllegalStateException('EntityProperty contains no target EntityPropertyCollection: ' . $this);
 	}
+
+	function getEmbeddedCascadeEntityObj(mixed $entityObj): mixed {
+		return null;
+	}
 	
 	public function __toString(): string {
 		return (new \ReflectionClass($this))->getShortName() . ' [' . $this->accessProxy . ']';
