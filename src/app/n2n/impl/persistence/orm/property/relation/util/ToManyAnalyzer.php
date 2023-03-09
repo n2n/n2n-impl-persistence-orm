@@ -47,7 +47,7 @@ class ToManyAnalyzer {
 			if (!$persistenceContext->containsManagedEntityObj($entity)) {
 				continue;
 			}
-						
+
 			$persistAction = $this->actionQueue->getPersistAction($entity);
 			if ($persistAction->hasId()) {
 				$this->entityIds[] = $persistAction->getId();

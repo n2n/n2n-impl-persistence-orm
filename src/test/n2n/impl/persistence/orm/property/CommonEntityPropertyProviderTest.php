@@ -36,10 +36,9 @@ use n2n\impl\persistence\orm\property\relation\JoinTableToOneRelation;
 use n2n\impl\persistence\orm\property\relation\JoinColumnToOneRelation;
 use n2n\impl\persistence\orm\property\relation\JoinTableToManyRelation;
 use n2n\impl\persistence\orm\property\mock\EnumEntityMock;
-use n2n\persistence\orm\model\EntityModel;
-use n2n\impl\persistence\orm\property\mock\EmbeddedContainerMock;
+use n2n\impl\persistence\orm\live\mock\EmbeddedContainerMock;
 use n2n\impl\persistence\orm\property\relation\InverseJoinColumnOneToManyRelation;
-use n2n\impl\persistence\orm\property\mock\SimpleTargetMock;
+use n2n\impl\persistence\orm\live\mock\SimpleTargetMock;
 
 class CommonEntityPropertyProviderTest extends TestCase {
 	private EntityModelManager $emm;
@@ -216,8 +215,5 @@ class CommonEntityPropertyProviderTest extends TestCase {
 		$relation = $simpleTargetsEntityProperty->getRelation();
 		$this->assertInstanceOf(InverseJoinColumnOneToManyRelation::class, $relation);
 		$this->assertEquals('holeradio_embeddable_mock_id', $relation->getInverseJoinColumnName());
-
-
-
 	}
 }

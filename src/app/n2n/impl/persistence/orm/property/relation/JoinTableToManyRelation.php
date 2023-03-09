@@ -70,7 +70,7 @@ class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelatio
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createSelection()
 	 */
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
-		$idSelection = $metaTreePoint->requestPropertySelection($this->createIdTreePath());
+		$idSelection = $metaTreePoint->requestCustomPropertySelection($this->entityModel->getIdDef()->getEntityProperty());
 		
 		$toManyLoader = new JoinTableToManyLoader(
 				new SimpleLoaderUtils($queryState->getEntityManager(), $this->targetEntityModel),

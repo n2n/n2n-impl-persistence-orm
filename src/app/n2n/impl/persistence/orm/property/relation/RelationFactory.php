@@ -255,12 +255,9 @@ class RelationFactory {
 				$joinColumnName = $this->joinColumnAttribute->getInstance()->getName();
 			}
 
-			$joinColumnName = $namingStrategy->buildJoinColumnName($this->relationProperty->getName(),
-					$targetEntityModel->getIdDef()->getPropertyName(), $joinColumnName);
-
 			$relation = new JoinColumnToOneRelation($this->relationProperty, $targetEntityModel);
-			$relation->setJoinColumnName($this->classSetup->requestColumn($this->relationProperty->getName(),
-					$joinColumnName, array($this->joinColumnAttribute)));
+			$relation->setJoinColumnName($this->classSetup->requestJoinColumn($this->relationProperty->getName(),
+					$targetEntityModel->getIdDef()->getPropertyName(), $joinColumnName, array($this->joinColumnAttribute)));
 
 			$this->completeRelation($relation);
 			return $relation;
@@ -451,7 +448,7 @@ class RelationFactory {
 
 		if ($targetEntityName === null && null !== ($type = $propertyAttribute->getProperty()->getType())
 				&& TypeName::isNamedType($type) && !$type->isBuiltin()) {
-			$targetEntityName = (string) $type;
+			$targetEntityName = $type->getName();
 		}
 
 		if ($targetEntityName === null) {

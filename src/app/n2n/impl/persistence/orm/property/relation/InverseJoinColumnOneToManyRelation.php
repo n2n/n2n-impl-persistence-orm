@@ -131,9 +131,10 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 	 */
 	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, 
 			?ValueHash $oldValueHash) {
+
 		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToManyValueHash);
 		if ($oldValueHash !== null && $oldValueHash->checkForUntouchedProxy($value)) return;
-		
+
 		$toManyAnalyzer = new ToManyAnalyzer($persistAction->getActionQueue());
 		$toManyAnalyzer->analyze($value);
 		
@@ -205,7 +206,7 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createSelection()
 	 */
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
-		$idSelection = $metaTreePoint->requestPropertySelection($this->createIdTreePath());
+		$idSelection = $metaTreePoint->requestCustomPropertySelection($this->entityModel->getIdDef()->getEntityProperty());
 		$idProperty = $this->entityModel->getIdDef()->getEntityProperty();
 		
 		$toManyLoader = new JoinColumnToManyLoader(
