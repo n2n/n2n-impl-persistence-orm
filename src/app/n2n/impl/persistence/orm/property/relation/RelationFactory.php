@@ -301,11 +301,9 @@ class RelationFactory {
 							. ' property', null, array($this->joinColumnAttribute));
 				}
 
-				$joinColumnName = $this->joinColumnAttribute->getInstance()->getName();
-				if ($joinColumnName === null) {
-					$namingStrategy->buildJunctionJoinColumnName($targetEntityModel->getClass(),
-							$targetEntityModel->getIdDef()->getPropertyName(), $joinColumnName);
-				}
+				$joinColumnName = $namingStrategy->buildJunctionJoinColumnName($targetEntityModel->getClass(),
+						$targetEntityModel->getIdDef()->getPropertyName(),
+						$this->joinColumnAttribute->getInstance()->getName());
 
 				$relation = new InverseJoinColumnOneToManyRelation($this->relationProperty, $targetEntityModel);
 				$relation->setInverseJoinColumnName($joinColumnName);
@@ -443,6 +441,8 @@ class RelationFactory {
 					. $this->relationProperty->getEntityModel()->getClass()->getName() . '::$'
 					. implode('::$', $propertyNames));
 		}
+
+		throw new IllegalStateException();
 	}
 
 	public static function readTargetClass(PropertyAttribute $propertyAttribute, ?string $attributeTargetClassName,
