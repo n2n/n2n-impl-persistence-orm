@@ -17,7 +17,7 @@ class OverrideEmbeddedContainerMock {
 	#[Embedded(columnPrefix: 'ptusch_')]
 	#[AttributeOverrides(['name' => 'override_name'])]
 	#[AssociationOverrides(
-			joinColumns: [
+			joinColumnsMap: [
 				'notSimpleTargetMocks' => new JoinColumn('inverse_over_oecm_id'),
 				'verySimpleTargetMock' => new JoinColumn('very_over_simple_id')
 			],
