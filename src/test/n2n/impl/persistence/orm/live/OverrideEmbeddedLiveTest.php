@@ -17,7 +17,7 @@ use n2n\impl\persistence\orm\property\CommonEntityPropertyProvider;
 use n2n\persistence\orm\EntityManager;
 use n2n\impl\persistence\orm\live\mock\OverrideEmbeddedContainerMock;
 
-class EmbeddedLiveTest extends TestCase {
+class OverrideEmbeddedLiveTest extends TestCase {
 
 	private PdoPool $pdoPool;
 
@@ -26,7 +26,7 @@ class EmbeddedLiveTest extends TestCase {
 				new DbConfig([new PersistenceUnitConfig('default', 'sqlite::memory:', '', '',
 						PersistenceUnitConfig::TIL_SERIALIZABLE, SqliteDialect::class,
 						false, null)]),
-				new OrmConfig([EmbeddedContainerMock::class, SimpleTargetMock::class, OverrideEmbeddedContainerMock::class],
+				new OrmConfig([SimpleTargetMock::class, OverrideEmbeddedContainerMock::class],
 						[CommonEntityPropertyProvider::class]),
 				$this->createMock(MagicContext::class),
 				new TransactionManager(), null, null);
@@ -35,35 +35,29 @@ class EmbeddedLiveTest extends TestCase {
 		$database = $metaData->getDatabase();
 		$metaEntityFactory = $database->createMetaEntityFactory();
 
-		$table = $metaEntityFactory->createTable('embedded_container_mock');
-		$columnFactory = $table->createColumnFactory();
-		$columnFactory->createIntegerColumn('id', 32);
-		$columnFactory->createStringColumn('holeradio_name', 255);
-		$columnFactory->createIntegerColumn('holeradio_very_simple_target_mock_id', 32);
-
 
 		$table = $metaEntityFactory->createTable('override_embedded_container_mock');
 		$columnFactory = $table->createColumnFactory();
 		$columnFactory->createIntegerColumn('id', 32);
-		$columnFactory->createStringColumn('override_name', 255);
-		$columnFactory->createIntegerColumn('override_very_simple_target_mock_id', 32);
+		$columnFactory->createStringColumn('ptusch_override_name', 255);
+		$columnFactory->createIntegerColumn('ptusch_very_over_simple_id', 32);
 
 
 		$table = $metaEntityFactory->createTable('simple_target_mock');
 		$columnFactory = $table->createColumnFactory();
 		$columnFactory->createIntegerColumn('id', 32);
-		$columnFactory->createIntegerColumn('holeradio_embeddable_mock_id', 32);
+		$columnFactory->createIntegerColumn('ptusch_inverse_over_oecm_id', 32);
 		$columnFactory->createStringColumn('holeradio', 255);
 
-		$table = $metaEntityFactory->createTable('holeradio_embedded_container_mock_not_simple_target_mocks');
+		$table = $metaEntityFactory->createTable('ptusch_over_ocm_stm');
 		$columnFactory = $table->createColumnFactory();
-		$columnFactory->createIntegerColumn('holeradio_embedded_container_mock_id', 32);
-		$columnFactory->createIntegerColumn('holeradio_simple_target_mock_id', 32);
+		$columnFactory->createIntegerColumn('ptusch_oecm_id', 32);
+		$columnFactory->createIntegerColumn('ptusch_stm_id', 32);
 
-		$table = $metaEntityFactory->createTable('holeradio_embedded_container_mock_many_simple_target_mocks');
+		$table = $metaEntityFactory->createTable('ptusch_over_many_ocm_stm');
 		$columnFactory = $table->createColumnFactory();
-		$columnFactory->createIntegerColumn('holeradio_embedded_container_mock_id', 32);
-		$columnFactory->createIntegerColumn('holeradio_simple_target_mock_id', 32);
+		$columnFactory->createIntegerColumn('ptusch_moecm_id', 32);
+		$columnFactory->createIntegerColumn('ptusch_mstm_id', 32);
 
 
 		$metaData->getMetaManager()->flush();
@@ -72,7 +66,7 @@ class EmbeddedLiveTest extends TestCase {
 	function testNotFound() {
 		$em = $this->pdoPool->getEntityManagerFactory()->getExtended();
 
-		$this->assertNull($em->find(EmbeddedContainerMock::class, 1));
+		$this->assertNull($em->find(OverrideEmbeddedContainerMock::class, 1));
 	}
 
 	function testPersist() {
@@ -99,7 +93,7 @@ class EmbeddedLiveTest extends TestCase {
 		$stm5->id = 5;
 		$stm5->holeradio = 'huii 5';
 
-		$ecm = new EmbeddedContainerMock();
+		$ecm = new OverrideEmbeddedContainerMock();
 		$ecm->id = 1;
 		$ecm->embeddableMock = new EmbeddableMock();
 		$ecm->embeddableMock->name = 'huii';
@@ -112,12 +106,12 @@ class EmbeddedLiveTest extends TestCase {
 		$em->persist($ecm);
 		$tx->commit();
 
-		$this->assertEquals(1, $this->countEntityObjs($em, EmbeddedContainerMock::class));
+		$this->assertEquals(1, $this->countEntityObjs($em, OverrideEmbeddedContainerMock::class));
 		$this->assertEquals(5, $this->countEntityObjs($em, SimpleTargetMock::class));
 
 		$em->clear();
 
-		$ecm2 = $em->find(EmbeddedContainerMock::class, 1);
+		$ecm2 = $em->find(OverrideEmbeddedContainerMock::class, 1);
 
 		$this->assertNotNull($ecm2);
 
@@ -131,7 +125,7 @@ class EmbeddedLiveTest extends TestCase {
 		$tx->commit();
 
 
-		$this->assertEmpty($this->countEntityObjs($em, EmbeddedContainerMock::class));
+		$this->assertEmpty($this->countEntityObjs($em, OverrideEmbeddedContainerMock::class));
 		$this->assertEmpty($this->countEntityObjs($em, SimpleTargetMock::class));
 	}
 

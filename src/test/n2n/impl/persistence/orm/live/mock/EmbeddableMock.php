@@ -12,6 +12,7 @@ use n2n\persistence\orm\attribute\ManyToMany;
 class EmbeddableMock {
 
 	public string $name;
+
 	#[OneToMany(SimpleTargetMock::class, cascade: CascadeType::ALL)]
 	#[JoinColumn('embeddable_mock_id')]
 	public \ArrayObject $simpleTargetMocks;
