@@ -48,6 +48,8 @@ use n2n\reflection\attribute\PropertyAttribute;
 use n2n\reflection\attribute\Attribute;
 use n2n\reflection\property\PropertyAccessProxy;
 use n2n\util\type\TypeConstraints;
+use n2n\persistence\orm\attribute\AttributeOverrides;
+use n2n\persistence\orm\attribute\AssociationOverrides;
 
 class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	const PROP_FILE_NAME_SUFFIX = '.originalName';
@@ -164,7 +166,10 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		$propertyName = $propertyAccessProxy->getPropertyName();
 		$attributeSet = $classSetup->getAttributeSet();
 		$attrEmbedded = $attributeSet->getPropertyAttribute($propertyName, Embedded::class);
-		if ($attrEmbedded === null) return false;
+		if ($attrEmbedded === null) {
+			return false;
+		}
+
 		ArgUtils::assertTrue($attrEmbedded instanceof PropertyAttribute);
 
 		$embedded = $attrEmbedded->getInstance();
@@ -180,6 +185,17 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 				new EmbeddedNampingStrategy($classSetup->getNamingStrategy(), $embedded->getColumnPrefix(),
 						$embedded->getColumnSuffix()),
 				$classSetup, $propertyName);
+
+		if (null !== ($attrAttributeOverridesAttr = $attributeSet
+						->getPropertyAttribute($propertyName, AttributeOverrides::class))) {
+			$targetClassSetup->addAttributeOverrides($attrAttributeOverridesAttr->getInstance());
+		}
+
+//		if (null !== ($attrAssociationOverridesAttr = $attributeSet
+//						->getPropertyAttribute($propertyName, AssociationOverrides::class))) {
+//			$targetClassSetup->addAttributeOverrides($attrAssociationOverridesAttr->getInstance());
+//		}
+
 		$setupProcess->getEntityPropertyAnalyzer()->analyzeClass($targetClassSetup);
 
 		foreach ($targetClassSetup->getEntityProperties() as $property) {
