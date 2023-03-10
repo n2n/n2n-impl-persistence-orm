@@ -21,7 +21,7 @@ class OverrideEmbeddedContainerMock {
 				'notSimpleTargetMocks' => new JoinColumn('inverse_over_oecm_id'),
 				'verySimpleTargetMock' => new JoinColumn('very_over_simple_id')
 			],
-			joinTables: [
+			joinTablesMap: [
 				'simpleTargetMocks' => new JoinTable('over_ocm_stm', 'oecm_id', 'stm_id'),
 				'manySimpleTargetMocks' => new JoinTable('over_many_ocm_stm', 'moecm_id', 'mstm_id')
 			])]
