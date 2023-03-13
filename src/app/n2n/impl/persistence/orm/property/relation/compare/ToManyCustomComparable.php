@@ -52,12 +52,11 @@ class ToManyCustomComparable implements CustomComparable {
 	private $entityColumnComparable;
 	private $toManyQueryItem;
 
-	public function __construct(MetaTreePoint $metaTreePoint, EntityModel $targetEntityModel, 
+	public function __construct(MetaTreePoint $metaTreePoint, private EntityModel $targetEntityModel,
 			TreePath $targetIdTreePath, ToManyQueryItemFactory $toManyQueryItemFactory, 
 			QueryState $queryState) {
 		$this->metaTreePoint = $metaTreePoint;
 		$this->targetIdTreePath = $targetIdTreePath;
-		$this->targetEntityModel = $targetEntityModel;
 		$this->toManyQueryItemFactory = $toManyQueryItemFactory;
 		$this->queryState = $queryState;
 		$this->typeConstraint = TypeConstraint::createSimple($this->targetEntityModel->getClass()->getName(), true);
