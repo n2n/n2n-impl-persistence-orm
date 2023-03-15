@@ -229,5 +229,6 @@ class ToManyValueHash implements ValueHash, WeakRefInitializedListener {
 
 		$this->idRepsMap = $this->toManyValueHasher->extractIdRepsMapFromValue($this->arrayObjectProxy);
 		$this->arrayObjectProxy = null;
+		$this->toManyValueHasher = null;
 	}
 }
