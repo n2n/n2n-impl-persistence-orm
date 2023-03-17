@@ -44,7 +44,7 @@ class ActionMarker {
 	}
 
 	public function isConstraintReleased(RemoveAction $removeAction) {
-		return $removeAction->getAttr($this->entityProperty, self::CONSTRAINT_ATTR) === self::STATE_RELEASED;
+		return $removeAction->getAttr($this->entityProperty, self::CONSTRAINT_ATTR) === self::CONSTRAINT_STATE_RELEASED;
 	}
 	
 	public function resetConstraint(RemoveAction $persistAction) {
