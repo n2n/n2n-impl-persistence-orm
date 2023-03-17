@@ -256,8 +256,8 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 		$resetAction = new JoinColumnResetAction($pdo, 
 				$this->entityModel->getTableName(), $this->joinColumnName);
 		$resetAction->setJoinIdRaw($idRaw);
-		
-		$targetRemoveAction->executeAtEnd(function ($actionQueue, $resetAction) {
+
+		$targetRemoveAction->executeAtEnd(function () use ($actionQueue, $resetAction) {
 			$actionQueue->add($resetAction);
 		});
 	}
