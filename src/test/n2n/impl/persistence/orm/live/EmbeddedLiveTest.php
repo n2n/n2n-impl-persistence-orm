@@ -19,23 +19,15 @@ use n2n\impl\persistence\orm\live\mock\OverrideEmbeddedContainerMock;
 use n2n\persistence\ext\EmPool;
 use n2n\persistence\orm\model\EntityModelManager;
 use n2n\persistence\orm\model\EntityModelFactory;
+use n2n\impl\persistence\orm\test\GeneralTestEnv;
 
 class EmbeddedLiveTest extends TestCase {
 
 	private PdoPool $pdoPool;
 
 	function setUp(): void {
-		$this->pdoPool = new PdoPool(
-				[PdoPool::DEFAULT_DS_NAME => new PersistenceUnitConfig('default', 'sqlite::memory:', '', '',
-						PersistenceUnitConfig::TIL_SERIALIZABLE, SqliteDialect::class,
-						false, null)],
-				new TransactionManager(), null, null);
-
-		$this->emPool = new EmPool($this->pdoPool,
-				new EntityModelManager(
-						[EmbeddedContainerMock::class, SimpleTargetMock::class, OverrideEmbeddedContainerMock::class],
-						new EntityModelFactory([CommonEntityPropertyProvider::class])),
-				$this->createMock(MagicContext::class));
+		$this->emPool = GeneralTestEnv::setUpEmPool([EmbeddedContainerMock::class, SimpleTargetMock::class, OverrideEmbeddedContainerMock::class]);
+		$this->pdoPool = $this->emPool->getPdoPool();
 
 		$metaData = $this->pdoPool->getPdo()->getMetaData();
 		$database = $metaData->getDatabase();
@@ -47,13 +39,11 @@ class EmbeddedLiveTest extends TestCase {
 		$columnFactory->createStringColumn('holeradio_name', 255);
 		$columnFactory->createIntegerColumn('holeradio_very_simple_target_mock_id', 32);
 
-
 		$table = $metaEntityFactory->createTable('override_embedded_container_mock');
 		$columnFactory = $table->createColumnFactory();
 		$columnFactory->createIntegerColumn('id', 32);
 		$columnFactory->createStringColumn('override_name', 255);
 		$columnFactory->createIntegerColumn('override_very_simple_target_mock_id', 32);
-
 
 		$table = $metaEntityFactory->createTable('simple_target_mock');
 		$columnFactory = $table->createColumnFactory();

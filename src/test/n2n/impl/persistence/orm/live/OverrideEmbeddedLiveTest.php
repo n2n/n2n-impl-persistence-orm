@@ -19,6 +19,7 @@ use n2n\impl\persistence\orm\live\mock\OverrideEmbeddedContainerMock;
 use n2n\persistence\ext\EmPool;
 use n2n\persistence\orm\model\EntityModelManager;
 use n2n\persistence\orm\model\EntityModelFactory;
+use n2n\impl\persistence\orm\test\GeneralTestEnv;
 
 class OverrideEmbeddedLiveTest extends TestCase {
 
@@ -27,17 +28,9 @@ class OverrideEmbeddedLiveTest extends TestCase {
 	private EmPool $emPool;
 
 	function setUp(): void {
-		$this->pdoPool = new PdoPool(
-				[PdoPool::DEFAULT_DS_NAME => new PersistenceUnitConfig('default', 'sqlite::memory:', '', '',
-						PersistenceUnitConfig::TIL_SERIALIZABLE, SqliteDialect::class,
-						false, null)],
-				new TransactionManager(), null, null);
+		$this->emPool = GeneralTestEnv::setUpEmPool([SimpleTargetMock::class, OverrideEmbeddedContainerMock::class]);
+		$this->pdoPool = $this->emPool->getPdoPool();
 
-		$this->emPool = new EmPool($this->pdoPool,
-				new EntityModelManager(
-						[SimpleTargetMock::class, OverrideEmbeddedContainerMock::class],
-						new EntityModelFactory([CommonEntityPropertyProvider::class])),
-				$this->createMock(MagicContext::class));
 
 		$metaData = $this->pdoPool->getPdo()->getMetaData();
 		$database = $metaData->getDatabase();
