@@ -54,7 +54,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 	public function __construct(EntityProperty $entityProperty, EntityModel $targetEntityModel) {
 		parent::__construct($entityProperty, $targetEntityModel);
 		$targetEntityModel->registerActionDependency($this);
-		
+
 		$this->toOneUtils = new ToOneUtils($this, true);
 	}
 	
@@ -232,9 +232,9 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\model\ActionDependency::persistActionSupplied()
 	 */
-	public function persistActionSupplied(PersistAction $targetPersistAction) {
-		
-	}
+//	public function persistActionSupplied(PersistAction $targetPersistAction) {
+//
+//	}
 	
 	private function markRemoveAction(RemoveAction $removeAction) {
 		$removeAction->setAttribute(get_class($this), true);
