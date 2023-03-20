@@ -16,6 +16,9 @@ use n2n\impl\persistence\orm\live\mock\EmbeddableMock;
 use n2n\impl\persistence\orm\property\CommonEntityPropertyProvider;
 use n2n\persistence\orm\EntityManager;
 use n2n\impl\persistence\orm\live\mock\OverrideEmbeddedContainerMock;
+use n2n\persistence\ext\EmPool;
+use n2n\persistence\orm\model\EntityModelManager;
+use n2n\persistence\orm\model\EntityModelFactory;
 
 class EmbeddedLiveTest extends TestCase {
 
@@ -23,13 +26,16 @@ class EmbeddedLiveTest extends TestCase {
 
 	function setUp(): void {
 		$this->pdoPool = new PdoPool(
-				new DbConfig([new PersistenceUnitConfig('default', 'sqlite::memory:', '', '',
+				[PdoPool::DEFAULT_DS_NAME => new PersistenceUnitConfig('default', 'sqlite::memory:', '', '',
 						PersistenceUnitConfig::TIL_SERIALIZABLE, SqliteDialect::class,
-						false, null)]),
-				new OrmConfig([EmbeddedContainerMock::class, SimpleTargetMock::class, OverrideEmbeddedContainerMock::class],
-						[CommonEntityPropertyProvider::class]),
-				$this->createMock(MagicContext::class),
+						false, null)],
 				new TransactionManager(), null, null);
+
+		$this->emPool = new EmPool($this->pdoPool,
+				new EntityModelManager(
+						[EmbeddedContainerMock::class, SimpleTargetMock::class, OverrideEmbeddedContainerMock::class],
+						new EntityModelFactory([CommonEntityPropertyProvider::class])),
+				$this->createMock(MagicContext::class));
 
 		$metaData = $this->pdoPool->getPdo()->getMetaData();
 		$database = $metaData->getDatabase();
@@ -70,13 +76,13 @@ class EmbeddedLiveTest extends TestCase {
 	}
 
 	function testNotFound() {
-		$em = $this->pdoPool->getEntityManagerFactory()->getExtended();
+		$em = $this->emPool->getEntityManagerFactory()->getExtended();
 
 		$this->assertNull($em->find(EmbeddedContainerMock::class, 1));
 	}
 
 	function testPersist() {
-		$em = $this->pdoPool->getEntityManagerFactory()->getExtended();
+		$em = $this->emPool->getEntityManagerFactory()->getExtended();
 		$tm = $this->pdoPool->getTransactionManager();
 
 		$stm1 = new SimpleTargetMock();
