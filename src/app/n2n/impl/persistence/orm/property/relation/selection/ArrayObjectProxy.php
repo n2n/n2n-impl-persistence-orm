@@ -55,7 +55,7 @@ class ArrayObjectProxy extends \ArrayObject {
 
 	public function initialize() {
 		if ($this->isInitialized()) return;
-		
+
 		$entities = $this->loadClosure->invoke();
 // 		$hasher = new ToManyValueHasher($this->targetIdEntityProperty);
 // 		$this->loadedValueHash = $hasher->createValueHash($entities);
