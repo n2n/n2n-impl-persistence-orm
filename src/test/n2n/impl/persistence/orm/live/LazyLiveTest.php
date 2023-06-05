@@ -17,6 +17,7 @@ use n2n\core\container\TransactionManager;
 use n2n\impl\persistence\orm\live\mock\LazyContainerMock;
 use n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy;
 use n2n\impl\persistence\orm\test\GeneralTestEnv;
+use n2n\persistence\orm\OrmUtils;
 
 class LazyLiveTest extends TestCase {
 
@@ -72,11 +73,23 @@ class LazyLiveTest extends TestCase {
 		$this->assertFalse($lcm === $reLcm);
 
 		$this->assertInstanceOf(ArrayObjectProxy::class, $reLcm->getSimpleTargetMocks());
+		$calls = 0;
+		OrmUtils::whenArrayObjectInitialized($reLcm->getSimpleTargetMocks(), function () use (&$calls) {
+			$calls++;
+		});
+
 		$this->assertFalse($reLcm->getSimpleTargetMocks()->isInitialized());
+		$this->assertEquals(0, $calls);
 
 		$this->assertCount(1, $reLcm->getSimpleTargetMocks());
 
 		$this->assertTrue($reLcm->getSimpleTargetMocks()->isInitialized());
+		$this->assertEquals(1, $calls);
+
+		OrmUtils::whenArrayObjectInitialized($reLcm->getSimpleTargetMocks(), function () use (&$calls) {
+			$calls++;
+		});
+		$this->assertEquals(2, $calls);
 
 	}
 

@@ -28,7 +28,7 @@ use n2n\util\type\ArgUtils;
 use n2n\util\col\ArrayUtils;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\util\ex\IllegalStateException;
-use n2n\impl\persistence\orm\property\relation\selection\WeakRefInitializedListener;
+use n2n\impl\persistence\orm\property\relation\selection\ArrayObjectInitializedListener;
 
 class ToManyValueHasher {
 	const PROXY_KEYWORD = 'proxy';
@@ -143,7 +143,7 @@ class ToManyValueHasher {
 }
 
 
-class ToManyValueHash implements ValueHash, WeakRefInitializedListener {
+class ToManyValueHash implements ValueHash, ArrayObjectInitializedListener {
 	protected $arrayObjectProxy;
 	protected ?ToManyValueHasher $toManyValueHasher = null;
 	protected $idRepsMap;
@@ -209,7 +209,7 @@ class ToManyValueHash implements ValueHash, WeakRefInitializedListener {
 		$toManyValueHash = new ToManyValueHash();
 		$toManyValueHash->arrayObjectProxy = $arrayObjectProxy;
 		$toManyValueHash->toManyValueHasher = $toManyValueHasher;
-		$arrayObjectProxy->registerWeakRefInitializedListener($toManyValueHash);
+		$arrayObjectProxy->registerArrayObjectInitializedListener($toManyValueHash);
 		return $toManyValueHash;
 	}
 

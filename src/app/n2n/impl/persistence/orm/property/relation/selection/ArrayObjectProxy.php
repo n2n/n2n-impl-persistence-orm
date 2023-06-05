@@ -29,15 +29,19 @@ class ArrayObjectProxy extends \ArrayObject {
 //	private $targetIdEntityProperty;
 	private $id;
 // 	private $loadedValueHash;
+	private \SplObjectStorage $initializedListeners;
 	private \WeakMap $weakRefInitializedListenerMap;
 	
 	public function __construct(\Closure $loadClosure, EntityProperty $targetIdEntityProperty) {
 		parent::__construct();
 
+		$this->initializedListeners = new \SplObjectStorage();
 		$this->weakRefInitializedListenerMap = new \WeakMap();
 		$this->loadClosure = new \ReflectionFunction($loadClosure);
 //		$this->targetIdEntityProperty = $targetIdEntityProperty;
 		$this->id = uniqid();
+
+
 	}
 
 	public function getId() {
@@ -61,16 +65,26 @@ class ArrayObjectProxy extends \ArrayObject {
 // 		$this->loadedValueHash = $hasher->createValueHash($entities);
 		parent::exchangeArray($entities);
 		$this->loadClosure = null;
-		
+
+		foreach ($this->initializedListeners as $initializedListener) {
+			$initializedListener->arrayObjectProxyInitialized();
+		}
+		$this->initializedListeners = new \SplObjectStorage();
+
 		foreach ($this->weakRefInitializedListenerMap as $listener => $value) {
 			$listener->arrayObjectProxyInitialized();
 		}
 		$this->weakRefInitializedListenerMap = new \WeakMap();
 	}
-	
-	public function registerWeakRefInitializedListener(WeakRefInitializedListener $weakRefInitializedListener) {
+
+	function registerInitializedListener(ArrayObjectInitializedListener $initializedListener) {
 		IllegalStateException::assertTrue(!$this->isInitialized());
-		$this->weakRefInitializedListenerMap[$weakRefInitializedListener] = null;
+		$this->initializedListeners->attach($initializedListener);
+	}
+	
+	public function registerArrayObjectInitializedListener(ArrayObjectInitializedListener $initializedListener) {
+		IllegalStateException::assertTrue(!$this->isInitialized());
+		$this->weakRefInitializedListenerMap[$initializedListener] = null;
 	}
 
 	public function offsetExists ($index): bool {
