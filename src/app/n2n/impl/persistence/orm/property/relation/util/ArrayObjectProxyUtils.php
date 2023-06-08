@@ -32,6 +32,10 @@ class ArrayObjectProxyUtils {
 		}
 	}
 
+	static function isInitialized(\ArrayObject|ArrayObjectProxy $arrayObject): bool {
+		return !($arrayObject instanceof ArrayObjectProxy) || $arrayObject->isInitialized();
+	}
+
 	static function whenInitialized(\ArrayObject|ArrayObjectProxy $arrayObject, \Closure $callback): void {
 		if (!($arrayObject instanceof ArrayObjectProxy) || $arrayObject->isInitialized()) {
 			$callback();
