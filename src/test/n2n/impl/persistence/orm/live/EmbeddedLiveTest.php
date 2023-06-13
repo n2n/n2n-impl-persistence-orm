@@ -133,8 +133,11 @@ class EmbeddedLiveTest extends TestCase {
 		$this->assertEmpty($this->countEntityObjs($em, SimpleTargetMock::class));
 	}
 
+	private function tem(): EntityManager {
+		return $this->emPool->getEntityManagerFactory()->getTransactional();
+	}
+
 	function testLifecycle() {
-		$em = $this->emPool->getEntityManagerFactory()->getExtended();
 		$tm = $this->pdoPool->getTransactionManager();
 
 		$ecm = new EmbeddedContainerMock();
@@ -146,7 +149,7 @@ class EmbeddedLiveTest extends TestCase {
 		$this->assertEmpty(0, $this->lifecycleListener->getNum());
 
 		$tx = $tm->createTransaction();
-		$em->persist($ecm);
+		$this->tem()->persist($ecm);
 
 		$this->assertCount(1, $this->lifecycleListener->getClassNames());
 		$this->assertEquals(1, $this->lifecycleListener->getNum());
@@ -157,6 +160,50 @@ class EmbeddedLiveTest extends TestCase {
 		$this->assertCount(1, $this->lifecycleListener->getClassNames());
 		$this->assertEquals(2, $this->lifecycleListener->getNum());
 		$this->assertEquals(1, $this->lifecycleListener->postPersistNums[EmbeddedContainerMock::class]);
+
+		// VOID UPDATE
+
+		$tx = $tm->createTransaction();
+
+		$ecm = $this->tem()->find(EmbeddedContainerMock::class, $ecm->id);
+		$tx->commit();
+
+		$this->assertCount(1, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(2, $this->lifecycleListener->getNum());
+
+
+		// UPDATE
+
+		$tx = $tm->createTransaction();
+
+		$ecm = $this->tem()->find(EmbeddedContainerMock::class, $ecm->id);
+		$ecm->embeddableMock->name = 'holeradio';
+
+		$tx->commit();
+
+		$this->assertCount(1, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(4, $this->lifecycleListener->getNum());
+		$this->assertEquals(1, $this->lifecycleListener->preUpdateNums[EmbeddedContainerMock::class]);
+		$this->assertEquals(1, $this->lifecycleListener->postUpdateNums[EmbeddedContainerMock::class]);
+
+
+		// REMOVE
+
+		$tx = $tm->createTransaction();
+
+		$ecm = $this->tem()->find(EmbeddedContainerMock::class, $ecm->id);
+
+		$this->tem()->remove($ecm);
+
+		$this->assertCount(1, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(5, $this->lifecycleListener->getNum());
+		$this->assertEquals(1, $this->lifecycleListener->preRemoveNums[EmbeddedContainerMock::class]);
+
+		$tx->commit();
+
+		$this->assertCount(1, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(6, $this->lifecycleListener->getNum());
+		$this->assertEquals(1, $this->lifecycleListener->postRemoveNums[EmbeddedContainerMock::class]);
 	}
 
 	private function countEntityObjs(EntityManager $em, string $entityClass): int {
