@@ -50,24 +50,25 @@ use n2n\persistence\orm\store\operation\CascadeOperation;
 use n2n\persistence\orm\CascadeType;
 use n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy;
 use n2n\util\col\ArrayUtils;
+use n2n\persistence\orm\store\ValueHashCol;
 
-class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComparableEntityProperty, 
+class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComparableEntityProperty,
 		EntityPropertyCollection, JoinableEntityProperty {
 	private $targetClass;
 	private $properties = array();
-	
+
 	public function __construct(AccessProxy $accessProxy, \ReflectionClass $targetClass) {
 		parent::__construct($accessProxy);
 		$this->targetClass = $targetClass;
 	}
-	
+
 	/**
 	 * @return \ReflectionClass
 	 */
 	public function getTargetClass() {
 		return $this->targetClass;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\model\EntityPropertyCollection::getClass()
@@ -75,12 +76,12 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	public function getClass(): \ReflectionClass {
 		return $this->targetClass;
 	}
-		
+
 	public function addEntityProperty(EntityProperty $property) {
 		$this->properties[$property->getName()] = $property;
 		$property->setParent($this);
 	}
-	
+
 	public function containsEntityPropertyName($name) {
 		return isset($this->properties[$name]);
 	}
@@ -88,13 +89,13 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	public function getEntityProperties() {
 		return $this->properties;
 	}
-	
+
 	public function getEntityPropertyByName($name) {
 		if (!$this->containsEntityPropertyName($name)) {
 			throw new UnknownEntityPropertyException(
 					'Unkown entity property: ' . $this->targetClass->getName() . '::$' . $name);
 		}
-	
+
 		return $this->properties[$name];
 	}
 	/* (non-PHPdoc)
@@ -116,19 +117,19 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	 */
 	public function mergeValue($object, $sameEntity, MergeOperation $mergeOperation) {
 		if ($object === null) return null;
-		
+
 		$mergedObject = null;
 		if ($sameEntity) {
 			$mergedObject = $object;
 		} else {
 			$mergedObject = ReflectionUtils::createObject($this->targetClass);
 		}
-		
+
 		foreach ($this->properties as $property) {
 			$mergedPropertyValue = $property->mergeValue($property->readValue($object), $sameEntity, $mergeOperation);
 			$property->writeValue($mergedObject, $mergedPropertyValue);
 		}
-		
+
 		return $mergedObject;
 	}
 
@@ -136,29 +137,29 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
 	 */
 	public function supplyPersistAction(PersistAction $persistingJob, $object, ValueHash $valueHash, ?ValueHash $oldValueHash) {
-		ArgUtils::assertTrue($valueHash instanceof CommonValueHash);
-		
-		$propertyValueHashes = $valueHash->getHash();
+		assert($valueHash instanceof ValueHashCol);
+
+		$propertyValueHashes = $valueHash->getValueHashes();
 		$oldPropertyValueHashes = null;
 		if ($oldValueHash !== null) {
-			$oldPropertyValueHashes = $oldValueHash->getHash();
+			$oldPropertyValueHashes = $oldValueHash->getValueHashes();
 		}
-		
+
 		foreach ($this->properties as $propertyName => $property)  {
 			$propertyValue = null;
 			if ($object !== null) {
 				$propertyValue = $property->readValue($object);
 			}
-			
+
 			ArgUtils::assertTrue(array_key_exists($propertyName, $propertyValueHashes));
 			$propertyValueHash = $propertyValueHashes[$propertyName];
-			
+
 			$oldPropertyValueHash = null;
 			if ($oldPropertyValueHashes !== null) {
 				ArgUtils::assertTrue(array_key_exists($propertyName, $oldPropertyValueHashes));
 				$oldPropertyValueHash = $oldPropertyValueHashes[$propertyName] ?? null;
 			}
-			
+
 			$property->supplyPersistAction($persistingJob, $propertyValue, $propertyValueHash, $oldPropertyValueHash);
 		}
 	}
@@ -169,33 +170,33 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
 		ArgUtils::assertTrue($oldValueHash instanceof CommonValueHash);
 		$valueHash = $oldValueHash->getHash();
-		
+
 		foreach ($this->properties as $propertyName => $property)  {
 			$propertyValue = null;
 			if ($value !== null) {
 				$propertyValue = $property->readValue($value);
 			}
-			
+
 			$propertyValueHash = null;
 			if ($valueHash !== null) {
 				ArgUtils::assertTrue(array_key_exists($propertyName, $valueHash));
 				$propertyValueHash = $valueHash[$propertyName];
 			}
-			
+
 			$property->supplyRemoveAction($removeAction, $propertyValue, $propertyValueHash);
 		}
 	}
 
 	public function createValueHash($value, EntityManager $em): ValueHash {
-		$valueHashes = array();
+		$valueHashCol = new ValueHashCol();
 		foreach ($this->properties as $propertyName => $property)  {
 			$propertyValue = null;
 			if ($value !== null) {
 				$propertyValue = $property->readValue($value);
 			}
-			$valueHashes[$propertyName] = $property->createValueHash($propertyValue, $em);
+			$valueHashCol->putValueHash($propertyName, $property->createValueHash($propertyValue, $em));
 		}
-		return new CommonValueHash($valueHashes);
+		return $valueHashCol;
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\JoinableEntityProperty::createJoinTreePoint()
@@ -203,11 +204,11 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	public function createJoinTreePoint(TreePointMeta $treePointMeta, QueryState $queryState) {
 		return new EmbeddedTreePoint($queryState, $treePointMeta, $this);
 	}
-	
+
 	public function hasEmbeddedEntityPropertyCollection(): bool {
 		return true;
 	}
-	
+
 	public function getEmbeddedEntityPropertyCollection(): EntityPropertyCollection {
 		return $this;
 	}
@@ -224,18 +225,18 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 class EmbeddedTreePoint extends ExtendableTreePoint implements JoinedTreePoint {
 	private $embeddedEntityProperty;
 
-		
-	public function __construct(QueryState $queryState, TreePointMeta $treePointMeta, 
+
+	public function __construct(QueryState $queryState, TreePointMeta $treePointMeta,
 			EmbeddedEntityProperty $embeddedEntityProperty) {
 		parent::__construct($queryState, $embeddedEntityProperty, $treePointMeta);
-		
+
 		$this->embeddedEntityProperty = $embeddedEntityProperty;
 	}
-	
+
 	public function setJoinType($joinType) {
 		if ($joinType == JoinType::INNER/* || $joinType == JoinType::LEFT*/) return;
-		
-		throw new QueryConflictException('Can not perform ' . $joinType . ' JOIN on embedded property ' 
+
+		throw new QueryConflictException('Can not perform ' . $joinType . ' JOIN on embedded property '
 				. $this->embeddedEntityProperty->toPropertyString() . '. Use INNER JOIN.');
 	}
 	/* (non-PHPdoc)
@@ -244,12 +245,12 @@ class EmbeddedTreePoint extends ExtendableTreePoint implements JoinedTreePoint {
 	public function getJoinType() {
 		return JoinType::INNER;
 	}
-	
+
 	public function getOnQueryComparator(): QueryComparator {
-		throw new QueryConflictException('no on clause available for JOIN on embedded property ' 
+		throw new QueryConflictException('no on clause available for JOIN on embedded property '
 				. $this->embeddedEntityProperty->toPropertyString() . '.');
 	}
-	
+
 	private $comparisonStrategy;
 	private $selection;
 	/* (non-PHPdoc)
@@ -257,7 +258,7 @@ class EmbeddedTreePoint extends ExtendableTreePoint implements JoinedTreePoint {
 	 */
 	public function requestComparisonStrategy(): ComparisonStrategy {
 		if ($this->comparisonStrategy !== null) return $this->comparisonStrategy;
-		return $this->comparisonStrategy = new ComparisonStrategy(null, 
+		return $this->comparisonStrategy = new ComparisonStrategy(null,
 				$this->embeddedEntityProperty->createCustomComparable($this, $this->queryState));
 	}
 	/* (non-PHPdoc)
@@ -271,7 +272,7 @@ class EmbeddedTreePoint extends ExtendableTreePoint implements JoinedTreePoint {
 	 * @see \n2n\persistence\orm\query\QueryPoint::requestRepresentableQueryItem()
 	 */
 	public function requestRepresentableQueryItem(): QueryItem {
-		throw new QueryConflictException('Embedded property is not representable by a single query item: ' 
+		throw new QueryConflictException('Embedded property is not representable by a single query item: '
 				. $this->embeddedEntityProperty->toPropertyString());
 	}
 
