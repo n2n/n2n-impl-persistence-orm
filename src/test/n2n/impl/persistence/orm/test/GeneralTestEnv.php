@@ -10,8 +10,11 @@ use n2n\persistence\orm\model\EntityModelManager;
 use n2n\persistence\orm\model\EntityModelFactory;
 use n2n\impl\persistence\orm\property\CommonEntityPropertyProvider;
 use n2n\util\magic\impl\SimpleMagicContext;
+use n2n\impl\persistence\orm\live\mock\LifecycleListener;
 
 class GeneralTestEnv {
+
+	private static LifecycleListener $lifecycleListener;
 
 	static function setUpEmPool(array $registeredClassNames): EmPool {
 		$pdoPool = new PdoPool(
@@ -24,6 +27,10 @@ class GeneralTestEnv {
 				new EntityModelManager(
 						$registeredClassNames,
 						new EntityModelFactory([CommonEntityPropertyProvider::class])),
-				new SimpleMagicContext([]));
+				new SimpleMagicContext([LifecycleListener::class => self::$lifecycleListener = new LifecycleListener()]));
+	}
+
+	static function getLifecycleListener(): LifecycleListener {
+		return self::$lifecycleListener;
 	}
 }

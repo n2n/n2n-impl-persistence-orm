@@ -20,13 +20,16 @@ use n2n\persistence\ext\EmPool;
 use n2n\persistence\orm\model\EntityModelManager;
 use n2n\persistence\orm\model\EntityModelFactory;
 use n2n\impl\persistence\orm\test\GeneralTestEnv;
+use n2n\impl\persistence\orm\live\mock\LifecycleListener;
 
 class EmbeddedLiveTest extends TestCase {
 
 	private PdoPool $pdoPool;
+	private LifecycleListener $lifecycleListener;
 
 	function setUp(): void {
 		$this->emPool = GeneralTestEnv::setUpEmPool([EmbeddedContainerMock::class, SimpleTargetMock::class, OverrideEmbeddedContainerMock::class]);
+		$this->lifecycleListener = GeneralTestEnv::getLifecycleListener();
 		$this->pdoPool = $this->emPool->getPdoPool();
 
 		$metaData = $this->pdoPool->getPdo()->getMetaData();
@@ -60,7 +63,6 @@ class EmbeddedLiveTest extends TestCase {
 		$columnFactory = $table->createColumnFactory();
 		$columnFactory->createIntegerColumn('holeradio_embedded_container_mock_id', 32);
 		$columnFactory->createIntegerColumn('holeradio_simple_target_mock_id', 32);
-
 
 		$metaData->getMetaManager()->flush();
 	}
@@ -129,6 +131,32 @@ class EmbeddedLiveTest extends TestCase {
 
 		$this->assertEmpty($this->countEntityObjs($em, EmbeddedContainerMock::class));
 		$this->assertEmpty($this->countEntityObjs($em, SimpleTargetMock::class));
+	}
+
+	function testLifecycle() {
+		$em = $this->emPool->getEntityManagerFactory()->getExtended();
+		$tm = $this->pdoPool->getTransactionManager();
+
+		$ecm = new EmbeddedContainerMock();
+		$ecm->id = 1;
+		$ecm->embeddableMock = new EmbeddableMock();
+		$ecm->embeddableMock->name = 'huii';
+
+		$this->assertCount(0, $this->lifecycleListener->getClassNames());
+		$this->assertEmpty(0, $this->lifecycleListener->getNum());
+
+		$tx = $tm->createTransaction();
+		$em->persist($ecm);
+
+		$this->assertCount(1, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(1, $this->lifecycleListener->getNum());
+		$this->assertEquals(1, $this->lifecycleListener->prePersistNums[EmbeddedContainerMock::class]);
+
+		$tx->commit();
+
+		$this->assertCount(1, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(2, $this->lifecycleListener->getNum());
+		$this->assertEquals(1, $this->lifecycleListener->postPersistNums[EmbeddedContainerMock::class]);
 	}
 
 	private function countEntityObjs(EntityManager $em, string $entityClass): int {
