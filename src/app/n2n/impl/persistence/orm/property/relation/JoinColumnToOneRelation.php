@@ -148,7 +148,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 		
 		$actionQueue = $persistAction->getActionQueue();
 		$pdo = $actionQueue->getEntityManager()->getPdo();
-		$targetPersistAction = $persistAction->getActionQueue()->getPersistAction($value);
+//		$targetPersistAction = $persistAction->getActionQueue()->getPersistAction($value);
 
 		try {
 			$targetPersistAction = $persistAction->getActionQueue()->getPersistAction($value);

@@ -107,4 +107,21 @@ class PropertyMappedToManyRelation extends MappedRelation implements ToManyRelat
 		
 // 		$orphanRemover->removeByIdReps(ToManyValueHasher::extractIdReps($oldValueHash));
 	}
+
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
+		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToManyValueHash);
+		if ($oldValueHash !== null && $oldValueHash->checkForUntouchedProxy($value)) return;
+
+		$toManyAnalyzer = new ToManyAnalyzer($persistAction->getActionQueue());
+		$toManyAnalyzer->analyze($value);
+
+		$hasher = new ToManyValueHasher($this->targetEntityModel->getIdDef()->getEntityProperty());
+
+		foreach ($toManyAnalyzer->getPendingPersistActions() as $key => $targetPersistAction) {
+			$targetPersistAction->executeAtEnd(function () use ($targetPersistAction, $hasher, $key, $valueHash) {
+				$targetId = $targetPersistAction->getId();
+				$hasher->reportId($key, $targetId, $valueHash);
+			});
+		}
+	}
 }

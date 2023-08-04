@@ -36,6 +36,11 @@ use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\query\from\TreePath;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\util\ex\IllegalStateException;
+use n2n\persistence\orm\store\action\PersistAction;
+use n2n\persistence\orm\store\PersistenceOperationException;
+use n2n\persistence\orm\store\EntityInfo;
+use n2n\util\type\ArgUtils;
+use n2n\impl\persistence\orm\property\relation\util\ToOneValueHash;
 
 class PropertyMappedOneToOneRelation extends MappedRelation implements ToOneRelation  {
 	private $toOneUtils;
@@ -89,5 +94,32 @@ class PropertyMappedOneToOneRelation extends MappedRelation implements ToOneRela
 	 */
 	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash) {
 		$this->toOneUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
+	}
+
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash,
+			?ValueHash $oldValueHash) {
+		if ($value === null) {
+			return;
+		}
+
+		try {
+			$targetPersistAction = $persistAction->getActionQueue()->getPersistAction($value);
+		} catch (PersistenceOperationException $e) {
+			throw new PersistenceOperationException($this->entityProperty->toPropertyString() . ' of entity obj '
+					. EntityInfo::buildEntityString($persistAction->getEntityModel(), $persistAction->getId())
+					. ' contains value that can not be persisted.', 0, $e, 3);
+		}
+
+		if ($targetPersistAction->hasId()) {
+			return;
+		}
+
+		ArgUtils::assertTrue($valueHash instanceof ToOneValueHash);
+		$targetPersistAction->executeAtEnd(function () use ($valueHash, $targetPersistAction) {
+			$targetId = $targetPersistAction->getId();
+
+			$hasher = new ToOneValueHasher($this->getTargetIdEntityProperty());
+			$hasher->reportId($targetId, $valueHash);
+		});
 	}
 }
