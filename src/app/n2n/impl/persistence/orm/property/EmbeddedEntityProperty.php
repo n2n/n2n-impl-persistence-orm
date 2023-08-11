@@ -82,15 +82,15 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 		$property->setParent($this);
 	}
 
-	public function containsEntityPropertyName($name) {
+	public function containsEntityPropertyName(string $name): bool {
 		return isset($this->properties[$name]);
 	}
 
-	public function getEntityProperties() {
+	public function getEntityProperties(): array {
 		return $this->properties;
 	}
 
-	public function getEntityPropertyByName($name) {
+	public function getEntityPropertyByName(string $name): EntityProperty {
 		if (!$this->containsEntityPropertyName($name)) {
 			throw new UnknownEntityPropertyException(
 					'Unkown entity property: ' . $this->targetClass->getName() . '::$' . $name);
@@ -98,6 +98,18 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 
 		return $this->properties[$name];
 	}
+
+	public function containsLevelEntityPropertyName(string $name): bool {
+		return $this->containsEntityPropertyName($name);
+	}
+
+	public function getLevelEntityProperties(): array {
+		return $this->getEntityProperties();
+	}
+	public function getLevelEntityPropertyByName(string $name): EntityProperty {
+		return $this->getEntityPropertyByName($name);
+	}
+
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\CustomComparableEntityProperty::createCustomComparable()
 	 */
