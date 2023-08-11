@@ -24,6 +24,7 @@ use n2n\impl\persistence\orm\live\mock\LifecycleListener;
 
 class EmbeddedLiveTest extends TestCase {
 
+	private EmPool $emPool;
 	private PdoPool $pdoPool;
 	private LifecycleListener $lifecycleListener;
 
