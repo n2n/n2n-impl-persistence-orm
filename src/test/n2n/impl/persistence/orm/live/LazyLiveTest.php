@@ -4,24 +4,16 @@ namespace n2n\impl\persistence\orm\live;
 
 use PHPUnit\Framework\TestCase;
 use n2n\persistence\ext\PdoPool;
-use n2n\core\config\DbConfig;
-use n2n\core\config\PersistenceUnitConfig;
-use n2n\impl\persistence\meta\sqlite\SqliteDialect;
-use n2n\core\config\OrmConfig;
-use n2n\impl\persistence\orm\live\mock\EmbeddedContainerMock;
 use n2n\impl\persistence\orm\live\mock\SimpleTargetMock;
-use n2n\impl\persistence\orm\live\mock\OverrideEmbeddedContainerMock;
-use n2n\impl\persistence\orm\property\CommonEntityPropertyProvider;
-use n2n\util\magic\MagicContext;
-use n2n\core\container\TransactionManager;
 use n2n\impl\persistence\orm\live\mock\LazyContainerMock;
 use n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy;
 use n2n\impl\persistence\orm\test\GeneralTestEnv;
-use n2n\persistence\orm\OrmUtils;
 use n2n\impl\persistence\orm\property\relation\util\ArrayObjectProxyUtils;
+use n2n\persistence\ext\EmPool;
 
 class LazyLiveTest extends TestCase {
-
+	private EmPool $emPool;
+	private PdoPool $pdoPool;
 
 	function setUp(): void {
 		$this->emPool = GeneralTestEnv::setUpEmPool([LazyContainerMock::class, SimpleTargetMock::class]);
