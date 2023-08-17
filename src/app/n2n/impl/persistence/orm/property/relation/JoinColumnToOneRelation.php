@@ -54,7 +54,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 	public function __construct(EntityProperty $entityProperty, EntityModel $targetEntityModel) {
 		parent::__construct($entityProperty, $targetEntityModel);
 		$targetEntityModel->registerActionDependency($this);
-		
+
 		$this->toOneUtils = new ToOneUtils($this, true);
 	}
 	
@@ -148,7 +148,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 		
 		$actionQueue = $persistAction->getActionQueue();
 		$pdo = $actionQueue->getEntityManager()->getPdo();
-		$targetPersistAction = $persistAction->getActionQueue()->getPersistAction($value);
+//		$targetPersistAction = $persistAction->getActionQueue()->getPersistAction($value);
 
 		try {
 			$targetPersistAction = $persistAction->getActionQueue()->getPersistAction($value);
@@ -232,9 +232,9 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\model\ActionDependency::persistActionSupplied()
 	 */
-	public function persistActionSupplied(PersistAction $targetPersistAction) {
-		
-	}
+//	public function persistActionSupplied(PersistAction $targetPersistAction) {
+//
+//	}
 	
 	private function markRemoveAction(RemoveAction $removeAction) {
 		$removeAction->setAttribute(get_class($this), true);
@@ -256,8 +256,8 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 		$resetAction = new JoinColumnResetAction($pdo, 
 				$this->entityModel->getTableName(), $this->joinColumnName);
 		$resetAction->setJoinIdRaw($idRaw);
-		
-		$targetRemoveAction->executeAtEnd(function ($actionQueue, $resetAction) {
+
+		$targetRemoveAction->executeAtEnd(function () use ($actionQueue, $resetAction) {
 			$actionQueue->add($resetAction);
 		});
 	}

@@ -139,6 +139,10 @@ abstract class EntityPropertyAdapter implements EntityProperty {
 	function getEmbeddedCascadeEntityObj(mixed $entityObj): mixed {
 		return null;
 	}
+
+	function ensureInit(): void {
+
+	}
 	
 	public function __toString(): string {
 		return (new \ReflectionClass($this))->getShortName() . ' [' . $this->accessProxy . ']';

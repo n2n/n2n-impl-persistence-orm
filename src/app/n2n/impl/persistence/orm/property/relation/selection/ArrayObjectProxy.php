@@ -26,15 +26,22 @@ use n2n\util\ex\IllegalStateException;
 
 class ArrayObjectProxy extends \ArrayObject {
 	private $loadClosure;
-	private $targetIdEntityProperty;
+//	private $targetIdEntityProperty;
 	private $id;
 // 	private $loadedValueHash;
-	private $whenInitializedClosures = array();
+	private \SplObjectStorage $initializedListeners;
+	private \WeakMap $weakRefInitializedListenerMap;
 	
 	public function __construct(\Closure $loadClosure, EntityProperty $targetIdEntityProperty) {
+		parent::__construct();
+
+		$this->initializedListeners = new \SplObjectStorage();
+		$this->weakRefInitializedListenerMap = new \WeakMap();
 		$this->loadClosure = new \ReflectionFunction($loadClosure);
-		$this->targetIdEntityProperty = $targetIdEntityProperty;
+//		$this->targetIdEntityProperty = $targetIdEntityProperty;
 		$this->id = uniqid();
+
+
 	}
 
 	public function getId() {
@@ -52,22 +59,32 @@ class ArrayObjectProxy extends \ArrayObject {
 
 	public function initialize() {
 		if ($this->isInitialized()) return;
-		
+
 		$entities = $this->loadClosure->invoke();
 // 		$hasher = new ToManyValueHasher($this->targetIdEntityProperty);
 // 		$this->loadedValueHash = $hasher->createValueHash($entities);
 		parent::exchangeArray($entities);
 		$this->loadClosure = null;
-		
-		foreach ($this->whenInitializedClosures as $closure) {
-			$closure($this);
+
+		foreach ($this->initializedListeners as $initializedListener) {
+			$initializedListener->arrayObjectProxyInitialized();
 		}
-		$this->whenInitializedClosures = array();
+		$this->initializedListeners = new \SplObjectStorage();
+
+		foreach ($this->weakRefInitializedListenerMap as $listener => $value) {
+			$listener->arrayObjectProxyInitialized();
+		}
+		$this->weakRefInitializedListenerMap = new \WeakMap();
+	}
+
+	function registerInitializedListener(ArrayObjectInitializedListener $initializedListener) {
+		IllegalStateException::assertTrue(!$this->isInitialized());
+		$this->initializedListeners->attach($initializedListener);
 	}
 	
-	public function whenInitialized(\Closure $whenInitiliazedClosure) {
+	public function registerArrayObjectInitializedListener(ArrayObjectInitializedListener $initializedListener) {
 		IllegalStateException::assertTrue(!$this->isInitialized());
-		$this->whenInitializedClosures[] = $whenInitiliazedClosure;
+		$this->weakRefInitializedListenerMap[$initializedListener] = null;
 	}
 
 	public function offsetExists ($index): bool {
@@ -168,3 +185,4 @@ class ArrayObjectProxy extends \ArrayObject {
 // 	}
 
 }
+

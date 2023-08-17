@@ -16,20 +16,21 @@ use n2n\impl\persistence\orm\live\mock\EmbeddableMock;
 use n2n\impl\persistence\orm\property\CommonEntityPropertyProvider;
 use n2n\persistence\orm\EntityManager;
 use n2n\impl\persistence\orm\live\mock\OverrideEmbeddedContainerMock;
+use n2n\persistence\ext\EmPool;
+use n2n\persistence\orm\model\EntityModelManager;
+use n2n\persistence\orm\model\EntityModelFactory;
+use n2n\impl\persistence\orm\test\GeneralTestEnv;
 
 class OverrideEmbeddedLiveTest extends TestCase {
 
 	private PdoPool $pdoPool;
 
+	private EmPool $emPool;
+
 	function setUp(): void {
-		$this->pdoPool = new PdoPool(
-				new DbConfig([new PersistenceUnitConfig('default', 'sqlite::memory:', '', '',
-						PersistenceUnitConfig::TIL_SERIALIZABLE, SqliteDialect::class,
-						false, null)]),
-				new OrmConfig([SimpleTargetMock::class, OverrideEmbeddedContainerMock::class],
-						[CommonEntityPropertyProvider::class]),
-				$this->createMock(MagicContext::class),
-				new TransactionManager(), null, null);
+		$this->emPool = GeneralTestEnv::setUpEmPool([SimpleTargetMock::class, OverrideEmbeddedContainerMock::class]);
+		$this->pdoPool = $this->emPool->getPdoPool();
+
 
 		$metaData = $this->pdoPool->getPdo()->getMetaData();
 		$database = $metaData->getDatabase();
@@ -64,13 +65,13 @@ class OverrideEmbeddedLiveTest extends TestCase {
 	}
 
 	function testNotFound() {
-		$em = $this->pdoPool->getEntityManagerFactory()->getExtended();
+		$em = $this->emPool->getEntityManagerFactory()->getExtended();
 
 		$this->assertNull($em->find(OverrideEmbeddedContainerMock::class, 1));
 	}
 
 	function testPersist() {
-		$em = $this->pdoPool->getEntityManagerFactory()->getExtended();
+		$em = $this->emPool->getEntityManagerFactory()->getExtended();
 		$tm = $this->pdoPool->getTransactionManager();
 
 		$stm1 = new SimpleTargetMock();

@@ -28,6 +28,7 @@ use n2n\util\type\ArgUtils;
 use n2n\util\col\ArrayUtils;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\util\ex\IllegalStateException;
+use n2n\impl\persistence\orm\property\relation\selection\ArrayObjectInitializedListener;
 
 class ToManyValueHasher {
 	const PROXY_KEYWORD = 'proxy';
@@ -47,7 +48,7 @@ class ToManyValueHasher {
 // 			throw new \InvalidArgumentException('Ids not extractable from AccessProxy hash.');
 // 			return array();
 // 		}
-		
+
 // 		$idReps = array();
 // 		foreach ($hash as $idRep) {
 // 			if ($idRep !== null) {
@@ -72,13 +73,13 @@ class ToManyValueHasher {
 // 		if ($value instanceof ArrayObjectProxy && $value->getLoadedValueHash() === $valueHash) {
 // 			return $value->getId();
 // 		}
-		
+
 // 		return $valueHash;
 	}
-	
+
 	public function extractIdRepsMapFromValue($entities) {
 		if ($entities === null) return array();
-		
+
 		ArgUtils::assertTrue(ArrayUtils::isArrayLike($entities));
 		$entityIdReps = array();
 		foreach ($entities as $key => $entity) {
@@ -91,7 +92,7 @@ class ToManyValueHasher {
 		}
 		return $entityIdReps;
 	}
-	
+
 // 	public function createValueHashFromEntities($entities) {
 // 		ArgUtils::assertTrue(ArrayUtils::isArrayLike($entities));
 // 		$entityIdReps = array();
@@ -111,13 +112,13 @@ class ToManyValueHasher {
 // 		return $value instanceof ArrayObjectProxy && !$value->isInitialized()
 // 				&& $valueHash === $value->getId();
 // 	}
-	
+
 	public function matches(array $entityIds, ToManyValueHash $valueHash) {
 		// this means that other array object has been asigned
 		if (!$valueHash->isInitialized()) return false;
-		
+
 		$vhIdReps = $valueHash->getIdReps(true);
-		
+
 		foreach ($entityIds as $entityId) {
 			$entityIdRep = $this->targetIdProperty->valueToRep($entityId);
 			if (!isset($vhIdReps[$entityIdRep])) return false;
@@ -129,10 +130,10 @@ class ToManyValueHasher {
 
 // 	public function findOrphanIdReps(array $entityIds, $valueHash) {
 // 		$vhIdReps = self::extractIdReps($valueHash);
-		
+
 // 		foreach ($entityIds as $entityId) {
 // 			$entityIdRep = $this->targetIdProperty->valueToRep($entityId);
-// 			if (isset($vhIdReps[$entityIdRep])) { 
+// 			if (isset($vhIdReps[$entityIdRep])) {
 // 				unset($vhIdReps[$entityIdRep]);
 // 			}
 // 		}
@@ -142,26 +143,27 @@ class ToManyValueHasher {
 }
 
 
-class ToManyValueHash implements ValueHash {
+class ToManyValueHash implements ValueHash, ArrayObjectInitializedListener {
 	protected $arrayObjectProxy;
+	protected ?ToManyValueHasher $toManyValueHasher = null;
 	protected $idRepsMap;
-	
+
 	protected function __construct() {
 	}
-	
+
 	public function isInitialized() {
 		return $this->idRepsMap !== null;
 	}
-	
+
 	public function initialize() {
 		if ($this->arrayObjectProxy !== null) {
 			$this->arrayObjectProxy->initialize();
 			return;
 		}
-		
+
 		throw new IllegalStateException('No uninitialized ArrayObjectProxy found.');
 	}
-	
+
 	public function getIdRepsMap(bool $initialize = false) {
 		if ($this->isInitialized()) {
 			return $this->idRepsMap;
@@ -169,16 +171,16 @@ class ToManyValueHash implements ValueHash {
 			$this->initialize();
 			return $this->idRepsMap;
 		}
-		
+
 		throw new IllegalStateException('ArrayObjectProxy not initialized.');
 	}
-	
+
 	public function reportIdRep($key, $idRep) {
-		IllegalStateException::assertTrue($this->idRepsMap !== null 
+		IllegalStateException::assertTrue($this->idRepsMap !== null
 				&& array_key_exists($key, $this->idRepsMap) && $this->idRepsMap[$key] === null);
 		$this->idRepsMap[$key] = $idRep;
 	}
-	
+
 	public function getIdReps(bool $initialize = false) {
 		$idReps = array();
 		foreach ($this->getIdRepsMap($initialize) as $key => $idRep) {
@@ -187,40 +189,46 @@ class ToManyValueHash implements ValueHash {
 		}
 		return $idReps;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\store\ValueHash::matches()
 	 */
 	public function matches(ValueHash $valueHash): bool {
 		ArgUtils::assertTrue($valueHash instanceof ToManyValueHash);
-		
+
 		return $this->idRepsMap === $valueHash->idRepsMap
 				&& $this->arrayObjectProxy === $valueHash->arrayObjectProxy;
 	}
-	
+
 	public static function createFromArrayObjectProxy(ArrayObjectProxy $arrayObjectProxy, ToManyValueHasher $toManyValueHasher) {
 		if ($arrayObjectProxy->isInitialized()) {
-			return self::createFromValue($arrayObjectProxy, $toManyValueHasher); 		
+			return self::createFromValue($arrayObjectProxy, $toManyValueHasher);
 		}
-			
+
 		$toManyValueHash = new ToManyValueHash();
 		$toManyValueHash->arrayObjectProxy = $arrayObjectProxy;
-		$arrayObjectProxy->whenInitialized(function () use ($arrayObjectProxy, $toManyValueHash, $toManyValueHasher) {
-			$toManyValueHash->idRepsMap = $toManyValueHasher->extractIdRepsMapFromValue($arrayObjectProxy);
-			$toManyValueHash->arrayObjectProxy = null;
-		});
+		$toManyValueHash->toManyValueHasher = $toManyValueHasher;
+		$arrayObjectProxy->registerArrayObjectInitializedListener($toManyValueHash);
 		return $toManyValueHash;
 	}
-	
+
 	public static function createFromValue($value, ToManyValueHasher $toManyValueHasher) {
 		$toManyValueHash = new ToManyValueHash();
 		$toManyValueHash->idRepsMap = $toManyValueHasher->extractIdRepsMapFromValue($value);
 		return $toManyValueHash;
 	}
-	
+
 
 	public function checkForUntouchedProxy($value) {
 		return $this->arrayObjectProxy !== null && $this->arrayObjectProxy === $value;
+	}
+
+	public function arrayObjectProxyInitialized(): void {
+		IllegalStateException::assertTrue($this->idRepsMap === null && $this->arrayObjectProxy !== null);
+
+		$this->idRepsMap = $this->toManyValueHasher->extractIdRepsMapFromValue($this->arrayObjectProxy);
+		$this->arrayObjectProxy = null;
+		$this->toManyValueHasher = null;
 	}
 }

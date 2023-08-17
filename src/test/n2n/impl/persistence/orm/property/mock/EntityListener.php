@@ -1,7 +1,7 @@
 <?php
 
-namespace n2n\impl\persistence\orm\property\class;
+namespace n2n\impl\persistence\orm\property\mock;
 
-class EntityListener {
+#[\Attribute] class EntityListener {
 
 }

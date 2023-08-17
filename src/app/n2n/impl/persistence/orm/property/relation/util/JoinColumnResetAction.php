@@ -34,7 +34,7 @@ class JoinColumnResetAction extends ActionAdapter {
 	
 	private $joinIdRaw;
 	
-	public function __construct(Pdo $pdo, $tableName, $idColumnName, $joinColumnName) {
+	public function __construct(Pdo $pdo, $tableName, $joinColumnName) {
 		$this->pdo = $pdo;
 		$this->tableName = $tableName;
 		$this->joinColumnName = $joinColumnName;

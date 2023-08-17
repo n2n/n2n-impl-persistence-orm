@@ -16,20 +16,22 @@ use n2n\impl\persistence\orm\live\mock\EmbeddableMock;
 use n2n\impl\persistence\orm\property\CommonEntityPropertyProvider;
 use n2n\persistence\orm\EntityManager;
 use n2n\impl\persistence\orm\live\mock\OverrideEmbeddedContainerMock;
+use n2n\persistence\ext\EmPool;
+use n2n\persistence\orm\model\EntityModelManager;
+use n2n\persistence\orm\model\EntityModelFactory;
+use n2n\impl\persistence\orm\test\GeneralTestEnv;
+use n2n\impl\persistence\orm\live\mock\LifecycleListener;
 
 class EmbeddedLiveTest extends TestCase {
 
+	private EmPool $emPool;
 	private PdoPool $pdoPool;
+	private LifecycleListener $lifecycleListener;
 
 	function setUp(): void {
-		$this->pdoPool = new PdoPool(
-				new DbConfig([new PersistenceUnitConfig('default', 'sqlite::memory:', '', '',
-						PersistenceUnitConfig::TIL_SERIALIZABLE, SqliteDialect::class,
-						false, null)]),
-				new OrmConfig([EmbeddedContainerMock::class, SimpleTargetMock::class, OverrideEmbeddedContainerMock::class],
-						[CommonEntityPropertyProvider::class]),
-				$this->createMock(MagicContext::class),
-				new TransactionManager(), null, null);
+		$this->emPool = GeneralTestEnv::setUpEmPool([EmbeddedContainerMock::class, SimpleTargetMock::class, OverrideEmbeddedContainerMock::class]);
+		$this->lifecycleListener = GeneralTestEnv::getLifecycleListener();
+		$this->pdoPool = $this->emPool->getPdoPool();
 
 		$metaData = $this->pdoPool->getPdo()->getMetaData();
 		$database = $metaData->getDatabase();
@@ -41,13 +43,11 @@ class EmbeddedLiveTest extends TestCase {
 		$columnFactory->createStringColumn('holeradio_name', 255);
 		$columnFactory->createIntegerColumn('holeradio_very_simple_target_mock_id', 32);
 
-
 		$table = $metaEntityFactory->createTable('override_embedded_container_mock');
 		$columnFactory = $table->createColumnFactory();
 		$columnFactory->createIntegerColumn('id', 32);
 		$columnFactory->createStringColumn('override_name', 255);
 		$columnFactory->createIntegerColumn('override_very_simple_target_mock_id', 32);
-
 
 		$table = $metaEntityFactory->createTable('simple_target_mock');
 		$columnFactory = $table->createColumnFactory();
@@ -65,18 +65,17 @@ class EmbeddedLiveTest extends TestCase {
 		$columnFactory->createIntegerColumn('holeradio_embedded_container_mock_id', 32);
 		$columnFactory->createIntegerColumn('holeradio_simple_target_mock_id', 32);
 
-
 		$metaData->getMetaManager()->flush();
 	}
 
 	function testNotFound() {
-		$em = $this->pdoPool->getEntityManagerFactory()->getExtended();
+		$em = $this->emPool->getEntityManagerFactory()->getExtended();
 
 		$this->assertNull($em->find(EmbeddedContainerMock::class, 1));
 	}
 
 	function testPersist() {
-		$em = $this->pdoPool->getEntityManagerFactory()->getExtended();
+		$em = $this->emPool->getEntityManagerFactory()->getExtended();
 		$tm = $this->pdoPool->getTransactionManager();
 
 		$stm1 = new SimpleTargetMock();
@@ -133,6 +132,79 @@ class EmbeddedLiveTest extends TestCase {
 
 		$this->assertEmpty($this->countEntityObjs($em, EmbeddedContainerMock::class));
 		$this->assertEmpty($this->countEntityObjs($em, SimpleTargetMock::class));
+	}
+
+	private function tem(): EntityManager {
+		return $this->emPool->getEntityManagerFactory()->getTransactional();
+	}
+
+	function testLifecycle() {
+		$tm = $this->pdoPool->getTransactionManager();
+
+		$ecm = new EmbeddedContainerMock();
+		$ecm->id = 1;
+		$ecm->embeddableMock = new EmbeddableMock();
+		$ecm->embeddableMock->name = 'huii';
+
+		$this->assertCount(0, $this->lifecycleListener->getClassNames());
+		$this->assertEmpty(0, $this->lifecycleListener->getNum());
+
+		$tx = $tm->createTransaction();
+		$this->tem()->persist($ecm);
+
+		$this->assertCount(1, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(1, $this->lifecycleListener->getNum());
+		$this->assertEquals(1, $this->lifecycleListener->prePersistNums[EmbeddedContainerMock::class]);
+
+		$tx->commit();
+
+		$this->assertCount(1, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(2, $this->lifecycleListener->getNum());
+		$this->assertEquals(1, $this->lifecycleListener->postPersistNums[EmbeddedContainerMock::class]);
+
+		// VOID UPDATE
+
+		$tx = $tm->createTransaction();
+
+		$ecm = $this->tem()->find(EmbeddedContainerMock::class, $ecm->id);
+		$tx->commit();
+
+		$this->assertCount(1, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(2, $this->lifecycleListener->getNum());
+
+
+		// UPDATE
+
+		$tx = $tm->createTransaction();
+
+		$ecm = $this->tem()->find(EmbeddedContainerMock::class, $ecm->id);
+		$ecm->embeddableMock->name = 'holeradio';
+
+		$tx->commit();
+
+		$this->assertCount(1, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(4, $this->lifecycleListener->getNum());
+		$this->assertEquals(1, $this->lifecycleListener->preUpdateNums[EmbeddedContainerMock::class]);
+		$this->assertEquals(1, $this->lifecycleListener->postUpdateNums[EmbeddedContainerMock::class]);
+
+
+		// REMOVE
+
+		$tx = $tm->createTransaction();
+
+		$ecm = $this->tem()->find(EmbeddedContainerMock::class, $ecm->id);
+
+		$this->tem()->remove($ecm);
+
+		$this->assertCount(1, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(5, $this->lifecycleListener->getNum());
+		$this->assertEquals(1, $this->lifecycleListener->preRemoveNums[EmbeddedContainerMock::class]);
+
+		$tx->commit();
+
+		$this->assertCount(1, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(6, $this->lifecycleListener->getNum());
+		$this->assertEquals(1, $this->lifecycleListener->postRemoveNums[EmbeddedContainerMock::class]);
 	}
 
 	private function countEntityObjs(EntityManager $em, string $entityClass): int {

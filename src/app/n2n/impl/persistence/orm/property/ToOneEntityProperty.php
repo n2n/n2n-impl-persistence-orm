@@ -74,11 +74,11 @@ class ToOneEntityProperty extends RelationEntityPropertyAdapter implements Colum
 		return $value;
 	}
 	
-	public function hasEmbeddedEntityPropertyCollection(): bool {
-		return true;
-	}
-	
-	public function getEmbeddedEntityPropertyCollection(): EntityPropertyCollection {
-		return $this->getRelation()->getTargetEntityModel();
-	}
+//	public function hasEmbeddedEntityPropertyCollection(): bool {
+//		return true;
+//	}
+//
+//	public function getEmbeddedEntityPropertyCollection(): EntityPropertyCollection {
+//		return $this->getRelation()->getTargetEntityModel();
+//	}
 }

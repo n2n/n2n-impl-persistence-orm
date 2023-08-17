@@ -160,4 +160,8 @@ abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter imple
 	public function getAvailableJoinTypes(): array {
 		return JoinType::getValues();
 	}
+
+	function ensureInit(): void {
+		$this->getRelation();
+	}
 }
