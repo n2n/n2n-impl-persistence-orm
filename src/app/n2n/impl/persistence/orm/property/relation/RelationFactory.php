@@ -437,6 +437,11 @@ class RelationFactory {
 				continue;
 			}
 
+			if ($entityProperty->hasTargetEntityModel()) {
+				$entityPropertyCollection = $entityProperty->getTargetEntityModel();
+				continue;
+			}
+
 			throw new UnknownEntityPropertyException('Unresolvable entity property: '
 					. $this->relationProperty->getEntityModel()->getClass()->getName() . '::$'
 					. implode('::$', $propertyNames));
