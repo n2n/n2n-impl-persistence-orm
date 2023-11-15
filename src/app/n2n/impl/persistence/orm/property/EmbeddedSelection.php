@@ -94,7 +94,7 @@ class EmbeddedValueBuilder implements ValueBuilder {
 
 		if (!$notNull) return null;
 		
-		$object = ReflectionUtils::createObject($this->embeddedEntityProperty->getTargetClass());
+		$object = ReflectionUtils::createObject($this->embeddedEntityProperty->getTargetClass(), false);
 		foreach ($this->embeddedEntityProperty->getEntityProperties() as $entityProperty) {
 			$propertyString = $entityProperty->toPropertyString();
 			IllegalStateException::assertTrue(array_key_exists($propertyString, $propertyValues));
