@@ -16,7 +16,7 @@ class GeneralTestEnv {
 
 	private static LifecycleListener $lifecycleListener;
 
-	static function setUpEmPool(array $registeredClassNames): EmPool {
+	static function setUpEmPool(array $registeredClassNames, array $magicContextObjs = []): EmPool {
 		$pdoPool = new PdoPool(
 				[PdoPool::DEFAULT_DS_NAME => new PersistenceUnitConfig('default', 'sqlite::memory:', '', '',
 						PersistenceUnitConfig::TIL_SERIALIZABLE, SqliteDialect::class,
@@ -27,7 +27,7 @@ class GeneralTestEnv {
 				new EntityModelManager(
 						$registeredClassNames,
 						new EntityModelFactory([CommonEntityPropertyProvider::class])),
-				new SimpleMagicContext([LifecycleListener::class => self::$lifecycleListener = new LifecycleListener()]));
+				new SimpleMagicContext([...$magicContextObjs, LifecycleListener::class => self::$lifecycleListener = new LifecycleListener()]));
 	}
 
 	static function getLifecycleListener(): LifecycleListener {
