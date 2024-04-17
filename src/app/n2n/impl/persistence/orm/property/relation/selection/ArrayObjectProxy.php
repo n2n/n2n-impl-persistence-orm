@@ -31,7 +31,7 @@ class ArrayObjectProxy extends \ArrayObject {
 // 	private $loadedValueHash;
 	private \SplObjectStorage $initializedListeners;
 	private \WeakMap $weakRefInitializedListenerMap;
-	
+
 	public function __construct(\Closure $loadClosure, EntityProperty $targetIdEntityProperty) {
 		parent::__construct();
 
@@ -47,12 +47,12 @@ class ArrayObjectProxy extends \ArrayObject {
 	public function getId() {
 		return $this->id;
 	}
-	
+
 // 	public function getLoadedValueHash() {
 // 		IllegalStateException::assertTrue($this->loadedValueHash !== null);
 // 		return $this->loadedValueHash;
 // 	}
-	
+
 	public function isInitialized() {
 		return $this->loadClosure === null;
 	}
@@ -81,7 +81,7 @@ class ArrayObjectProxy extends \ArrayObject {
 		IllegalStateException::assertTrue(!$this->isInitialized());
 		$this->initializedListeners->attach($initializedListener);
 	}
-	
+
 	public function registerArrayObjectInitializedListener(ArrayObjectInitializedListener $initializedListener) {
 		IllegalStateException::assertTrue(!$this->isInitialized());
 		$this->weakRefInitializedListenerMap[$initializedListener] = null;
@@ -122,32 +122,32 @@ class ArrayObjectProxy extends \ArrayObject {
 		return parent::count();
 	}
 
-	public function asort (int $flags = SORT_REGULAR): bool {
+	public function asort (int $flags = SORT_REGULAR): true {
 		$this->initialize();
 		return parent::asort($flags);
 	}
 
-	public function ksort (int $flags = SORT_REGULAR): bool {
+	public function ksort (int $flags = SORT_REGULAR): true {
 		$this->initialize();
 		return parent::ksort($flags);
 	}
 
-	public function uasort ($cmp_function): bool {
+	public function uasort ($cmp_function): true {
 		$this->initialize();
 		return parent::uasort($cmp_function);
 	}
 
-	public function uksort ($cmp_function): bool {
+	public function uksort ($cmp_function): true {
 		$this->initialize();
 		return parent::uksort($cmp_function);
 	}
 
-	public function natsort (): bool {
+	public function natsort (): true {
 		$this->initialize();
 		return parent::natsort();
 	}
 
-	public function natcasesort (): bool {
+	public function natcasesort (): true {
 		$this->initialize();
 		return parent::natcasesort();
 	}
@@ -185,4 +185,3 @@ class ArrayObjectProxy extends \ArrayObject {
 // 	}
 
 }
-
