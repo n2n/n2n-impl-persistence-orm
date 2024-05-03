@@ -23,7 +23,7 @@ namespace n2n\impl\persistence\orm\property\hangar\scalar;
 
 use n2n\util\type\attrs\DataSet;
 use hangar\api\DbInfo;
-use n2n\persistence\meta\structure\ColumnFactory;
+use n2n\spec\dbo\meta\structure\ColumnFactory;
 use hangar\api\PropSourceDef;
 use n2n\impl\web\dispatch\mag\model\NumericMag;
 use n2n\impl\web\dispatch\mag\model\StringMag;
@@ -33,7 +33,7 @@ use n2n\util\type\ArgUtils;
 use n2n\persistence\meta\structure\common\CommonStringColumn;
 use phpbob\representation\PhpTypeDef;
 use n2n\web\dispatch\mag\MagCollection;
-use n2n\persistence\meta\structure\Column;
+use n2n\spec\dbo\meta\structure\Column;
 use hangar\api\CompatibilityLevel;
 use n2n\impl\persistence\orm\property\StringEntityProperty;
 

@@ -32,7 +32,7 @@ use hangar\api\ColumnDefaults;
 use hangar\api\CompatibilityLevel;
 use phpbob\representation\PhpTypeDef;
 use hangar\api\HuoContext;
-use n2n\persistence\meta\structure\Column;
+use n2n\spec\dbo\meta\structure\Column;
 use n2n\persistence\orm\annotation\AnnoTransient;
 use n2n\impl\web\dispatch\mag\model\StringMag;
 

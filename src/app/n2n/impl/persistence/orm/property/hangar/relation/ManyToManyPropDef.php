@@ -31,13 +31,13 @@ use n2n\util\type\ArgUtils;
 use n2n\impl\persistence\orm\property\RelationEntityProperty;
 use n2n\util\type\CastUtils;
 use n2n\impl\persistence\orm\property\relation\JoinTableToManyRelation;
-use n2n\persistence\meta\structure\IndexType;
+use n2n\spec\dbo\meta\structure\IndexType;
 use hangar\api\ColumnDefaults;
 use hangar\api\CompatibilityLevel;
 use phpbob\PhpbobUtils;
 use phpbob\representation\PhpTypeDef;
 use hangar\api\HuoContext;
-use n2n\persistence\meta\structure\Column;
+use n2n\spec\dbo\meta\structure\Column;
 use n2n\web\dispatch\mag\MagCollection;
 use n2n\util\type\attrs\DataSet;
 
