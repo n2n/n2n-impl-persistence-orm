@@ -32,14 +32,14 @@ use n2n\persistence\orm\annotation\AnnoManyToOne;
 use n2n\impl\persistence\orm\property\ToOneEntityProperty;
 use hangar\api\ColumnDefaults;
 use n2n\impl\persistence\orm\property\relation\JoinColumnToOneRelation;
-use n2n\persistence\meta\structure\IndexType;
-use n2n\persistence\meta\structure\Table;
+use n2n\spec\dbo\meta\structure\IndexType;
+use n2n\spec\dbo\meta\structure\Table;
 use hangar\api\CompatibilityLevel;
 use phpbob\representation\PhpTypeDef;
 use phpbob\PhpbobUtils;
 use hangar\api\HuoContext;
 use n2n\web\dispatch\mag\MagCollection;
-use n2n\persistence\meta\structure\Column;
+use n2n\spec\dbo\meta\structure\Column;
 use n2n\impl\persistence\orm\property\IntEntityProperty;
 
 class ManyToOnePropDef implements HangarPropDef {

@@ -22,7 +22,7 @@
 namespace n2n\impl\persistence\orm\property\hangar\scalar;
 
 use n2n\util\type\attrs\DataSet;
-use n2n\persistence\meta\structure\ColumnFactory;
+use n2n\spec\dbo\meta\structure\ColumnFactory;
 use hangar\api\DbInfo;
 use hangar\api\PropSourceDef;
 use n2n\persistence\orm\property\EntityProperty;
@@ -34,7 +34,7 @@ use phpbob\representation\PhpTypeDef;
 use n2n\impl\persistence\orm\property\BoolEntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
 use n2n\web\dispatch\mag\MagCollection;
-use n2n\persistence\meta\structure\Column;
+use n2n\spec\dbo\meta\structure\Column;
 use n2n\impl\web\dispatch\mag\model\EnumMag;
 
 class BooleanPropDef extends ScalarPropDefAdapter {

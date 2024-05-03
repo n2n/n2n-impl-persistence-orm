@@ -25,7 +25,7 @@ use hangar\api\HangarPropDef;
 use n2n\util\type\attrs\DataSet;
 use hangar\api\PropSourceDef;
 use hangar\api\DbInfo;
-use n2n\persistence\meta\structure\ColumnFactory;
+use n2n\spec\dbo\meta\structure\ColumnFactory;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\reflection\annotation\AnnotationSet;
 use n2n\util\type\ArgUtils;

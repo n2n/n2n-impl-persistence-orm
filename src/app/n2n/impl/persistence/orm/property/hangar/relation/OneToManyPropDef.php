@@ -26,7 +26,7 @@ use hangar\api\PropSourceDef;
 use n2n\util\type\attrs\DataSet;
 use hangar\api\DbInfo;
 use n2n\persistence\orm\annotation\AnnoOneToMany;
-use n2n\persistence\meta\structure\Table;
+use n2n\spec\dbo\meta\structure\Table;
 use n2n\impl\persistence\orm\property\relation\RelationFactory;
 use n2n\persistence\orm\property\EntityProperty;
 use n2n\impl\persistence\orm\property\RelationEntityProperty;
@@ -36,7 +36,7 @@ use n2n\impl\persistence\orm\property\relation\InverseJoinColumnOneToManyRelatio
 use n2n\reflection\annotation\AnnotationSet;
 use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\annotation\AnnoJoinColumn;
-use n2n\persistence\meta\structure\IndexType;
+use n2n\spec\dbo\meta\structure\IndexType;
 use n2n\persistence\orm\annotation\AnnoJoinTable;
 use hangar\api\ColumnDefaults;
 use hangar\api\CompatibilityLevel;
@@ -44,7 +44,7 @@ use phpbob\PhpbobUtils;
 use phpbob\representation\PhpTypeDef;
 use n2n\web\dispatch\mag\MagCollection;
 use hangar\api\HuoContext;
-use n2n\persistence\meta\structure\Column;
+use n2n\spec\dbo\meta\structure\Column;
 
 class OneToManyPropDef implements HangarPropDef {
 	private $columnDefaults;
