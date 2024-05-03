@@ -122,32 +122,32 @@ class ArrayObjectProxy extends \ArrayObject {
 		return parent::count();
 	}
 
-	public function asort (int $flags = SORT_REGULAR): true {
+	public function asort (int $flags = SORT_REGULAR): bool {
 		$this->initialize();
 		return parent::asort($flags);
 	}
 
-	public function ksort (int $flags = SORT_REGULAR): true {
+	public function ksort (int $flags = SORT_REGULAR): bool {
 		$this->initialize();
 		return parent::ksort($flags);
 	}
 
-	public function uasort ($cmp_function): true {
+	public function uasort ($cmp_function): bool {
 		$this->initialize();
 		return parent::uasort($cmp_function);
 	}
 
-	public function uksort ($cmp_function): true {
+	public function uksort ($cmp_function): bool {
 		$this->initialize();
 		return parent::uksort($cmp_function);
 	}
 
-	public function natsort (): true {
+	public function natsort (): bool {
 		$this->initialize();
 		return parent::natsort();
 	}
 
-	public function natcasesort (): true {
+	public function natcasesort (): bool {
 		$this->initialize();
 		return parent::natcasesort();
 	}
