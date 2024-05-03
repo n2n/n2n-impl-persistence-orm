@@ -31,7 +31,7 @@ use n2n\persistence\orm\query\select\SimpleSelection;
 use n2n\persistence\orm\store\action\PersistAction;
 use n2n\persistence\orm\store\operation\MergeOperation;
 use n2n\persistence\orm\store\action\RemoveAction;
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\persistence\Pdo;
 use n2n\persistence\orm\EntityManager;
 use n2n\util\type\ArgUtils;

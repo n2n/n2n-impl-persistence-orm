@@ -9,9 +9,9 @@ use n2n\impl\persistence\orm\live\mock\JoinColumnTargetMock;
 use n2n\persistence\ext\EmPool;
 use n2n\persistence\ext\PdoPool;
 use n2n\core\container\TransactionManager;
-use n2n\persistence\meta\data\QueryColumn;
-use n2n\persistence\meta\data\QueryPlaceMarker;
-use n2n\persistence\meta\data\QueryTable;
+use n2n\spec\dbo\meta\data\impl\QueryColumn;
+use n2n\spec\dbo\meta\data\impl\QueryPlaceMarker;
+use n2n\spec\dbo\meta\data\impl\QueryTable;
 
 class ActionDependencyLiveTest extends TestCase {
 

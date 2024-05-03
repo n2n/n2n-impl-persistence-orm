@@ -22,11 +22,11 @@
 namespace n2n\impl\persistence\orm\property\relation\selection;
 
 use n2n\persistence\orm\query\from\MetaTreePoint;
-use n2n\persistence\meta\data\SelectStatementBuilder;
+use n2n\spec\dbo\meta\data\SelectStatementBuilder;
 use n2n\persistence\orm\query\from\TreePath;
 use n2n\persistence\orm\CorruptedDataException;
 use n2n\persistence\orm\store\SimpleLoaderUtils;
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
 
 abstract class ToManyLoaderAdapter implements ToManyLoader {
 	private $orderDirectives = array();

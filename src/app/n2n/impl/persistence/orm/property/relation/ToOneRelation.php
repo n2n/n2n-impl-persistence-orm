@@ -29,7 +29,7 @@ interface ToOneRelation extends Relation {
 	/**
 	 * @param QueryState $queryState
 	 * @param TreePointMeta $queryPoint
-	 * @return \n2n\persistence\meta\data\QueryColumn
+	 * @return \n2n\spec\dbo\meta\data\impl\QueryColumn
 	 */
 	public function createRepresentingQueryItem(MetaTreePoint $metaTreePoint, QueryState $queryState);
 	/**

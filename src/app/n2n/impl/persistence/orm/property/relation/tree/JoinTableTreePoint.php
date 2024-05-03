@@ -21,9 +21,9 @@
  */
 namespace n2n\impl\persistence\orm\property\relation\tree;
 
-use n2n\persistence\meta\data\QueryColumn;
-use n2n\persistence\meta\data\SelectStatementBuilder;
-use n2n\persistence\meta\data\QueryTable;
+use n2n\spec\dbo\meta\data\impl\QueryColumn;
+use n2n\spec\dbo\meta\data\SelectStatementBuilder;
+use n2n\spec\dbo\meta\data\impl\QueryTable;
 use n2n\persistence\meta\data\QueryComparator;
 use n2n\persistence\orm\query\from\JoinedTreePointAdapter;
 

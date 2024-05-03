@@ -23,8 +23,8 @@ namespace n2n\impl\persistence\orm\property\relation\util;
 
 // @todo remove
 // use n2n\persistence\orm\store\action\ActionAdapter;
-// use n2n\persistence\meta\data\QueryColumn;
-// use n2n\persistence\meta\data\QueryPlaceMarker;
+// use n2n\spec\dbo\meta\data\impl\QueryColumn;
+// use n2n\spec\dbo\meta\data\impl\QueryPlaceMarker;
 // use n2n\persistence\meta\data\QueryComparator;
 
 // test JoinColumnAction extends ActionAdapter {

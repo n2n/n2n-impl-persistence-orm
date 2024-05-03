@@ -26,7 +26,7 @@ use n2n\persistence\orm\query\from\TreePath;
 use n2n\persistence\orm\criteria\compare\CriteriaComparator;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
-use n2n\persistence\meta\data\QueryPlaceMarker;
+use n2n\spec\dbo\meta\data\impl\QueryPlaceMarker;
 use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\query\QueryState;
 use n2n\util\type\TypeConstraint;
@@ -40,7 +40,7 @@ use n2n\persistence\orm\query\QueryModel;
 use n2n\persistence\orm\query\from\Tree;
 use n2n\persistence\orm\query\QueryItemSelect;
 use n2n\persistence\orm\criteria\item\ConstantQueryPoint;
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
 
 class ToManyCustomComparable implements CustomComparable {
 	private $metaTreePoint;
