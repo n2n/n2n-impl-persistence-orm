@@ -21,7 +21,7 @@
  */
 namespace n2n\impl\persistence\orm\property\select;
 
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\persistence\PdoStatement;
 use n2n\persistence\meta\OrmDialectConfig;
 use n2n\persistence\orm\CorruptedDataException;

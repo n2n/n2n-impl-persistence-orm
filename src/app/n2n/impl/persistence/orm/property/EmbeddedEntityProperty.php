@@ -43,7 +43,7 @@ use n2n\persistence\orm\criteria\compare\ComparisonStrategy;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\meta\data\QueryComparator;
 use n2n\persistence\orm\query\select\Selection;
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\store\CommonValueHash;
 use n2n\persistence\orm\store\operation\CascadeOperation;

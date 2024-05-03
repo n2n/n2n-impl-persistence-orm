@@ -23,7 +23,7 @@ namespace n2n\impl\persistence\orm\property\relation\compare;
 
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\query\QueryState;
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
 
 interface ToManyQueryItemFactory {
 	/**

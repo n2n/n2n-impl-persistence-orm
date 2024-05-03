@@ -23,9 +23,9 @@ namespace n2n\impl\persistence\orm\property\relation\selection;
 
 use n2n\persistence\orm\store\SimpleLoaderUtils;
 use n2n\persistence\orm\query\select\EntityObjSelection;
-use n2n\persistence\meta\data\QueryColumn;
+use n2n\spec\dbo\meta\data\impl\QueryColumn;
 use n2n\persistence\meta\data\JoinType;
-use n2n\persistence\meta\data\QueryTable;
+use n2n\spec\dbo\meta\data\impl\QueryTable;
 use n2n\persistence\meta\data\QueryComparator;
 use n2n\persistence\orm\property\BasicEntityProperty;
 

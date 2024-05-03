@@ -31,7 +31,7 @@ use n2n\l10n\IllegalN2nLocaleFormatException;
 use n2n\persistence\Pdo;
 use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\query\select\N2nLocaleSelection;
-use n2n\persistence\meta\data\QueryItem;
+use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\criteria\compare\N2nLocaleColumnComparable;
 use n2n\persistence\orm\query\from\MetaTreePoint;

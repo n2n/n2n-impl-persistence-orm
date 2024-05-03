@@ -23,8 +23,8 @@ namespace n2n\impl\persistence\orm\property\relation\compare;
 
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\query\QueryState;
-use n2n\persistence\meta\data\QueryColumn;
-use n2n\persistence\meta\data\QueryTable;
+use n2n\spec\dbo\meta\data\impl\QueryColumn;
+use n2n\spec\dbo\meta\data\impl\QueryTable;
 use n2n\persistence\meta\data\QueryPartGroup;
 use n2n\persistence\meta\data\QueryComparator;
 
