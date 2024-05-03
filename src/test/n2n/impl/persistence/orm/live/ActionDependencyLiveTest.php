@@ -11,7 +11,6 @@ use n2n\persistence\ext\PdoPool;
 use n2n\core\container\TransactionManager;
 use n2n\spec\dbo\meta\data\impl\QueryColumn;
 use n2n\spec\dbo\meta\data\impl\QueryPlaceMarker;
-use n2n\spec\dbo\meta\data\impl\QueryTable;
 
 class ActionDependencyLiveTest extends TestCase {
 
