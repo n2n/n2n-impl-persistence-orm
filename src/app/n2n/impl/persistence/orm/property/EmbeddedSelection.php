@@ -50,17 +50,17 @@ class EmbeddedSelection implements Selection {
 	/**
 	 * @return \n2n\spec\dbo\meta\data\QueryItem[]
 	 */
-	public function getSelectQueryItems() {
+	public function getSelectQueryItems(): array {
 		return $this->selectionGroup->getSelectQueryItems();
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\select\Selection::bindColumns()
 	*/
-	public function bindColumns(PdoStatement $stmt, array $columnAliases) {
+	public function bindColumns(PdoStatement $stmt, array $columnAliases): void {
 		$this->selectionGroup->bindColumns($stmt, $columnAliases);
 	}
 	
-	public function createValueBuilder() {
+	public function createValueBuilder(): ValueBuilder {
 		$propertyValueBuilders = array();
 		foreach ($this->embeddedEntityProperty->getEntityProperties() as $entityProperty) {
 			$propertyString = $entityProperty->toPropertyString();
@@ -83,7 +83,7 @@ class EmbeddedValueBuilder implements ValueBuilder {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\select\ValueBuilder::buildValue()
 	 */
-	public function buildValue() {
+	public function buildValue(): mixed {
 		$propertyValues = array();
 		$notNull = false;
 		foreach ($this->propertyValueBuilders as $propertyString => $propertyValueBuilder) {

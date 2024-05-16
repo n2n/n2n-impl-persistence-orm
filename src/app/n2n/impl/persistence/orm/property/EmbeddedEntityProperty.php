@@ -148,7 +148,7 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
 	 */
-	public function supplyPersistAction(PersistAction $persistingJob, $object, ValueHash $valueHash, ?ValueHash $oldValueHash) {
+	public function supplyPersistAction(PersistAction $persistAction, $object, ValueHash $valueHash, ?ValueHash $oldValueHash) {
 		assert($valueHash instanceof ValueHashCol);
 
 		$propertyValueHashes = $valueHash->getValueHashes();
@@ -172,7 +172,7 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 				$oldPropertyValueHash = $oldPropertyValueHashes[$propertyName] ?? null;
 			}
 
-			$property->supplyPersistAction($persistingJob, $propertyValue, $propertyValueHash, $oldPropertyValueHash);
+			$property->supplyPersistAction($persistAction, $propertyValue, $propertyValueHash, $oldPropertyValueHash);
 		}
 	}
 

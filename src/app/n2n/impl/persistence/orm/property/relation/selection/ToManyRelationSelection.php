@@ -37,7 +37,7 @@ class ToManyRelationSelection extends RelationSelection implements Selection {
 		$this->targetIdEntityProperty = $targetIdEntityProperty;
 	}
 	
-	public function createValueBuilder() {
+	public function createValueBuilder(): ValueBuilder {
 		$idValueBuilder = $this->idSelection->createValueBuilder();
 		
 		if ($this->lazy) {

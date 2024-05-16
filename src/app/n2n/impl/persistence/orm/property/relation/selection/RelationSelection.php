@@ -34,13 +34,13 @@ abstract class RelationSelection implements Selection{
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\select\Selection::getSelectQueryItems()
 	 */
-	public function getSelectQueryItems() {
+	public function getSelectQueryItems(): array {
 		return $this->idSelection->getSelectQueryItems();
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\select\Selection::bindColumns()
 	 */
-	public function bindColumns(PdoStatement $stmt, array $columnAliases) {
+	public function bindColumns(PdoStatement $stmt, array $columnAliases): void {
 		$this->idSelection->bindColumns($stmt, $columnAliases);
 	}
 	

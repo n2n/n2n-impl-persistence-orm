@@ -21,8 +21,8 @@
  */
 namespace n2n\impl\persistence\orm\property;
 
-use n2n\persistence\orm\criteria\compare\UrlColumnComparable;
-use n2n\persistence\orm\query\select\UrlSelection;
+use n2n\impl\persistence\orm\property\compare\UrlColumnComparable;
+use n2n\impl\persistence\orm\property\select\UrlSelection;
 use n2n\util\type\TypeConstraint;
 use n2n\persistence\orm\store\action\PersistAction;
 use n2n\reflection\property\AccessProxy;
@@ -46,14 +46,14 @@ class UrlEntityProperty extends ColumnPropertyAdapter implements BasicEntityProp
 		parent::__construct($accessProxy, $columnName);
 	}
 
-	public function supplyPersistAction(PersistAction $persistingJob, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
 		$rawValue = null;
 
 		if ($value instanceof Url) {
 			$rawValue = (string) $value;
 		}
 
-		$persistingJob->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $rawValue);
+		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $rawValue);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyRemoveAction()
@@ -61,10 +61,10 @@ class UrlEntityProperty extends ColumnPropertyAdapter implements BasicEntityProp
 	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
 	}
 
-	public static function areConstraintsTypical(TypeConstraint $constraints = null) {
-		return isset($constraints) && !is_null($constraints->getParamClass())
-				&& $constraints->getParamClass()->getName() == Url::class && !$constraints->isArray();
-	}
+//	public static function areConstraintsTypical(TypeConstraint $constraints = null) {
+//		return isset($constraints) && !is_null($constraints->getParamClass())
+//				&& $constraints->getParamClass()->getName() == Url::class && !$constraints->isArray();
+//	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::valueToRep()
 	 */

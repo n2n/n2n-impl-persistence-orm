@@ -21,15 +21,14 @@
  */
 namespace n2n\impl\persistence\orm\property;
 
-use n2n\util\type\TypeConstraint;
 use n2n\reflection\property\AccessProxy;
 use n2n\persistence\orm\property\BasicEntityProperty;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\QueryState;
 use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\util\type\ArgUtils;
-use n2n\persistence\orm\query\select\DateTimeSelection;
-use n2n\persistence\orm\criteria\compare\DateTimeColumnComparable;
+use n2n\impl\persistence\orm\property\select\DateTimeSelection;
+use n2n\impl\persistence\orm\property\compare\DateTimeColumnComparable;
 use n2n\persistence\orm\store\action\PersistAction;
 use n2n\persistence\orm\store\operation\MergeOperation;
 use n2n\persistence\Pdo;
@@ -73,7 +72,7 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 		return $value;
 	}
 	
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void {
 		$rawValue = $this->buildRaw($value, $persistAction->getActionQueue()->getEntityManager()->getPdo());
 		
 		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $rawValue);
@@ -93,7 +92,7 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 		return clone $value;
 	}
 
-	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $valueHash = null) {
+	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
 	}
 
 	public function parseValue($raw, Pdo $pdo) {

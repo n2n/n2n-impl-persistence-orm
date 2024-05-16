@@ -90,12 +90,12 @@ class IntEntityProperty extends ColumnPropertyAdapter implements BasicEntityProp
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
 	 */
-	public function supplyPersistAction(PersistAction $persistAction, $mappedValue, ValueHash $valueHash, ?ValueHash $oldValueHash) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
 // 		$pdoDataType = null;
 // 		if (is_bool($mappedValue)) {
 // 			$pdoDataType = PDO::PARAM_BOOL;
 // 		}
-		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $mappedValue/*, $pdoDataType*/);
+		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $value/*, $pdoDataType*/);
 	}
 
 

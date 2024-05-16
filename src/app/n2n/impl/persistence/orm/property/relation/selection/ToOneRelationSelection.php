@@ -42,7 +42,7 @@ class ToOneRelationSelection extends RelationSelection implements Selection {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\select\Selection::createValueBuilder()
 	 */
-	public function createValueBuilder() {
+	public function createValueBuilder(): ValueBuilder {
 		$idValueBuilder = $this->idSelection->createValueBuilder();
 		
 		if ($this->lazy) {

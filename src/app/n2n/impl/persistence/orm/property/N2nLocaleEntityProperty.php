@@ -30,10 +30,10 @@ use n2n\persistence\orm\property\BasicEntityProperty;
 use n2n\l10n\IllegalN2nLocaleFormatException;
 use n2n\persistence\Pdo;
 use n2n\util\type\ArgUtils;
-use n2n\persistence\orm\query\select\N2nLocaleSelection;
+use n2n\impl\persistence\orm\property\select\N2nLocaleSelection;
 use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\persistence\orm\query\QueryState;
-use n2n\persistence\orm\criteria\compare\N2nLocaleColumnComparable;
+use n2n\impl\persistence\orm\property\compare\N2nLocaleColumnComparable;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\store\operation\MergeOperation;
 use n2n\persistence\orm\EntityManager;
@@ -48,14 +48,14 @@ class N2nLocaleEntityProperty extends ColumnPropertyAdapter implements BasicEnti
 				$columnName);
 	}
 	
-	public function supplyPersistAction(PersistAction $persistingJob, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
 		$rawValue = null;
 
 		if ($value instanceof N2nLocale) {
 			$rawValue = $value->getId();
 		}
 		
-		$persistingJob->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $rawValue);
+		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $rawValue);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyRemoveAction()
@@ -63,15 +63,15 @@ class N2nLocaleEntityProperty extends ColumnPropertyAdapter implements BasicEnti
 	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
 	}
 	
-	public static function areConstraintsTypical(TypeConstraint $constraints = null) {
-		return isset($constraints) && !is_null($constraints->getParamClass()) 
-				&& $constraints->getParamClass()->getName() == 'n2n\l10n\N2nLocale' && !$constraints->isArray();
-	}
+//	public static function areConstraintsTypical(TypeConstraint $constraints = null) {
+//		return isset($constraints) && !is_null($constraints->getParamClass())
+//				&& $constraints->getParamClass()->getName() == 'n2n\l10n\N2nLocale' && !$constraints->isArray();
+//	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::valueToRep()
 	 */
 	public function valueToRep($value): string {
-		if ($value === null) return null;
+		ArgUtils::assertTrue($value !== null);
 		
 		ArgUtils::assertTrue($value instanceof N2nLocale);
 		return $value->getId();		
@@ -79,7 +79,7 @@ class N2nLocaleEntityProperty extends ColumnPropertyAdapter implements BasicEnti
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::repToValue()
 	 */
-	public function repToValue(string $rep) {		
+	public function repToValue(string $rep) {
 		try {
 			return N2nLocale::create($rep);
 		} catch (IllegalN2nLocaleFormatException $e) {

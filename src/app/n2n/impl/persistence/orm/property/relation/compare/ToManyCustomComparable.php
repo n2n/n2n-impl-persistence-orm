@@ -92,7 +92,7 @@ class ToManyCustomComparable implements CustomComparable {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\criteria\compare\ColumnComparable::buildCounterpartQueryItemFromValue()
 	 */
-	public function buildCounterpartQueryItemFromValue($operator, $value) {
+	public function buildCounterpartQueryItemFromValue(string $operator, mixed $value): QueryItem {
 		if ($operator == CriteriaComparator::OPERATOR_CONTAINS) {
 			return $this->requestEntityColumnComparable()
 					->buildCounterpartQueryItemFromValue($operator, $value);

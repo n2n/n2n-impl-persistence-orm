@@ -23,34 +23,45 @@ namespace n2n\impl\persistence\orm\property\select;
 
 use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\persistence\PdoStatement;
-use n2n\persistence\meta\OrmDialectConfig;
 use n2n\persistence\orm\CorruptedDataException;
-use n2n\util\EnumUtils;
+use n2n\util\io\stream\ResourceStream;
+use n2n\io\managed\impl\FileFactory;
+use n2n\persistence\orm\query\select\ValueBuilder;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\orm\query\select\EagerValueBuilder;
-use n2n\persistence\orm\query\select\ValueBuilder;
+use n2n\util\ex\NotYetImplementedException;
 
-class EnumSelection implements Selection {
-	private $value;
+class FileSelection implements Selection {
+	private $fileColumn;
+	private $fileNameColumn;
+	
+	private $resource;
+	private $fileName;
 
-	public function __construct(private QueryItem $queryItem, private \ReflectionEnum $enum) {
-
+	public function __construct(QueryItem $fileColumn, QueryItem $fileNameColumn) {
+		$this->fileColumn = $fileColumn;
+		$this->fileNameColumn = $fileNameColumn;
 	}
 	
 	public function getSelectQueryItems(): array {
-		return array($this->queryItem);
+		return array($this->fileColumn, $this->fileNameColumn);
 	}
 
 	public function bindColumns(PdoStatement $stmt, array $columnAliases): void {
-		$stmt->shareBindColumn($columnAliases[0], $this->value);
+		throw new NotYetImplementedException();
+//		$stmt->bindColumn($columnAliases[0], $this->resource);
+//		$stmt->shareBindColumn($columnAliases[1], $this->fileName);
 	}
-
+	/* (non-PHPdoc)
+	 * @see \n2n\persistence\orm\query\select\Selection::createValueBuilder()
+	 */
 	public function createValueBuilder(): ValueBuilder {
-		try {
-			return new EagerValueBuilder(EnumUtils::backedToUnit($this->value, $this->enum));
-		} catch (\InvalidArgumentException $e) {
-			throw new CorruptedDataException(null, 0, $e);
-		}
+		throw new NotYetImplementedException();
+//		try {
+//			return new EagerValueBuilder(FileFactory::createFromInputStream(
+//					new ResourceStream($this->resource)));
+//		} catch (\InvalidArgumentException $e) {
+//			throw new CorruptedDataException(null, 0, $e);
+//		}
 	}
-
 }

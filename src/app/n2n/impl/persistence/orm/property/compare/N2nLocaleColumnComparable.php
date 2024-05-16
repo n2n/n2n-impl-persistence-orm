@@ -23,40 +23,43 @@ namespace n2n\impl\persistence\orm\property\compare;
 
 use n2n\util\type\ArgUtils;
 use n2n\spec\dbo\meta\data\QueryItem;
+use n2n\util\type\TypeConstraint;
 use n2n\persistence\orm\query\QueryState;
 use n2n\spec\dbo\meta\data\impl\QueryPlaceMarker;
 use n2n\persistence\meta\data\QueryPartGroup;
 use n2n\util\ex\NotYetImplementedException;
 use n2n\persistence\orm\criteria\compare\ColumnComparableAdapter;
 use n2n\persistence\orm\criteria\compare\CriteriaComparator;
-use n2n\util\type\TypeConstraints;
-use n2n\util\EnumUtils;
 
-class EnumColumnComparable extends ColumnComparableAdapter {
-
-	public function __construct(QueryItem $comparableQueryItem, private QueryState $queryState) {
+class N2nLocaleColumnComparable extends ColumnComparableAdapter {
+	private $queryState;
+	
+	public function __construct(QueryItem $comparableQueryItem, QueryState $queryState) {
 		parent::__construct(CriteriaComparator::getOperators(false), 
-				TypeConstraints::namedType(\UnitEnum::class, true), $comparableQueryItem);
+				TypeConstraint::createSimple('n2n\l10n\N2nLocale', true), $comparableQueryItem);
+		
+		$this->queryState = $queryState;
 	}
 	
-	private function buildEnumRawValue(?\UnitEnum $value) {
-		return EnumUtils::unitToBacked($value);
+	private function buildN2nLocaleRawValue($value) {
+		if ($value === null) return null;
+		return $value->getId();
 	}
 	
 	public function buildCounterpartQueryItemFromValue(string $operator, mixed $value): QueryItem {
 		if ($operator != CriteriaComparator::OPERATOR_IN  && $operator != CriteriaComparator::OPERATOR_NOT_IN) {
-			ArgUtils::valType($value, \UnitEnum::class, true);
+			ArgUtils::valType($value, 'n2n\l10n\N2nLocale', true);
 			return new QueryPlaceMarker($this->queryState->registerPlaceholderValue(
-					$this->buildEnumRawValue($value)));
+					$this->buildN2nLocaleRawValue($value)));
 		} 
 		
-		ArgUtils::valArray($value, \UnitEnum::class);
+		ArgUtils::valArray($value, 'n2n\l10n\N2nLocale');
 		
 		$queryPartGroup = new QueryPartGroup();
 		foreach ($value as $fieldValue) {
 			$queryPartGroup->addQueryPart(
 					new QueryPlaceMarker($this->queryState->registerPlaceholderValue(
-							$this->buildEnumRawValue($fieldValue))));
+							$this->buildN2nLocaleRawValue($fieldValue))));
 		}
 		return $queryPartGroup;
 	}

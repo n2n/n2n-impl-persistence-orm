@@ -22,21 +22,20 @@
 namespace n2n\impl\persistence\orm\property\select;
 
 use n2n\spec\dbo\meta\data\QueryItem;
+use n2n\util\uri\Url;
 use n2n\persistence\PdoStatement;
-use n2n\persistence\meta\OrmDialectConfig;
-use n2n\persistence\orm\CorruptedDataException;
-use n2n\util\EnumUtils;
+use n2n\persistence\orm\query\select\ValueBuilder;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\orm\query\select\EagerValueBuilder;
-use n2n\persistence\orm\query\select\ValueBuilder;
 
-class EnumSelection implements Selection {
+class UrlSelection implements Selection {
+	private $queryItem;
 	private $value;
 
-	public function __construct(private QueryItem $queryItem, private \ReflectionEnum $enum) {
-
+	public function __construct(QueryItem $queryItem) {
+		$this->queryItem = $queryItem;
 	}
-	
+
 	public function getSelectQueryItems(): array {
 		return array($this->queryItem);
 	}
@@ -44,13 +43,14 @@ class EnumSelection implements Selection {
 	public function bindColumns(PdoStatement $stmt, array $columnAliases): void {
 		$stmt->shareBindColumn($columnAliases[0], $this->value);
 	}
-
+	/* (non-PHPdoc)
+	 * @see \n2n\persistence\orm\query\select\Selection::createValueBuilder()
+	 */
 	public function createValueBuilder(): ValueBuilder {
 		try {
-			return new EagerValueBuilder(EnumUtils::backedToUnit($this->value, $this->enum));
+			return new EagerValueBuilder(Url::build($this->value));
 		} catch (\InvalidArgumentException $e) {
-			throw new CorruptedDataException(null, 0, $e);
+			throw new \InvalidArgumentException(null, 0, $e);
 		}
 	}
-
 }

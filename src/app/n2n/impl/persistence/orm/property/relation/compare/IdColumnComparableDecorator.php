@@ -26,6 +26,7 @@ use n2n\persistence\orm\model\EntityModel;
 use n2n\util\type\TypeConstraint;
 use n2n\persistence\orm\criteria\compare\CriteriaComparator;
 use n2n\util\type\ArgUtils;
+use n2n\spec\dbo\meta\data\QueryItem;
 
 class IdColumnComparableDecorator implements ColumnComparable {
 	private $idColumnComparable;	
@@ -64,7 +65,7 @@ class IdColumnComparableDecorator implements ColumnComparable {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\criteria\compare\ColumnComparable::buildCounterpartQueryItemFromValue()
 	 */	
-	public function buildCounterpartQueryItemFromValue($operator, $value) {
+	public function buildCounterpartQueryItemFromValue(string $operator, mixed $value): QueryItem {
 		return $this->idColumnComparable->buildCounterpartQueryItemFromValue($operator, 
 				$this->parseComparableValue($operator, $value));	
 	}

@@ -23,18 +23,20 @@ namespace n2n\impl\persistence\orm\property\select;
 
 use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\persistence\PdoStatement;
-use n2n\persistence\meta\OrmDialectConfig;
-use n2n\persistence\orm\CorruptedDataException;
-use n2n\util\EnumUtils;
+use n2n\l10n\N2nLocale;
+use n2n\persistence\orm\query\CorruptedDataException;
+use n2n\l10n\IllegalN2nLocaleFormatException;
+use n2n\persistence\orm\query\select\ValueBuilder;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\orm\query\select\EagerValueBuilder;
-use n2n\persistence\orm\query\select\ValueBuilder;
 
-class EnumSelection implements Selection {
+class N2nLocaleSelection implements Selection {
+	private $queryItem;
+	private $ormDialectConfig;
 	private $value;
 
-	public function __construct(private QueryItem $queryItem, private \ReflectionEnum $enum) {
-
+	public function __construct(QueryItem $queryItem) {
+		$this->queryItem = $queryItem;
 	}
 	
 	public function getSelectQueryItems(): array {
@@ -44,11 +46,13 @@ class EnumSelection implements Selection {
 	public function bindColumns(PdoStatement $stmt, array $columnAliases): void {
 		$stmt->shareBindColumn($columnAliases[0], $this->value);
 	}
-
+	/* (non-PHPdoc)
+	 * @see \n2n\persistence\orm\query\select\Selection::createValueBuilder()
+	 */
 	public function createValueBuilder(): ValueBuilder {
 		try {
-			return new EagerValueBuilder(EnumUtils::backedToUnit($this->value, $this->enum));
-		} catch (\InvalidArgumentException $e) {
+			return new EagerValueBuilder(N2nLocale::build($this->value));
+		} catch (IllegalN2nLocaleFormatException $e) {
 			throw new CorruptedDataException(null, 0, $e);
 		}
 	}

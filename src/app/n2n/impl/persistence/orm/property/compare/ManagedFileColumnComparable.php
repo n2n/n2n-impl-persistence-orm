@@ -21,48 +21,59 @@
  */
 namespace n2n\impl\persistence\orm\property\compare;
 
-use n2n\util\type\ArgUtils;
 use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\persistence\orm\query\QueryState;
+use n2n\util\type\TypeConstraint;
+use n2n\util\type\ArgUtils;
 use n2n\spec\dbo\meta\data\impl\QueryPlaceMarker;
+use n2n\io\managed\FileManager;
+use n2n\io\managed\File;
+use n2n\persistence\orm\criteria\CriteriaConflictException;
 use n2n\persistence\meta\data\QueryPartGroup;
-use n2n\util\ex\NotYetImplementedException;
 use n2n\persistence\orm\criteria\compare\ColumnComparableAdapter;
 use n2n\persistence\orm\criteria\compare\CriteriaComparator;
-use n2n\util\type\TypeConstraints;
-use n2n\util\EnumUtils;
 
-class EnumColumnComparable extends ColumnComparableAdapter {
-
-	public function __construct(QueryItem $comparableQueryItem, private QueryState $queryState) {
-		parent::__construct(CriteriaComparator::getOperators(false), 
-				TypeConstraints::namedType(\UnitEnum::class, true), $comparableQueryItem);
-	}
+class ManagedFileColumnComparable extends ColumnComparableAdapter {
+	private $queryState;
+	private $fileManager;
 	
-	private function buildEnumRawValue(?\UnitEnum $value) {
-		return EnumUtils::unitToBacked($value);
+	public function __construct(QueryItem $comparableQueryItem, QueryState $queryState, FileManager $fileManager) {
+		parent::__construct(CriteriaComparator::getOperators(false), 
+				TypeConstraint::createSimple('n2n\io\managed\File', true), $comparableQueryItem);
+		
+		$this->queryState = $queryState;
+		$this->fileManager = $fileManager;
 	}
 	
 	public function buildCounterpartQueryItemFromValue(string $operator, mixed $value): QueryItem {
-		if ($operator != CriteriaComparator::OPERATOR_IN  && $operator != CriteriaComparator::OPERATOR_NOT_IN) {
-			ArgUtils::valType($value, \UnitEnum::class, true);
-			return new QueryPlaceMarker($this->queryState->registerPlaceholderValue(
-					$this->buildEnumRawValue($value)));
-		} 
-		
-		ArgUtils::valArray($value, \UnitEnum::class);
-		
+		if ($operator != CriteriaComparator::OPERATOR_IN && $operator != CriteriaComparator::OPERATOR_NOT_IN) {
+			ArgUtils::valType($value, 'n2n\io\managed\File', true);
+			return new QueryPlaceMarker($this->registerPlaceholder($value));
+		}
+	
+		ArgUtils::valArray($value, 'n2n\io\managed\File');
+	
 		$queryPartGroup = new QueryPartGroup();
 		foreach ($value as $fieldValue) {
-			$queryPartGroup->addQueryPart(
-					new QueryPlaceMarker($this->queryState->registerPlaceholderValue(
-							$this->buildEnumRawValue($fieldValue))));
+			$queryPartGroup->addQueryPart(new QueryPlaceMarker($this->registerPlaceholder($fieldValue)));
 		}
 		return $queryPartGroup;
 	}
 	
-	public function buildCounterpartPlaceholder($operator, $value) {
-		throw new NotYetImplementedException();
+	private function registerPlaceholder(File $file = null)  {
+		if ($file === null) {
+			return $this->queryState->registerPlaceholderValue(null);
+		}
+		
+		if (null !== ($qualifiedName = $this->fileManager->checkFile($file))) {
+			return $this->queryState->registerPlaceholderValue($qualifiedName);
+		}
+		
+		// @todo better exception
+		throw new CriteriaConflictException('Passed file is not registered in file manager.');
 	}
 	
+	public function buildCounterpartPlaceholder($operator, $value) {
+	
+	}
 }

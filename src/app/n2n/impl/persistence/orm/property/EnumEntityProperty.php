@@ -93,7 +93,7 @@ class EnumEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 		return $value;
 	}
 
-	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $valueHash = null) {
+	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
 	}
 
 	public function parseValue($raw, Pdo $pdo) {

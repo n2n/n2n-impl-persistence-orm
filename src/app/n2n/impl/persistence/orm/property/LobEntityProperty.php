@@ -25,7 +25,7 @@ use n2n\reflection\property\AccessProxy;
 use n2n\util\type\TypeConstraint;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\QueryState;
-use n2n\persistence\orm\query\select\FileSelection;
+use n2n\impl\persistence\orm\property\select\FileSelection;
 use n2n\persistence\orm\store\operation\MergeOperation;
 use n2n\util\ex\NotYetImplementedException;
 use n2n\persistence\orm\store\action\PersistAction;
@@ -49,7 +49,8 @@ class LobEntityProperty extends EntityPropertyAdapter {
 	 * @see \n2n\persistence\orm\property\EntityProperty::createSelection()
 	 */
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
-		return new FileSelection($this->createQueryColumn($metaTreePoint->getMeta()));
+		throw new NotYetImplementedException();
+//		return new FileSelection($this->createQueryColumn($metaTreePoint->getMeta()));
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::mergeValue()
@@ -57,22 +58,20 @@ class LobEntityProperty extends EntityPropertyAdapter {
 	public function mergeValue($value, $sameEntity, MergeOperation $mergeOperation) {
 		throw new NotYetImplementedException();
 	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
-	 */
-	public function supplyPersistAction(PersistAction $persistingJob, $value, ?ValueHash $oldValueHash) {
+
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
 		
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyRemoveAction()
 	 */
-	public function supplyRemoveAction($value, $valueHash, RemoveAction $removeAction) {
+	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
 		
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
 	 */
-	public function createValueHash($value, EntityManager $em) {
-		
+	public function createValueHash($value, EntityManager $em): ValueHash {
+		throw new NotYetImplementedException();
 	}	
 }
