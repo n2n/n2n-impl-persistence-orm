@@ -41,6 +41,8 @@ use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\persistence\orm\store\EntityInfo;
 use n2n\util\type\ArgUtils;
 use n2n\impl\persistence\orm\property\relation\util\ToOneValueHash;
+use n2n\persistence\orm\criteria\compare\ColumnComparable;
+use n2n\persistence\orm\query\select\Selection;
 
 class PropertyMappedOneToOneRelation extends MappedRelation implements ToOneRelation  {
 	private $toOneUtils;
@@ -59,7 +61,7 @@ class PropertyMappedOneToOneRelation extends MappedRelation implements ToOneRela
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\ToOneRelation::createColumnComparable()
 	 */
-	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): ColumnComparable {
 		$comparisonStrategy = $metaTreePoint->requestPropertyComparisonStrategy($this->createTargetIdTreePath());
 
 		IllegalStateException::assertTrue($comparisonStrategy->getType() == ComparisonStrategy::TYPE_COLUMN);
@@ -69,7 +71,7 @@ class PropertyMappedOneToOneRelation extends MappedRelation implements ToOneRela
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createSelection()
 	 */
-	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
 		$targetTreePath = $this->createTargetIdTreePath();
 
 		$idSelection = $metaTreePoint->requestCustomPropertyJoinTreePoint($this->entityProperty, false)
@@ -92,12 +94,12 @@ class PropertyMappedOneToOneRelation extends MappedRelation implements ToOneRela
 	 * @param ValueHash $oldValueHash
 	 * @param SupplyJob $supplyJob
 	 */
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash) {
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash): void {
 		$this->toOneUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
 	}
 
 	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash,
-			?ValueHash $oldValueHash) {
+			?ValueHash $oldValueHash): void {
 		if ($value === null) {
 			return;
 		}

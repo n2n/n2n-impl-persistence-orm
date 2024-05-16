@@ -33,6 +33,7 @@ use n2n\persistence\orm\store\operation\CascadeOperation;
 use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\util\type\TypeConstraints;
 use n2n\impl\persistence\orm\property\relation\LazyRelation;
+use n2n\persistence\orm\criteria\compare\ColumnComparable;
 
 class ToOneEntityProperty extends RelationEntityPropertyAdapter implements ColumnComparableEntityProperty, 
 		QueryItemRepresentableEntityProperty {
@@ -50,7 +51,7 @@ class ToOneEntityProperty extends RelationEntityPropertyAdapter implements Colum
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\ColumnComparableEntityProperty::createColumnComparable()
 	*/
-	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): ColumnComparable {
 		return $this->getRelation()->createColumnComparable($metaTreePoint, $queryState);
 	}
 	

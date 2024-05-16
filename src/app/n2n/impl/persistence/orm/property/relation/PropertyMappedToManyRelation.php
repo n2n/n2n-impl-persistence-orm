@@ -38,6 +38,8 @@ use n2n\persistence\orm\store\action\PersistAction;
 use n2n\impl\persistence\orm\property\relation\util\ToManyValueHash;
 use n2n\impl\persistence\orm\property\relation\util\ToManyAnalyzer;
 use n2n\util\type\ArgUtils;
+use n2n\persistence\orm\query\select\Selection;
+use n2n\persistence\orm\criteria\compare\CustomComparable;
 
 class PropertyMappedToManyRelation extends MappedRelation implements ToManyRelation {
 	private $toManyUtils;
@@ -57,7 +59,7 @@ class PropertyMappedToManyRelation extends MappedRelation implements ToManyRelat
 		$this->orderDirectives = $orderDirectives;
 	}
 	
-	public function createCustomComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createCustomComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): CustomComparable {
 		$toManyQueryItemFactory = $this->getMasterRelation()->createInverseJoinTableToManyQueryItemFactory(
 				$this->getTargetEntityModel());
 		
@@ -67,7 +69,7 @@ class PropertyMappedToManyRelation extends MappedRelation implements ToManyRelat
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createSelection()
 	 */
-	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
 		$idSelection = $metaTreePoint->requestPropertySelection(new TreePath(
 				array($this->entityModel->getIdDef()->getPropertyName())));
 		$toManyLoader = $this->getMasterRelation()->createInverseToManyLoader($this->targetEntityModel, $queryState);
@@ -84,7 +86,7 @@ class PropertyMappedToManyRelation extends MappedRelation implements ToManyRelat
 				->createValueHash($value);
 	}
 
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash) {
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash): void {
 		$this->toManyUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
 // 		if (!$this->orphanRemoval || $supplyJob->isInsert()) return;
 	
@@ -112,7 +114,7 @@ class PropertyMappedToManyRelation extends MappedRelation implements ToManyRelat
 // 		$orphanRemover->removeByIdReps(ToManyValueHasher::extractIdReps($oldValueHash));
 	}
 
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void {
 		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToManyValueHash);
 		if ($oldValueHash !== null && $oldValueHash->checkForUntouchedProxy($value)) {
 			return;

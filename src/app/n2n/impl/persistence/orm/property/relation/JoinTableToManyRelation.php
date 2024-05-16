@@ -40,6 +40,8 @@ use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\util\type\ArgUtils;
 use n2n\impl\persistence\orm\property\relation\util\ToManyValueHash;
+use n2n\persistence\orm\query\select\Selection;
+use n2n\persistence\orm\criteria\compare\CustomComparable;
 
 class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelation {
 	private $toManyUtils;
@@ -58,7 +60,7 @@ class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelatio
 		$this->orderDirectives = $orderDirectives;
 	}
 
-	public function createCustomComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createCustomComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): CustomComparable {
 		$toManyQueryItemFactory = new JoinTableToManyQueryItemFactory($this->joinTableName,
 				$this->joinColumnName, $this->inverseJoinColumnName);
 		
@@ -69,7 +71,7 @@ class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelatio
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createSelection()
 	 */
-	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
 		$idSelection = $metaTreePoint->requestCustomPropertySelection($this->entityModel->getIdDef()->getEntityProperty());
 		
 		$toManyLoader = new JoinTableToManyLoader(
@@ -86,14 +88,14 @@ class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelatio
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::prepareSupplyJob()
 	 */
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash) {
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash): void {
 		$this->toManyUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyPersistAction()
 	 */
 	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, 
-			?ValueHash $oldValueHash) {
+			?ValueHash $oldValueHash): void {
 		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToManyValueHash);
 		if ($oldValueHash !== null && $oldValueHash->checkForUntouchedProxy($value)) return;
 		

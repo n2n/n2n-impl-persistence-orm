@@ -35,6 +35,7 @@ use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\property\CustomComparableEntityProperty;
 use n2n\util\type\TypeConstraints;
 use n2n\impl\persistence\orm\property\relation\LazyRelation;
+use n2n\persistence\orm\criteria\compare\CustomComparable;
 
 class ToManyEntityProperty extends RelationEntityPropertyAdapter implements CustomComparableEntityProperty {
 	public function setLazyRelation(LazyRelation $lazyRelation) {
@@ -75,7 +76,7 @@ class ToManyEntityProperty extends RelationEntityPropertyAdapter implements Cust
 		return $mergedEntities;
 	}
 
-	public function createCustomComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createCustomComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): CustomComparable {
 		return $this->getRelation()->createCustomComparable($metaTreePoint, $queryState);
 	}
 	

@@ -40,6 +40,8 @@ use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\store\CommonValueHash;
 use n2n\util\type\TypeConstraints;
+use n2n\persistence\orm\query\select\Selection;
+use n2n\persistence\orm\criteria\compare\ColumnComparable;
 
 class N2nLocaleEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	public function __construct(AccessProxy $accessProxy, $columnName) {
@@ -48,7 +50,7 @@ class N2nLocaleEntityProperty extends ColumnPropertyAdapter implements BasicEnti
 				$columnName);
 	}
 	
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void {
 		$rawValue = null;
 
 		if ($value instanceof N2nLocale) {
@@ -70,7 +72,7 @@ class N2nLocaleEntityProperty extends ColumnPropertyAdapter implements BasicEnti
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::valueToRep()
 	 */
-	public function valueToRep($value): string {
+	public function valueToRep(mixed $value): string {
 		ArgUtils::assertTrue($value !== null);
 		
 		ArgUtils::assertTrue($value instanceof N2nLocale);
@@ -79,7 +81,7 @@ class N2nLocaleEntityProperty extends ColumnPropertyAdapter implements BasicEnti
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::repToValue()
 	 */
-	public function repToValue(string $rep) {
+	public function repToValue(string $rep): mixed {
 		try {
 			return N2nLocale::create($rep);
 		} catch (IllegalN2nLocaleFormatException $e) {
@@ -90,7 +92,7 @@ class N2nLocaleEntityProperty extends ColumnPropertyAdapter implements BasicEnti
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::parseValue()
 	 */
-	public function parseValue($raw, Pdo $pdo) {
+	public function parseValue(mixed $raw, Pdo $pdo): mixed {
 		return $this->repToValue($raw);
 	}
 	/* (non-PHPdoc)
@@ -102,25 +104,25 @@ class N2nLocaleEntityProperty extends ColumnPropertyAdapter implements BasicEnti
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::createSelectionFromQueryItem()
 	 */
-	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
+	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState): Selection {
 		return new N2nLocaleSelection($queryItem);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::createColumnComparableFromQueryItem()
 	 */
-	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
+	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState): ColumnComparable {
 		return new N2nLocaleColumnComparable($queryItem, $queryState);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\ColumnComparableEntityProperty::createColumnComparable()
 	 */
-	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): ColumnComparable {
 		return new N2nLocaleColumnComparable($this->createQueryColumn($metaTreePoint->getMeta()), $queryState);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::createSelection()
 	 */
-	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
 		return new N2nLocaleSelection($this->createQueryColumn($metaTreePoint->getMeta()));
 	}
 	/* (non-PHPdoc)

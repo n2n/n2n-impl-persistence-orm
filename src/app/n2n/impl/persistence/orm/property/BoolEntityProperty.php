@@ -38,6 +38,8 @@ use n2n\persistence\orm\store\CommonValueHash;
 use n2n\persistence\orm\criteria\compare\ScalarColumnComparable;
 use n2n\persistence\orm\query\select\SimpleSelection;
 use n2n\util\type\TypeConstraints;
+use n2n\persistence\orm\criteria\compare\ColumnComparable;
+use n2n\persistence\orm\query\select\Selection;
 
 class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	/**
@@ -55,7 +57,7 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\ColumnComparableEntityProperty::createColumnComparable()
 	 */
-	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): ColumnComparable {
 		return new ScalarColumnComparable($this->createQueryColumn($metaTreePoint->getMeta()), $queryState, 'bool');
 	}
 
@@ -63,7 +65,7 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::createColumnComparableFromQueryItem()
 	 */
-	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
+	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState): ColumnComparable {
 		return new ScalarColumnComparable($queryItem, $queryState, 'bool');
 	}
 
@@ -71,7 +73,7 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::createSelection()
 	 */
-	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
 		return new SimpleSelection($this->createQueryColumn($metaTreePoint->getMeta()), 'bool');
 	}
 
@@ -79,7 +81,7 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::valueToRep()
 	 */
-	public function valueToRep($value): string {
+	public function valueToRep(mixed $value): string {
 		ArgUtils::assertTrue(is_bool($value));
 
 		return (string) (int) $value;
@@ -89,7 +91,7 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::repToValue()
 	 */
-	public function repToValue(string $rep) {
+	public function repToValue(string $rep): mixed {
 		ArgUtils::assertTrue(is_numeric($rep));
 		return (bool) $rep;
 	}
@@ -98,7 +100,7 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
 	 */
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void {
 		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $value, \PDO::PARAM_BOOL);
 	}
 
@@ -130,7 +132,7 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::parseValue()
 	 */
-	public function parseValue($raw, Pdo $pdo) {
+	public function parseValue(mixed $raw, Pdo $pdo): mixed {
 		if ($raw === null) return null;
 
 		return (bool) $raw;
@@ -141,7 +143,7 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 		return $value;
 	}
 
-	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
+	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState): Selection {
 		return new SimpleSelection($queryItem, 'bool');
 	}
 }

@@ -38,6 +38,8 @@ use n2n\persistence\orm\store\ValueHash;
 use n2n\util\type\ArgUtils;
 use n2n\impl\persistence\orm\property\relation\util\ToOneValueHash;
 use n2n\persistence\orm\EntityManager;
+use n2n\persistence\orm\criteria\compare\ColumnComparable;
+use n2n\persistence\orm\query\select\Selection;
 
 class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation {
 	private $toOneUtils;
@@ -54,7 +56,7 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 		return $metaTreePoint->requestPropertyRepresentableQueryItem($this->createTargetIdTreePath());
 	}
 
-	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): ColumnComparable {
 		$comparisonStargegy = $metaTreePoint->requestPropertyComparisonStrategy($this->createTargetIdTreePath())
 				->getColumnComparable();
 		
@@ -67,7 +69,7 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createSelection()
 	 */
-	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
 		$idSelection = $metaTreePoint->requestPropertySelection($this->createTargetIdTreePath());
 	
 		$toOneRelationSelection = new ToOneRelationSelection($this->entityModel, $idSelection, $queryState);
@@ -75,11 +77,11 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 		return $toOneRelationSelection;
 	}
 	
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash) {
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash): void {
 		$this->toOneUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
 	}
 	
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void {
 		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToOneValueHash);
 		
 		if ($value === null) {

@@ -37,6 +37,8 @@ use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\store\CommonValueHash;
 use n2n\util\type\TypeConstraints;
+use n2n\persistence\orm\criteria\compare\ColumnComparable;
+use n2n\persistence\orm\query\select\Selection;
 
 class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	public function __construct(AccessProxy $accessProxy, $columnName) {
@@ -45,27 +47,27 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 				$columnName);
 	}
 
-	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): ColumnComparable {
 		return new DateTimeColumnComparable($this->createQueryColumn($metaTreePoint->getMeta()), $queryState);
 	}
 
-	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
+	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState): ColumnComparable {
 		return new DateTimeColumnComparable($queryItem, $queryState);
 	}
 	
-	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
 		return new DateTimeSelection($this->createQueryColumn($metaTreePoint->getMeta()),
 				$queryState->getEntityManager()->getPdo()->getMetaData()
 						->getDialect()->getOrmDialectConfig());
 	}
 
-	public function valueToRep($value): string {
+	public function valueToRep(mixed $value): string {
 		ArgUtils::assertTrue($value instanceof \DateTime);
 		
 		return $value->getTimestamp();
 	}
 
-	public function repToValue(string $rep) {		
+	public function repToValue(string $rep): mixed {		
 		ArgUtils::assertTrue(is_numeric($rep));
 		$value = new \DateTime();
 		$value->setTimestamp($rep);
@@ -95,7 +97,7 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
 	}
 
-	public function parseValue($raw, Pdo $pdo) {
+	public function parseValue(mixed $raw, Pdo $pdo): mixed {
 		return $pdo->getMetaData()->getDialect()->getOrmDialectConfig()->parseDateTime($raw);
 	}
 
@@ -103,7 +105,7 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 		return $pdo->getMetaData()->getDialect()->getOrmDialectConfig()->buildDateTimeRawValue($value);
 	}
 
-	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
+	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState): Selection {
 		return new DateTimeSelection($queryItem, $queryState->getEntityManager()->getPdo()->getMetaData()
 				->getDialect()->getOrmDialectConfig());
 	}

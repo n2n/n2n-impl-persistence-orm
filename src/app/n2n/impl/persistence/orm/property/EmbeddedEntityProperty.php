@@ -51,6 +51,7 @@ use n2n\persistence\orm\CascadeType;
 use n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy;
 use n2n\util\col\ArrayUtils;
 use n2n\persistence\orm\store\ValueHashCol;
+use n2n\persistence\orm\criteria\compare\CustomComparable;
 
 class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComparableEntityProperty,
 		EntityPropertyCollection, JoinableEntityProperty {
@@ -113,14 +114,14 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\CustomComparableEntityProperty::createCustomComparable()
 	 */
-	public function createCustomComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createCustomComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): CustomComparable {
 		return new EmbeddedCustomComparable($metaTreePoint->requestPropertyJoinedTreePoint($this->getName(), false), $this);
 	}
 
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::createSelection()
 	 */
-	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
 		return new EmbeddedSelection($this, $metaTreePoint->requestPropertyJoinedTreePoint($this->getName(), false));
 	}
 
@@ -148,7 +149,7 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
 	 */
-	public function supplyPersistAction(PersistAction $persistAction, $object, ValueHash $valueHash, ?ValueHash $oldValueHash) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void {
 		assert($valueHash instanceof ValueHashCol);
 
 		$propertyValueHashes = $valueHash->getValueHashes();
@@ -159,8 +160,8 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 
 		foreach ($this->properties as $propertyName => $property)  {
 			$propertyValue = null;
-			if ($object !== null) {
-				$propertyValue = $property->readValue($object);
+			if ($value !== null) {
+				$propertyValue = $property->readValue($value);
 			}
 
 			ArgUtils::assertTrue(array_key_exists($propertyName, $propertyValueHashes));

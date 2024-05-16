@@ -39,6 +39,7 @@ use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\criteria\JoinType;
 use n2n\impl\persistence\orm\property\relation\LazyRelation;
+use n2n\persistence\orm\query\select\Selection;
 
 abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter implements RelationEntityProperty, 
 		CascadableEntityProperty {
@@ -103,7 +104,7 @@ abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter imple
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::createSelection()
 	 */
-	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
 		return $this->getRelation()->createSelection($metaTreePoint, $queryState);
 	}
 	/* (non-PHPdoc)
@@ -117,7 +118,7 @@ abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter imple
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\CascadableEntityProperty::prepareSupplyJob()
 	 */
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash) {
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash): void {
 		$this->getRelation()->prepareSupplyJob($supplyJob, $value, $oldValueHash);
 	}
 
@@ -125,7 +126,7 @@ abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter imple
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
 	 */
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void {
 		$this->getRelation()->supplyPersistAction($persistAction, $value, $valueHash, $oldValueHash);
 	}
 	

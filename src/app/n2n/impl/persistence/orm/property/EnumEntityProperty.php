@@ -38,6 +38,7 @@ use n2n\util\type\TypeConstraints;
 use n2n\util\EnumUtils;
 use n2n\impl\persistence\orm\property\compare\EnumColumnComparable;
 use n2n\impl\persistence\orm\property\select\EnumSelection;
+use n2n\persistence\orm\query\select\Selection;
 
 class EnumEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 
@@ -59,13 +60,13 @@ class EnumEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 		return new EnumSelection($this->createQueryColumn($metaTreePoint->getMeta()), $this->enum);
 	}
 
-	public function valueToRep($value): string {
+	public function valueToRep(mixed $value): string {
 		ArgUtils::valType($value, $this->enum);
 
 		return $value->name;
 	}
 
-	public function repToValue(string $rep) {
+	public function repToValue(string $rep): mixed {
 		try {
 			return $this->enum->getCase($rep)->getValue();
 		} catch (\ReflectionException $e) {
@@ -73,7 +74,7 @@ class EnumEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 		}
 	}
 
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void {
 		$rawValue = $this->buildRaw($value, $persistAction->getActionQueue()->getEntityManager()->getPdo());
 
 		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $rawValue);
@@ -96,7 +97,7 @@ class EnumEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
 	}
 
-	public function parseValue($raw, Pdo $pdo) {
+	public function parseValue(mixed $raw, Pdo $pdo): mixed {
 		return EnumUtils::backedToUnit($raw, $this->enum);
 	}
 
@@ -104,7 +105,7 @@ class EnumEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 		return EnumUtils::unitToBacked($value);
 	}
 
-	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
+	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState): Selection {
 		return new EnumSelection($queryItem, $this->enum);
 	}
 }

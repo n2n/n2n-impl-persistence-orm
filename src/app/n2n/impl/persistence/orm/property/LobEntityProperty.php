@@ -32,6 +32,7 @@ use n2n\persistence\orm\store\action\PersistAction;
 use n2n\persistence\orm\store\action\RemoveAction;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\store\ValueHash;
+use n2n\persistence\orm\query\select\Selection;
 
 class LobEntityProperty extends EntityPropertyAdapter {
 	private $columnName;
@@ -48,7 +49,7 @@ class LobEntityProperty extends EntityPropertyAdapter {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::createSelection()
 	 */
-	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
 		throw new NotYetImplementedException();
 //		return new FileSelection($this->createQueryColumn($metaTreePoint->getMeta()));
 	}
@@ -59,7 +60,7 @@ class LobEntityProperty extends EntityPropertyAdapter {
 		throw new NotYetImplementedException();
 	}
 
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void {
 		
 	}
 	/* (non-PHPdoc)

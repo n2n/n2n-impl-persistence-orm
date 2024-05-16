@@ -34,7 +34,7 @@ class ToOneValueHasher {
 		$this->idEntityProperty = $idEntityProperty;
 	}
 	
-	public function createValueHash($value) {
+	public function createValueHash($value): ToOneValueHash {
 		if ($value === null) return new ToOneValueHash(false, null);
 		ArgUtils::assertTrue(is_object($value));
 		
@@ -44,7 +44,7 @@ class ToOneValueHasher {
 		return new ToOneValueHash(true, $this->idEntityProperty->valueToRep($id));
 	}
 	
-	public function reportId($id, ToOneValueHash $toOneValueHash) {
+	public function reportId($id, ToOneValueHash $toOneValueHash): void {
 		$toOneValueHash->reportIdRep($this->idEntityProperty->valueToRep($id));
 	}
 	
@@ -53,61 +53,3 @@ class ToOneValueHasher {
 	}
 }
 
-class ToOneValueHash implements ValueHash {
-	/**
-	 * @var bool
-	 */
-	private $objectExisting;
-	/**
-	 * @var string|null
-	 */
-	private $idRep;
-	
-	/**
-	 * @param string|null $idRep
-	 */
-	public function __construct(bool $objectExisting, ?string $idRep) {
-		$this->objectExisting = $objectExisting;
-		$this->idRep = $idRep;
-	}
-	
-	/**
-	 * @param string $idRep
-	 */
-	public function reportIdRep(string $idRep) {
-		IllegalStateException::assertTrue($this->objectExisting, 'Hash is for non-existing object.');
-		IllegalStateException::assertTrue($this->idRep === null, 'IdRep already known.');
-		$this->idRep = $idRep;
-	}
-	
-	/**
-	 * @return boolean
-	 */
-	public function isObjectExisting() {
-		return $this->objectExisting;
-	}
-	
-	/**
-	 * @return string|null
-	 */
-	public function getIdRep() {
-		return $this->idRep;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 * @see \n2n\persistence\orm\store\ValueHash::matches()
-	 */
-	public function matches(ValueHash $valueHash): bool {
-		ArgUtils::assertTrue($valueHash instanceof ToOneValueHash);
-		
-		return $this->objectExisting === $valueHash->isObjectExisting() 
-				&& $this->idRep === $valueHash->getIdRep();
-	}
-	
-// 	public function checkForUntouchedProxy($entityObj) {
-// 		if ($entityObj instanceof EntityProxy) {
-			
-// 		}
-// 	}
-}

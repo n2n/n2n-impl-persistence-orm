@@ -46,6 +46,8 @@ use n2n\persistence\orm\store\PersistenceOperationException;
 use n2n\persistence\orm\store\EntityInfo;
 use n2n\util\type\ArgUtils;
 use n2n\impl\persistence\orm\property\relation\util\ToOneValueHash;
+use n2n\persistence\orm\criteria\compare\ColumnComparable;
+use n2n\persistence\orm\query\select\Selection;
 
 class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, ActionDependency {
 	private $joinColumnName;
@@ -97,7 +99,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createColumnComparable()
 	 */
-	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): ColumnComparable {
 		$meta = $metaTreePoint->getMeta();
 		$targetIdProperty = $this->targetEntityModel->getIdDef()->getEntityProperty();
 		
@@ -115,7 +117,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createSelection()
 	 */
-	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
 		$targetIdProperty = $this->targetEntityModel->getIdDef()->getEntityProperty();
 		$idSelection = $targetIdProperty->createSelectionFromQueryItem($metaTreePoint->getMeta()
 				->registerColumn($this->entityModel, $this->joinColumnName), $queryState);
@@ -133,7 +135,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 				$this->targetEntityModel->getIdDef()->getEntityProperty(), $this->joinColumnName);
 	}
 	
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash) {
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash): void {
 		$this->toOneUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
 	}
 	/* (non-PHPdoc)
@@ -236,28 +238,28 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 //
 //	}
 	
-	private function markRemoveAction(RemoveAction $removeAction) {
+	private function markRemoveAction(RemoveAction $removeAction): void {
 		$removeAction->setAttribute(get_class($this), true);
 	}
 	
-	private function isRemoveActionMarked(RemoveAction $removeAction) {
+	private function isRemoveActionMarked(RemoveAction $removeAction): bool {
 		return (boolean) $removeAction->getAttribute(get_class($this));
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\model\ActionDependency::removeActionSupplied()
 	 */
-	public function removeActionSupplied(RemoveAction $targetRemoveAction) {
-		if ($this->actionMarker->isConstraintReleased($targetRemoveAction)) return;
+	public function removeActionSupplied(RemoveAction $removeAction): void {
+		if ($this->actionMarker->isConstraintReleased($removeAction)) return;
 		
-		$actionQueue = $targetRemoveAction->getActionQueue();
+		$actionQueue = $removeAction->getActionQueue();
 		$pdo = $actionQueue->getEntityManager()->getPdo();
-		$idRaw = $this->getTargetIdEntityProperty()->buildRaw($targetRemoveAction->getId(), $pdo);
+		$idRaw = $this->getTargetIdEntityProperty()->buildRaw($removeAction->getId(), $pdo);
 		
 		$resetAction = new JoinColumnResetAction($pdo, 
 				$this->entityModel->getTableName(), $this->joinColumnName);
 		$resetAction->setJoinIdRaw($idRaw);
 
-		$targetRemoveAction->executeAtEnd(function () use ($actionQueue, $resetAction) {
+		$removeAction->executeAtEnd(function () use ($actionQueue, $resetAction) {
 			$actionQueue->add($resetAction);
 		});
 	}

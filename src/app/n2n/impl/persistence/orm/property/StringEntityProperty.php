@@ -39,6 +39,8 @@ use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\store\CommonValueHash;
 use n2n\util\type\TypeName;
 use n2n\util\type\TypeConstraints;
+use n2n\persistence\orm\criteria\compare\ColumnComparable;
+use n2n\persistence\orm\query\select\Selection;
 
 class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	/**
@@ -54,17 +56,17 @@ class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\ColumnComparableEntityProperty::createComparisonStrategy()
 	 */
-	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): ColumnComparable {
 		return new ScalarColumnComparable($this->createQueryColumn($metaTreePoint->getMeta()), $queryState);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::createColumnComparableFromQueryItem()
 	 */
-	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
+	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState): ColumnComparable {
 		return new ScalarColumnComparable($queryItem, $queryState);
 	}
 
-	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
 		return new SimpleSelection($this->createQueryColumn($metaTreePoint->getMeta()), TypeName::STRING);
 	}
 
@@ -72,7 +74,7 @@ class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::valueToRep()
 	 */
-	public function valueToRep($value): string {
+	public function valueToRep(mixed $value): string {
 		ArgUtils::valScalar($value);
 		return (string) $value;
 	}
@@ -81,7 +83,7 @@ class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::repToValue()
 	 */
-	public function repToValue(string $rep) {
+	public function repToValue(string $rep): mixed {
 		return $rep;
 	}
 
@@ -89,7 +91,7 @@ class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
 	 */
-	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash) {
+	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void {
 // 		$pdoDataType = null;
 // 		if (is_bool($mappedValue)) {
 // 			$pdoDataType = PDO::PARAM_BOOL;
@@ -125,7 +127,7 @@ class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::parseValue()
 	 */
-	public function parseValue($raw, Pdo $pdo) {
+	public function parseValue(mixed $raw, Pdo $pdo): mixed {
 		ArgUtils::valScalar($raw);
 		if ($raw === null) {
 			return null;
@@ -142,7 +144,7 @@ class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::createSelectionFromQueryItem()
 	 */
-	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState) {
+	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState): Selection {
 		return new SimpleSelection($queryItem, TypeName::STRING);
 	}
 

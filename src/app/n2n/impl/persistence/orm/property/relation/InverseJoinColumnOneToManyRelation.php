@@ -43,6 +43,8 @@ use n2n\persistence\orm\store\ValueHash;
 use n2n\impl\persistence\orm\property\relation\util\ToManyValueHash;
 use n2n\impl\persistence\orm\property\relation\compare\ToManyCustomComparable;
 use n2n\impl\persistence\orm\property\relation\compare\InverseJoinColumnToManyQueryItemFactory;
+use n2n\persistence\orm\query\select\Selection;
+use n2n\persistence\orm\criteria\compare\CustomComparable;
 
 class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToManyRelation {
 	private $inverseJoinColumnName;
@@ -96,7 +98,7 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createColumnComparable()
 	 */
-	public function createCustomComparable(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createCustomComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): CustomComparable {
 		$toManyQueryItemFactory = new InverseJoinColumnToManyQueryItemFactory($this->targetEntityModel,
 				$this->inverseJoinColumnName);
 		
@@ -108,7 +110,7 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 		throw new UnsupportedOperationException();
 	}
 	
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash) {
+	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash): void {
 		if (!$this->orphanRemoval || $oldValueHash === null || $supplyJob->isInsert()) return;
 
 		ArgUtils::assertTrue($oldValueHash instanceof ToManyValueHash);
@@ -130,7 +132,7 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyPersistAction()
 	 */
 	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, 
-			?ValueHash $oldValueHash) {
+			?ValueHash $oldValueHash): void {
 
 		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToManyValueHash);
 		if ($oldValueHash !== null && $oldValueHash->checkForUntouchedProxy($value)) return;
@@ -205,7 +207,7 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createSelection()
 	 */
-	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState) {
+	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
 		$idSelection = $metaTreePoint->requestCustomPropertySelection($this->entityModel->getIdDef()->getEntityProperty());
 		$idProperty = $this->entityModel->getIdDef()->getEntityProperty();
 		
