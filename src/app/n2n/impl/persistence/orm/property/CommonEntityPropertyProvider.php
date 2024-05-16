@@ -49,14 +49,15 @@ use n2n\reflection\attribute\Attribute;
 use n2n\reflection\property\PropertyAccessProxy;
 use n2n\util\type\TypeConstraints;
 use n2n\persistence\orm\attribute\AttributeOverrides;
-use n2n\persistence\orm\attribute\AssociationOverrides;
+use n2n\util\type\TypeUtils;
+use n2n\spec\valobj\scalar\StringValueObject;
 
 class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	const PROP_FILE_NAME_SUFFIX = '.originalName';
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityPropertyProvider::setupPropertyIfSuitable()
 	 */
-	public function setupPropertyIfSuitable(AccessProxy $propertyAccessProxy, ClassSetup $classSetup) {
+	public function setupPropertyIfSuitable(AccessProxy $propertyAccessProxy, ClassSetup $classSetup): void {
 
 		$attributeSet = ReflectionContext::getAttributeSet($classSetup->getClass());
 		$propertyName = $propertyAccessProxy->getPropertyName();
@@ -156,6 +157,12 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 			if (enum_exists($typeName)) {
 				$classSetup->provideEntityProperty(new EnumEntityProperty($propertyAccessProxy,
 						$classSetup->requestColumn($propertyName), new \ReflectionEnum($typeName)));
+				return;
+			}
+
+			if (TypeUtils::isTypeA($typeName, StringValueObject::class)) {
+				$classSetup->provideEntityProperty(new StringValueObjectEntityProperty($propertyAccessProxy,
+						$classSetup->requestColumn($propertyName), new \ReflectionClass($typeName)));
 				return;
 			}
 		}

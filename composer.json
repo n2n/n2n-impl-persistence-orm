@@ -30,7 +30,8 @@
 		"n2n/n2n-io" : "~7.4",
 		"n2n/n2n-l10n": "~7.4",
 		"n2n/n2n-reflection" : "~7.4",
-		"n2n/n2n-util" : "~7.4"
+		"n2n/n2n-util" : "~7.4",
+        "n2n/n2n-spec-valobj": "~1.0"
 	},
 	"autoload" : {
 		"psr-4" : {
