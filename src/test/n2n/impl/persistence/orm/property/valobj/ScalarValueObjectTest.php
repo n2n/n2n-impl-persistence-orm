@@ -5,19 +5,15 @@ namespace n2n\impl\persistence\orm\property\valobj;
 use PHPUnit\Framework\TestCase;
 use n2n\persistence\orm\model\EntityModelManager;
 use n2n\persistence\orm\model\EntityModelFactory;
-use n2n\spec\valobj\scalar\ScalarValueObject;
 use n2n\impl\persistence\orm\property\CommonEntityPropertyProvider;
 use n2n\impl\persistence\orm\property\valobj\mock\ScalarValueObjectEntityMock;
 use n2n\impl\persistence\orm\property\ScalarValueObjectEntityProperty;
 use n2n\impl\persistence\orm\test\GeneralTestEnv;
-use n2n\impl\persistence\orm\live\mock\LazyContainerMock;
-use n2n\impl\persistence\orm\live\mock\SimpleTargetMock;
 use n2n\test\DbTestPdoUtil;
 use n2n\persistence\ext\EmPool;
 use n2n\persistence\ext\PdoPool;
 use n2n\persistence\orm\CorruptedDataException;
 use n2n\impl\persistence\orm\property\valobj\mock\PositiveInt;
-use n2n\util\ex\ExUtils;
 use n2n\spec\valobj\err\IllegalValueException;
 
 class ScalarValueObjectTest extends TestCase {
