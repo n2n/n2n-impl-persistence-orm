@@ -24,7 +24,7 @@ namespace n2n\impl\persistence\orm\property\select;
 use n2n\spec\dbo\meta\data\QueryItem;
 use n2n\persistence\PdoStatement;
 use n2n\l10n\N2nLocale;
-use n2n\persistence\orm\query\CorruptedDataException;
+use n2n\persistence\orm\CorruptedDataException;
 use n2n\l10n\IllegalN2nLocaleFormatException;
 use n2n\persistence\orm\query\select\ValueBuilder;
 use n2n\persistence\orm\query\select\Selection;
