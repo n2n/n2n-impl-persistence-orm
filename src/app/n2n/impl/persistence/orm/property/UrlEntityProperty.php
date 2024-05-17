@@ -38,14 +38,15 @@ use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\store\CommonValueHash;
 use n2n\util\uri\Url;
+use n2n\util\type\TypeConstraints;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
 
 class UrlEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	public function __construct(AccessProxy $accessProxy, $columnName) {
-		$accessProxy->setConstraint(TypeConstraint::createSimple(Url::class, true));
-
-		parent::__construct($accessProxy, $columnName);
+		parent::__construct(
+				$accessProxy->createRestricted(TypeConstraints::namedType(Url::class, true)),
+				$columnName);
 	}
 
 	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void {
