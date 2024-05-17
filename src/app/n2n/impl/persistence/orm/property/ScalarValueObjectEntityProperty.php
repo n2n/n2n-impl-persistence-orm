@@ -27,6 +27,10 @@ use n2n\persistence\orm\store\CommonValueHash;
 use n2n\util\ex\ExUtils;
 use n2n\util\type\TypeConstraint;
 use n2n\spec\valobj\scalar\ScalarValueObject;
+use n2n\spec\valobj\err\IllegalValueException;
+use n2n\persistence\orm\CorruptedDataException;
+use n2n\util\type\ValueIncompatibleWithConstraintsException;
+use n2n\util\type\UnionTypeConstraint;
 
 class ScalarValueObjectEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 
@@ -38,20 +42,28 @@ class ScalarValueObjectEntityProperty extends ColumnPropertyAdapter implements B
 				$columnName);
 	}
 
+	function getScalarTypeConstraint(): TypeConstraint {
+		return $this->scalarTypeConstraint;
+	}
+
+	function getClass(): \ReflectionClass {
+		return $this->class;
+	}
+
 	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState): ColumnComparable {
 		$callback = new class() implements PlaceholderValueMapper {
 			function __invoke(mixed $value): float|int|string|bool|null {
-				if ($value === null) {
-					return null;
+				if ($value === null || is_scalar($value)) {
+					return $value;
 				}
 
-				assert($value instanceof ScalarValueObject);
+				ArgUtils::assertTrue(assert($value instanceof ScalarValueObject));
 				return $value->toScalar();
 			}
 		};
 
 		return new CallbackColumnComparable($queryItem, $queryState,
-				TypeConstraints::string(true, true), $callback);
+				TypeConstraints::type([/*$this->scalarTypeConstraint*/ 'scalar', $this->class->getName()]), $callback);
 	}
 
 	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): ColumnComparable {
@@ -63,16 +75,20 @@ class ScalarValueObjectEntityProperty extends ColumnPropertyAdapter implements B
 	}
 
 	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState): Selection {
-		$mapper = new class($this->class) implements EagerValueMapper {
-			function __construct(private \ReflectionClass $class) {
+		$mapper = new class($this->class, $this->scalarTypeConstraint) implements EagerValueMapper {
+			function __construct(private \ReflectionClass $class, private TypeConstraint $scalarTypeConstraint) {
 			}
 
 			function __invoke(mixed $value): mixed {
 				if ($value === null) {
 					return null;
 				}
-				ArgUtils::assertTrue(is_string($value));
-				return $this->class->newInstance($value);
+
+				try {
+					return $this->class->newInstance($this->scalarTypeConstraint->validate($value));
+				} catch (IllegalValueException|ValueIncompatibleWithConstraintsException $e) {
+					throw new CorruptedDataException(previous: $e);
+				}
 			}
 		};
 
@@ -92,8 +108,8 @@ class ScalarValueObjectEntityProperty extends ColumnPropertyAdapter implements B
 	}
 
 	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
-		ArgUtils::assertTrue($value === null || $value instanceof StringValueObject);
-		return new CommonValueHash($value?->toValue());
+		assert($value === null || $value instanceof ScalarValueObject);
+		return new CommonValueHash($value?->toScalar());
 	}
 
 	public function valueToRep(mixed $value): string {
