@@ -5,7 +5,6 @@ namespace n2n\impl\persistence\orm\property\valobj;
 use PHPUnit\Framework\TestCase;
 use n2n\persistence\orm\model\EntityModelManager;
 use n2n\persistence\orm\model\EntityModelFactory;
-use n2n\impl\persistence\orm\property\IntEntityProperty;
 use n2n\spec\valobj\scalar\ScalarValueObject;
 
 class ScalarValueObjectTest extends TestCase {
