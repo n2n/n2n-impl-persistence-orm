@@ -132,13 +132,13 @@
 //		return isset($constraints) && !is_null($constraints->getParamClass())
 //				&& $constraints->getParamClass()->getName() == 'n2n\io\managed\File' && !$constraints->isArray();
 //	}
-//	public function createValueHash($value, EntityManager $em): ValueHash {
+//	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
 //	}
 //
 //	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
 //	}
 //
-//	public function mergeValue($value, $sameEntity, MergeOperation $mergeOperation) {
+//	public function mergeValue(mixed $value, bool $sameEntity, MergeOperation $mergeOperation): mixed {
 //	}
 //
 //}

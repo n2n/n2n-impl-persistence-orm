@@ -80,12 +80,12 @@ class EnumEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $rawValue);
 	}
 
-	public function createValueHash($value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
 		if ($value === null) return new CommonValueHash(null);
 		return new CommonValueHash($this->valueToRep($value));
 	}
 
-	public function mergeValue($value, $sameEntity, MergeOperation $mergeOperation) {
+	public function mergeValue(mixed $value, bool $sameEntity, MergeOperation $mergeOperation): mixed {
 		if ($sameEntity || $value === null) {
 			return $value;
 		}
@@ -101,7 +101,7 @@ class EnumEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 		return EnumUtils::backedToUnit($raw, $this->enum);
 	}
 
-	public function buildRaw($value, Pdo $pdo) {
+	public function buildRaw(mixed $value, Pdo $pdo): mixed {
 		return EnumUtils::unitToBacked($value);
 	}
 

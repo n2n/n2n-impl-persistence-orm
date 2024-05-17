@@ -51,13 +51,17 @@ use n2n\util\type\TypeConstraints;
 use n2n\persistence\orm\attribute\AttributeOverrides;
 use n2n\util\type\TypeUtils;
 use n2n\spec\valobj\scalar\StringValueObject;
+use n2n\spec\valobj\scalar\IntValueObject;
+use n2n\spec\valobj\scalar\FloatValueObject;
+use n2n\spec\valobj\scalar\BoolValueObject;
+use n2n\util\ex\ExUtils;
 
 class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	const PROP_FILE_NAME_SUFFIX = '.originalName';
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityPropertyProvider::setupPropertyIfSuitable()
 	 */
-	public function setupPropertyIfSuitable(AccessProxy $propertyAccessProxy, ClassSetup $classSetup): void {
+	public function setupPropertyIfSuitable(PropertyAccessProxy $propertyAccessProxy, ClassSetup $classSetup): void {
 
 		$attributeSet = ReflectionContext::getAttributeSet($classSetup->getClass());
 		$propertyName = $propertyAccessProxy->getPropertyName();
@@ -161,15 +165,37 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 			}
 
 			if (TypeUtils::isTypeA($typeName, StringValueObject::class)) {
-				$classSetup->provideEntityProperty(new StringValueObjectEntityProperty($propertyAccessProxy,
-						$classSetup->requestColumn($propertyName), new \ReflectionClass($typeName)));
+				$classSetup->provideEntityProperty(new ScalarValueObjectEntityProperty($propertyAccessProxy,
+						$classSetup->requestColumn($propertyName), TypeConstraints::string(true, true),
+						ExUtils::try(fn () => new \ReflectionClass($typeName))));
+				return;
+			}
+
+			if (TypeUtils::isTypeA($typeName, BoolValueObject::class)) {
+				$classSetup->provideEntityProperty(new ScalarValueObjectEntityProperty($propertyAccessProxy,
+						$classSetup->requestColumn($propertyName), TypeConstraints::bool(true, true),
+						ExUtils::try(fn () => new \ReflectionClass($typeName))));
+				return;
+			}
+
+			if (TypeUtils::isTypeA($typeName, IntValueObject::class)) {
+				$classSetup->provideEntityProperty(new ScalarValueObjectEntityProperty($propertyAccessProxy,
+						$classSetup->requestColumn($propertyName), TypeConstraints::int(true, true),
+						ExUtils::try(fn () => new \ReflectionClass($typeName))));
+				return;
+			}
+
+			if (TypeUtils::isTypeA($typeName, FloatValueObject::class)) {
+				$classSetup->provideEntityProperty(new ScalarValueObjectEntityProperty($propertyAccessProxy,
+						$classSetup->requestColumn($propertyName), TypeConstraints::float(true, true),
+						ExUtils::try(fn () => new \ReflectionClass($typeName))));
 				return;
 			}
 		}
 	}
 	
-	private function checkForEmbedded(PropertyAccessProxy $propertyAccessProxy,
-			ClassSetup $classSetup) {
+	private function checkForEmbedded(AccessProxy $propertyAccessProxy,
+			ClassSetup $classSetup): bool {
 		$propertyName = $propertyAccessProxy->getPropertyName();
 		$attributeSet = $classSetup->getAttributeSet();
 		$attrEmbedded = $attributeSet->getPropertyAttribute($propertyName, Embedded::class);
@@ -268,7 +294,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	}
 	
 	private function provideManyToOne(AccessProxy $propertyAccessProxy, 
-			Attribute $manyToOneAttribute, ClassSetup $classSetup) {
+			PropertyAttribute $manyToOneAttribute, ClassSetup $classSetup) {
 		$toOneProperty = new ToOneEntityProperty($propertyAccessProxy, true, 
 				RelationEntityProperty::TYPE_MANY_TO_ONE);
 		$classSetup->provideEntityProperty($toOneProperty);

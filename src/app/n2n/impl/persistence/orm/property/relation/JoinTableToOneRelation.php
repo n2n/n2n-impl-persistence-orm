@@ -113,7 +113,7 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 		});
 	}
 	
-	public function createValueHash($value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
 		return ToOneValueHasher::createFromEntityModel($this->targetEntityModel)
 				->createValueHash($value);
 	}

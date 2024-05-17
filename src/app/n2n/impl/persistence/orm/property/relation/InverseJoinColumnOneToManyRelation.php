@@ -198,7 +198,7 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 // 	public function supplyInverseToOneRemoveAction($targetValue, $targetValueHash, RemoveAction $targetRemoveAction) {
 // 	}
 	
-	public function createValueHash($value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
 		$analyzer = new ToManyValueHasher($this->targetEntityModel->getIdDef()
 				->getEntityProperty());
 		return $analyzer->createValueHash($value);

@@ -65,7 +65,7 @@ class ToOneEntityProperty extends RelationEntityPropertyAdapter implements Colum
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::mergeValue()
 	*/
-	public function mergeValue($value, $sameEntity, MergeOperation $mergeOperation) {
+	public function mergeValue(mixed $value, bool $sameEntity, MergeOperation $mergeOperation): mixed {
 		if ($value === null) return null;
 				
 		if ($this->getRelation()->getCascadeType() & CascadeType::MERGE) {

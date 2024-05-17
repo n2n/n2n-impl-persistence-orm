@@ -94,5 +94,5 @@ interface Relation {
 	 */
 	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash);
 	
-	public function createValueHash($value, EntityManager $em): ValueHash;
+	public function createValueHash(mixed $value, EntityManager $em): ValueHash;
 }

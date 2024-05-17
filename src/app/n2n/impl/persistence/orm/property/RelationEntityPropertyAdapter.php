@@ -142,7 +142,7 @@ abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter imple
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
 	 */
-	public function createValueHash($value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
 		return $this->getRelation()->createValueHash($value, $em);
 	}
 	

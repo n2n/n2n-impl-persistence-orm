@@ -62,7 +62,7 @@ class ToManyEntityProperty extends RelationEntityPropertyAdapter implements Cust
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::mergeValue()
 	 */
-	public function mergeValue($value, $sameEntity, MergeOperation $mergeOperation) {
+	public function mergeValue(mixed $value, bool $sameEntity, MergeOperation $mergeOperation): mixed {
 		if ($value === null) return null;
 	
 		if ($value instanceof ArrayObjectProxy && !$value->isInitialized()) return $value;

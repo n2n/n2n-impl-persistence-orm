@@ -128,18 +128,18 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::mergeValue()
 	 */
-	public function mergeValue($object, $sameEntity, MergeOperation $mergeOperation) {
-		if ($object === null) return null;
+	public function mergeValue(mixed $value, $sameEntity, MergeOperation $mergeOperation): mixed {
+		if ($value === null) return null;
 
 		$mergedObject = null;
 		if ($sameEntity) {
-			$mergedObject = $object;
+			$mergedObject = $value;
 		} else {
 			$mergedObject = ReflectionUtils::createObject($this->targetClass);
 		}
 
 		foreach ($this->properties as $property) {
-			$mergedPropertyValue = $property->mergeValue($property->readValue($object), $sameEntity, $mergeOperation);
+			$mergedPropertyValue = $property->mergeValue($property->readValue($value), $sameEntity, $mergeOperation);
 			$property->writeValue($mergedObject, $mergedPropertyValue);
 		}
 
@@ -200,7 +200,7 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 		}
 	}
 
-	public function createValueHash($value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
 		$valueHashCol = new ValueHashCol();
 		foreach ($this->properties as $propertyName => $property)  {
 			$propertyValue = null;

@@ -81,7 +81,7 @@ class PropertyMappedToManyRelation extends MappedRelation implements ToManyRelat
 		return $toManySelection;
 	}
 
-	public function createValueHash($value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
 		return ToManyValueHasher::createFromEntityModel($this->targetEntityModel)
 				->createValueHash($value);
 	}

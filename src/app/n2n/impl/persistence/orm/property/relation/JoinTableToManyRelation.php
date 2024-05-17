@@ -127,7 +127,7 @@ class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelatio
 		}
 	}
 	
-	public function createValueHash($value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
 		$analyzer = new ToManyValueHasher($this->targetEntityModel->getIdDef()->getEntityProperty());
 		return $analyzer->createValueHash($value);
 	}

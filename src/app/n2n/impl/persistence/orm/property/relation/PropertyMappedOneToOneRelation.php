@@ -85,7 +85,7 @@ class PropertyMappedOneToOneRelation extends MappedRelation implements ToOneRela
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::createValueHash()
 	 */
-	public function createValueHash($value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
 		return ToOneValueHasher::createFromEntityModel($this->targetEntityModel)
 			->createValueHash($value);
 	}

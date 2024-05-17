@@ -98,7 +98,7 @@ class N2nLocaleEntityProperty extends ColumnPropertyAdapter implements BasicEnti
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::buildRaw()
 	 */
-	public function buildRaw($value, Pdo $pdo) {
+	public function buildRaw(mixed $value, Pdo $pdo): mixed {
 		return $this->valueToRep($value);
 	}
 	/* (non-PHPdoc)
@@ -128,13 +128,13 @@ class N2nLocaleEntityProperty extends ColumnPropertyAdapter implements BasicEnti
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::mergeValue()
 	 */
-	public function mergeValue($value, $sameEntity, MergeOperation $mergeOperation) {
+	public function mergeValue(mixed $value, bool $sameEntity, MergeOperation $mergeOperation): mixed {
 		return $value;
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
 	 */
-	public function createValueHash($value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
 		if ($value === null) return new CommonValueHash(null);
 		return new CommonValueHash($value->getId());
 	}

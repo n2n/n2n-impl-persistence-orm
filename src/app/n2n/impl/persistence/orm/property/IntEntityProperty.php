@@ -105,7 +105,7 @@ class IntEntityProperty extends ColumnPropertyAdapter implements BasicEntityProp
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
 	 */
-	public function createValueHash($value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
 		return new CommonValueHash($value);
 	}
 
@@ -113,7 +113,7 @@ class IntEntityProperty extends ColumnPropertyAdapter implements BasicEntityProp
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::mergeValue()
 	 */
-	public function mergeValue($value, $sameEntity, MergeOperation $mergeOperation) {
+	public function mergeValue(mixed $value, bool $sameEntity, MergeOperation $mergeOperation): mixed {
 		return $value;
 	}
 
@@ -138,7 +138,7 @@ class IntEntityProperty extends ColumnPropertyAdapter implements BasicEntityProp
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\BasicEntityProperty::buildRaw()
 	 */
-	public function buildRaw($value, Pdo $pdo) {
+	public function buildRaw(mixed $value, Pdo $pdo): mixed {
 		return $value;
 	}
 	/* (non-PHPdoc)

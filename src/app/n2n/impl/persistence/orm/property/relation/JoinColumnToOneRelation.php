@@ -168,7 +168,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 		
 		$persistAction->addDependent($targetPersistAction);
 		
-		ArgUtils::assertTrue($valueHash instanceof ToOneValueHash);
+		assert($valueHash instanceof ToOneValueHash);
 		$targetPersistAction->executeAtEnd(function () use ($persistAction, $valueHash, $targetPersistAction, $pdo) {
 			$targetId = $targetPersistAction->getId();
 			
@@ -223,7 +223,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 // 	}
 
 	
-	public function createValueHash($value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
 		return ToOneValueHasher::createFromEntityModel($this->targetEntityModel)
 				->createValueHash($value);
 	}
@@ -238,13 +238,13 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 //
 //	}
 	
-	private function markRemoveAction(RemoveAction $removeAction): void {
-		$removeAction->setAttribute(get_class($this), true);
-	}
+//	private function markRemoveAction(RemoveAction $removeAction): void {
+//		$removeAction->setAttribute(get_class($this), true);
+//	}
 	
-	private function isRemoveActionMarked(RemoveAction $removeAction): bool {
-		return (boolean) $removeAction->getAttribute(get_class($this));
-	}
+//	private function isRemoveActionMarked(RemoveAction $removeAction): bool {
+//		return (boolean) $removeAction->getAttribute(get_class($this));
+//	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\model\ActionDependency::removeActionSupplied()
 	 */
