@@ -1,11 +1,27 @@
 <?php
-
+/*
+ * Copyright (c) 2012-2016, Hofmänner New Media.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This file is part of the N2N FRAMEWORK.
+ *
+ * The N2N FRAMEWORK is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU Lesser General Public License as published by the Free Software Foundation, either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * N2N is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details: http://www.gnu.org/licenses/
+ *
+ * The following people participated in this project:
+ *
+ * Andreas von Burg.....: Architect, Lead Developer
+ * Bert Hofmänner.......: Idea, Frontend UI, Community Leader, Marketing
+ * Thomas Günther.......: Developer, Hangar
+ */
 namespace n2n\impl\persistence\orm\property\valobj;
 
 use PHPUnit\Framework\TestCase;
-use n2n\persistence\orm\model\EntityModelManager;
-use n2n\persistence\orm\model\EntityModelFactory;
-use n2n\impl\persistence\orm\property\CommonEntityPropertyProvider;
 use n2n\impl\persistence\orm\property\valobj\mock\ScalarValueObjectEntityMock;
 use n2n\impl\persistence\orm\property\ScalarValueObjectEntityProperty;
 use n2n\impl\persistence\orm\test\GeneralTestEnv;
@@ -17,7 +33,7 @@ use n2n\impl\persistence\orm\property\valobj\mock\PositiveInt;
 use n2n\spec\valobj\err\IllegalValueException;
 use n2n\util\ex\ExUtils;
 
-class ScalarValueObjectTest extends TestCase {
+class ScalarValueObjectEntityPropertyTest extends TestCase {
 
 	private DbTestPdoUtil $pdoUtil;
 	private EmPool $emPool;
@@ -140,8 +156,8 @@ class ScalarValueObjectTest extends TestCase {
 		$entityMock3 = $em->merge($entityMock2);
 		$tx->commit();
 
-		$this->assertFalse($entityMock === $entityMock2);
-		$this->assertTrue($entityMock->positiveInt === $entityMock2->positiveInt);
+		$this->assertTrue($entityMock2 === $entityMock3);
+		$this->assertTrue($entityMock2->positiveInt === $entityMock3->positiveInt);
 		$rows = $this->pdoUtil->select('scalar_value_object_entity_mock');
 		$this->assertCount(1, $rows);
 		$this->assertEquals(4, $rows[0]['positive_int']);
