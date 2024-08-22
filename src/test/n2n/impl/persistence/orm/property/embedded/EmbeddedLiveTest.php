@@ -1,29 +1,19 @@
 <?php
 
-namespace n2n\impl\persistence\orm\live;
+namespace n2n\impl\persistence\orm\property\embedded;
 
 use n2n\persistence\ext\PdoPool;
-use n2n\core\config\DbConfig;
-use n2n\core\config\PersistenceUnitConfig;
-use n2n\impl\persistence\meta\sqlite\SqliteDialect;
-use n2n\core\config\OrmConfig;
 use PHPUnit\Framework\TestCase;
-use n2n\util\magic\MagicContext;
-use n2n\core\container\TransactionManager;
 use n2n\impl\persistence\orm\live\mock\EmbeddedContainerMock;
 use n2n\impl\persistence\orm\live\mock\SimpleTargetMock;
 use n2n\impl\persistence\orm\live\mock\EmbeddableMock;
-use n2n\impl\persistence\orm\property\CommonEntityPropertyProvider;
 use n2n\persistence\orm\EntityManager;
 use n2n\impl\persistence\orm\live\mock\OverrideEmbeddedContainerMock;
 use n2n\persistence\ext\EmPool;
-use n2n\persistence\orm\model\EntityModelManager;
-use n2n\persistence\orm\model\EntityModelFactory;
 use n2n\impl\persistence\orm\test\GeneralTestEnv;
 use n2n\impl\persistence\orm\live\mock\LifecycleListener;
 
 class EmbeddedLiveTest extends TestCase {
-
 	private EmPool $emPool;
 	private PdoPool $pdoPool;
 	private LifecycleListener $lifecycleListener;
@@ -171,6 +161,7 @@ class EmbeddedLiveTest extends TestCase {
 
 		$this->assertCount(1, $this->lifecycleListener->getClassNames());
 		$this->assertEquals(2, $this->lifecycleListener->getNum());
+		$this->assertCount(2, $this->lifecycleListener->events[EmbeddedContainerMock::class]);
 
 
 		// UPDATE
@@ -186,7 +177,17 @@ class EmbeddedLiveTest extends TestCase {
 		$this->assertEquals(4, $this->lifecycleListener->getNum());
 		$this->assertEquals(1, $this->lifecycleListener->preUpdateNums[EmbeddedContainerMock::class]);
 		$this->assertEquals(1, $this->lifecycleListener->postUpdateNums[EmbeddedContainerMock::class]);
+		$events = $this->lifecycleListener->events[EmbeddedContainerMock::class];
+		$this->assertCount(4, $events);
 
+		$this->assertTrue($events[2]->containsChangesFor('embeddableMock'));
+		$this->assertTrue($events[2]->containsChangesFor('embeddableMock.name'));
+		$this->assertFalse($events[2]->containsChangesForAnyBut('embeddableMock'));
+		$this->assertFalse($events[2]->containsChangesForAnyBut('embeddableMock.name'));
+		$this->assertTrue($events[3]->containsChangesFor('embeddableMock'));
+		$this->assertTrue($events[3]->containsChangesFor('embeddableMock.name'));
+		$this->assertFalse($events[3]->containsChangesForAnyBut('embeddableMock'));
+		$this->assertFalse($events[3]->containsChangesForAnyBut('embeddableMock.name'));
 
 		// REMOVE
 

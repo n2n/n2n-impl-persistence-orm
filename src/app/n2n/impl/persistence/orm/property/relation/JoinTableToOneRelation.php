@@ -90,7 +90,9 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 			$this->createJoinTableActionFromPersistAction($persistAction);		
 			return;
 		}
-		
+
+		$persistAction->getMeta()->markChange($this->entityProperty);
+
 		$targetIdProperty = $this->targetEntityModel->getIdDef()->getEntityProperty();
 		$actionQueue = $persistAction->getActionQueue();
 		$targetPersistAction = $actionQueue->getPersistAction($value);
@@ -99,14 +101,15 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 			$targetIdRep = $targetIdProperty->valueToRep($targetPersistAction->getId());
 			if ($oldValueHash !== null && $targetIdRep === $oldValueHash->getEntityIdRep()) return;
 
-			$this->createJoinTableActionFromPersistAction($persistAction)->addInverseJoinIdRep($targetIdRep);
+			$joinTableAction = $this->createJoinTableActionFromPersistAction($persistAction);
+			$joinTableAction->addInverseJoinIdRaw($targetIdProperty->buildRaw($targetPersistAction->getId(), $joinTableAction->getPdo()));
 			return;
 		}		
 	
 		$joinTableAction = $this->createJoinTableActionFromPersistAction($persistAction);
 		$joinTableAction->addDependent($targetPersistAction);
 		$targetPersistAction->executeAtEnd(function () use ($joinTableAction, $targetPersistAction, $targetIdProperty) {
-			$joinTableAction->addInverseJoinIdRep($targetIdProperty->valueToRep($targetPersistAction->getId()));
+			$joinTableAction->addInverseJoinIdRaw($targetIdProperty->buildRaw($targetPersistAction->getId(), $joinTableAction->getPdo()));
 			
 			$hasher = new ToOneValueHasher($this->getTargetIdEntityProperty());
 			$hasher->reportId($targetId, $valueHash);

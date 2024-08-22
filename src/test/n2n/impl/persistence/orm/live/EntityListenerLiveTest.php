@@ -47,8 +47,6 @@ class EntityListenerLiveTest extends TestCase {
 	}
 
 	function testLifecycle(): void {
-
-
 		$tm = $this->pdoPool->getTransactionManager();
 		$tx = $tm->createTransaction();
 
