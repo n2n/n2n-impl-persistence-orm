@@ -77,7 +77,7 @@ class EnumEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void {
 		$rawValue = $this->buildRaw($value, $persistAction->getActionQueue()->getEntityManager()->getPdo());
 
-		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $rawValue);
+		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $rawValue, null, $this);
 	}
 
 	public function createValueHash(mixed $value, EntityManager $em): ValueHash {

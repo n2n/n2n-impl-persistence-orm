@@ -27,6 +27,9 @@ use n2n\persistence\orm\property\EntityProperty;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\reflection\property\AccessProxy;
+use n2n\persistence\orm\store\action\meta\ActionMeta;
+use n2n\persistence\orm\store\action\Action;
+use n2n\persistence\orm\store\action\PersistAction;
 
 abstract class ColumnPropertyAdapter extends EntityPropertyAdapter implements ColumnEntityProperty {
 	protected $columnName;
@@ -46,6 +49,19 @@ abstract class ColumnPropertyAdapter extends EntityPropertyAdapter implements Co
 	
 	public function createRepresentingQueryItem(MetaTreePoint $metaTreePoint, QueryState $queryState) {
 		return $this->createQueryColumn($metaTreePoint->getMeta());
+	}
+
+	function containsChanges(PersistAction $action) {
+		$actionMeta = $action->getMeta();
+
+		foreach ($actionMeta->getItems() as $item) {
+			if ($item->getTableName() === $this->getEntityModel()->getTableName()
+					&& $item->containsColumnName($this->columnName)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 	
 	public function equals($obj) {

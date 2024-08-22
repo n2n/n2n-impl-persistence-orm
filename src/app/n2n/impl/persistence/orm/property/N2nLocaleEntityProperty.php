@@ -57,7 +57,7 @@ class N2nLocaleEntityProperty extends ColumnPropertyAdapter implements BasicEnti
 			$rawValue = $value->getId();
 		}
 		
-		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $rawValue);
+		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $rawValue, null, $this);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyRemoveAction()

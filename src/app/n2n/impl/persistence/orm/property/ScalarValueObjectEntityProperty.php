@@ -101,7 +101,7 @@ class ScalarValueObjectEntityProperty extends ColumnPropertyAdapter implements B
 
 	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void {
 		assert($value === null || $value instanceof ScalarValueObject);
-		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $value?->toScalar());
+		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $value?->toScalar(), null, $this);
 	}
 
 	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {

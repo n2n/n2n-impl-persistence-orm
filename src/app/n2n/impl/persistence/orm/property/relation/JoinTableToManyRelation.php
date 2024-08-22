@@ -116,6 +116,8 @@ class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelatio
 		foreach ($toManyAnalyzer->getEntityIds() as $targetEntityId) {
 			$joinTableAction->addInverseJoinIdRaw($targetIdProperty->buildRaw($targetEntityId, $joinTableAction->getPdo()));
 		}
+
+		$persistAction->getMeta()->markChange($this->entityProperty);
 		
 		foreach ($toManyAnalyzer->getPendingPersistActions() as $key => $targetPersistAction) {
 			$joinTableAction->addDependent($targetPersistAction);

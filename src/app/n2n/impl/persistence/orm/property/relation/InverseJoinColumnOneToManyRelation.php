@@ -183,8 +183,9 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 		$idRaw = $idProperty->valueToRep($persistAction->getId());
 		foreach ($targetPersistActions as $targetPersistAction) {
 			$targetPersistAction->getMeta()->setRawValue($this->targetEntityModel,
-					$this->inverseJoinColumnName, $idRaw);
+					$this->inverseJoinColumnName, $idRaw, null, $this->entityProperty);
 		}
+		$persistAction->getMeta()->markChange($this->entityProperty);
 	}
 // 	/* (non-PHPdoc)
 // 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyInverseToManyRemoveAction()

@@ -101,7 +101,7 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyPersistAction()
 	 */
 	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void {
-		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $value, \PDO::PARAM_BOOL);
+		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $value, \PDO::PARAM_BOOL, $this);
 	}
 
 	/**

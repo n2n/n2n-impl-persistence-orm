@@ -144,7 +144,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, 
 				?ValueHash $oldValueHash) {
 		if ($value === null) {
-			$persistAction->getMeta()->setRawValue($this->entityModel, $this->joinColumnName, null);
+			$persistAction->getMeta()->setRawValue($this->entityModel, $this->joinColumnName, null, null, $this->entityProperty);
 			return;
 		}
 		
@@ -162,7 +162,8 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 
 		if ($targetPersistAction->hasId()) {
 			$persistAction->getMeta()->setRawValue($this->entityModel, $this->joinColumnName, 
-					$this->getTargetIdEntityProperty()->buildRaw($targetPersistAction->getId(), $pdo));
+					$this->getTargetIdEntityProperty()->buildRaw($targetPersistAction->getId(), $pdo),
+					null, $this->entityProperty);
 			return;
 		}
 		
@@ -173,7 +174,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 			$targetId = $targetPersistAction->getId();
 			
 			$persistAction->getMeta()->setRawValue($this->entityModel, $this->joinColumnName, 
-					$this->getTargetIdEntityProperty()->buildRaw($targetId, $pdo));
+					$this->getTargetIdEntityProperty()->buildRaw($targetId, $pdo), null, $this->entityProperty);
 			
 			$hasher = new ToOneValueHasher($this->getTargetIdEntityProperty());
 			$hasher->reportId($targetId, $valueHash);

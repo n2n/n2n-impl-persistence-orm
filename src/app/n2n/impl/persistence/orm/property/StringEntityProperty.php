@@ -96,7 +96,7 @@ class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 // 		if (is_bool($mappedValue)) {
 // 			$pdoDataType = PDO::PARAM_BOOL;
 // 		}
-		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $value/*, $pdoDataType*/);
+		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $value, /*$pdoDataType*/null, $this);
 	}
 
 
