@@ -32,12 +32,17 @@ use n2n\persistence\orm\CorruptedDataException;
 use n2n\impl\persistence\orm\property\valobj\mock\PositiveInt;
 use n2n\spec\valobj\err\IllegalValueException;
 use n2n\util\ex\ExUtils;
+use n2n\impl\persistence\orm\live\mock\SimpleTargetMock;
+use n2n\persistence\orm\EntityManager;
+use n2n\impl\persistence\orm\live\mock\LifecycleListener;
+use n2n\impl\persistence\orm\property\valobj\mock\ShortString;
 
 class ScalarValueObjectEntityPropertyTest extends TestCase {
 
 	private DbTestPdoUtil $pdoUtil;
 	private EmPool $emPool;
 	private PdoPool $pdoPool;
+	private LifecycleListener $lifecycleListener;
 
 	public function setUp(): void {
 //		$this->emm = new EntityModelManager([ScalarValueObjectEntityMock::class],
@@ -54,6 +59,7 @@ class ScalarValueObjectEntityPropertyTest extends TestCase {
 		$columnFactory = $table->createColumnFactory();
 		$columnFactory->createIntegerColumn('id', 32);
 		$columnFactory->createIntegerColumn('positive_int', 32);
+		$columnFactory->createStringColumn('short_string', 5);
 
 		$metaData->getMetaManager()->flush();
 
@@ -161,5 +167,86 @@ class ScalarValueObjectEntityPropertyTest extends TestCase {
 		$rows = $this->pdoUtil->select('scalar_value_object_entity_mock');
 		$this->assertCount(1, $rows);
 		$this->assertEquals(4, $rows[0]['positive_int']);
+	}
+
+	private function tem(): EntityManager {
+		return $this->emPool->getEntityManagerFactory()->getTransactional();
+	}
+
+	function testLifecycle() {
+		$tm = $this->pdoPool->getTransactionManager();
+		$this->lifecycleListener = GeneralTestEnv::getLifecycleListener();
+
+		$svoem = new ScalarValueObjectEntityMock();
+		$svoem->id = 1;
+		$svoem->positiveInt = ExUtils::try(fn () => new PositiveInt(4));
+
+		$this->assertCount(0, $this->lifecycleListener->getClassNames());
+		$this->assertEmpty(0, $this->lifecycleListener->getNum());
+
+		$tx = $tm->createTransaction();
+		$this->tem()->persist($svoem);
+
+		$this->assertCount(1, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(1, $this->lifecycleListener->getNum());
+		$this->assertEquals(1, $this->lifecycleListener->prePersistNums[ScalarValueObjectEntityMock::class]);
+		$tx->commit();
+
+		$this->assertCount(1, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(2, $this->lifecycleListener->getNum());
+		$this->assertEquals(1, $this->lifecycleListener->postPersistNums[ScalarValueObjectEntityMock::class]);
+		$this->assertCount(2, $this->lifecycleListener->events[ScalarValueObjectEntityMock::class]);
+
+		// VOID UPDATE
+
+		$tx = $tm->createTransaction();
+
+		$svoem = $this->tem()->find(ScalarValueObjectEntityMock::class, $svoem->id);
+		$tx->commit();
+
+		$this->assertCount(1, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(2, $this->lifecycleListener->getNum());
+		$this->assertCount(2, $this->lifecycleListener->events[ScalarValueObjectEntityMock::class]);
+
+
+		// UPDATE TABLE
+
+		$tx = $tm->createTransaction();
+
+		$svoem = $this->tem()->find(ScalarValueObjectEntityMock::class, $svoem->id);
+		$svoem->shortString = ExUtils::try(fn () => new ShortString('hoi'));
+
+		$tx->commit();
+
+		$this->assertCount(1, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(4, $this->lifecycleListener->getNum());
+		$this->assertEquals(1, $this->lifecycleListener->preUpdateNums[ScalarValueObjectEntityMock::class]);
+		$this->assertEquals(1, $this->lifecycleListener->postUpdateNums[ScalarValueObjectEntityMock::class]);
+		$events = $this->lifecycleListener->events[ScalarValueObjectEntityMock::class];
+		$this->assertCount(4, $events);
+
+		$this->assertTrue($events[2]->containsChangesFor('shortString'));
+		$this->assertFalse($events[2]->containsChangesFor('positiveInt'));
+		$this->assertFalse($events[2]->containsChangesForAnyBut('shortString'));
+		$this->assertFalse($events[2]->containsChangesForAnyBut('positiveInt'));
+
+
+		// REMOVE
+
+		$tx = $tm->createTransaction();
+
+		$svoem = $this->tem()->find(ScalarValueObjectEntityMock::class, $svoem->id);
+
+		$this->tem()->remove($svoem);
+
+		$this->assertCount(1, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(5, $this->lifecycleListener->getNum());
+		$this->assertEquals(1, $this->lifecycleListener->preRemoveNums[ScalarValueObjectEntityMock::class]);
+
+		$tx->commit();
+
+		$this->assertCount(1, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(6, $this->lifecycleListener->getNum());
+		$this->assertEquals(1, $this->lifecycleListener->postRemoveNums[ScalarValueObjectEntityMock::class]);
 	}
 }
