@@ -15,7 +15,6 @@ class EmbeddedMandatoryTest extends TestCase {
 
 	private EmPool $emPool;
 	private PdoPool $pdoPool;
-	private LifecycleListener $lifecycleListener;
 
 	function setUp(): void {
 		$this->emPool = GeneralTestEnv::setUpEmPool([EmbeddedContainerManMock::class, EmbeddableManMock::class]);
