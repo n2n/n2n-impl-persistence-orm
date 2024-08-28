@@ -135,7 +135,7 @@ class ManagedFilePropDef implements HangarPropDef {
 			$phpTypeDef = PhpTypeDef::fromTypeName($fileManagerLookupId);
 			$propSourceDef->createPhpUse($phpTypeDef->getTypeName());
 			
-			$annoManagedFile->getOrCreatePhpAnnoParam(1, $phpTypeDef->getLocalName() . '::test');
+			$annoManagedFile->getOrCreatePhpAnnoParam(1, $phpTypeDef->getLocalName() . '::class');
 		} else if ($annoManagedFile->getNumPhpAnnoParams() > 1) {
 			$annoManagedFile->getPhpAnnoParam(1)->setValue('null');
 		} else {
@@ -189,7 +189,7 @@ class ManagedFilePropDef implements HangarPropDef {
     public static function determineFileManagerStr(string $param) {
     	if ($param === 'null') return FileManager::TYPE_PUBLIC;
     	
-    	if (StringUtils::endsWith('::test', $param)) {
+    	if (StringUtils::endsWith('::class', $param)) {
     		return mb_substr($param, 0, -7);
     	}
     	
