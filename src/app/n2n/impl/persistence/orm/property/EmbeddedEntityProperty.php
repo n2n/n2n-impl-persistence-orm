@@ -63,6 +63,10 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 		$this->targetClass = $targetClass;
 	}
 
+	function isMandatory(): bool {
+		return !$this->accessProxy->getSetterConstraint()->allowsNull();
+	}
+
 	/**
 	 * @return \ReflectionClass
 	 */

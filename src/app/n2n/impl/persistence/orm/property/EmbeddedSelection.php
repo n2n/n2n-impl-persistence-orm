@@ -85,7 +85,7 @@ class EmbeddedValueBuilder implements ValueBuilder {
 	 */
 	public function buildValue(): mixed {
 		$propertyValues = array();
-		$notNull = false;
+		$notNull = $this->embeddedEntityProperty->isMandatory();
 		foreach ($this->propertyValueBuilders as $propertyString => $propertyValueBuilder) {
 			if (null !== ($propertyValues[$propertyString] = $propertyValueBuilder->buildValue())) {
 				$notNull = true;
