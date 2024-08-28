@@ -12,6 +12,7 @@ use n2n\impl\persistence\orm\live\mock\OverrideEmbeddedContainerMock;
 use n2n\persistence\ext\EmPool;
 use n2n\impl\persistence\orm\test\GeneralTestEnv;
 use n2n\impl\persistence\orm\live\mock\LifecycleListener;
+use n2n\persistence\orm\LifecycleEvent;
 
 class EmbeddedLiveTest extends TestCase {
 	private EmPool $emPool;
@@ -180,14 +181,20 @@ class EmbeddedLiveTest extends TestCase {
 		$events = $this->lifecycleListener->events[EmbeddedContainerMock::class];
 		$this->assertCount(4, $events);
 
+		$this->assertEquals(LifecycleEvent::PRE_UPDATE, $events[2]->getType());
 		$this->assertTrue($events[2]->containsChangesFor('embeddableMock'));
 		$this->assertTrue($events[2]->containsChangesFor('embeddableMock.name'));
 		$this->assertFalse($events[2]->containsChangesForAnyBut('embeddableMock'));
 		$this->assertFalse($events[2]->containsChangesForAnyBut('embeddableMock.name'));
+		$this->assertTrue($events[2]->containsChangesForAnyBut('embeddableMock.simpleTargetMocks'));
+		$this->assertTrue($events[2]->containsChangesForAnyBut('id'));
+		$this->assertEquals(LifecycleEvent::POST_UPDATE, $events[3]->getType());
 		$this->assertTrue($events[3]->containsChangesFor('embeddableMock'));
 		$this->assertTrue($events[3]->containsChangesFor('embeddableMock.name'));
 		$this->assertFalse($events[3]->containsChangesForAnyBut('embeddableMock'));
 		$this->assertFalse($events[3]->containsChangesForAnyBut('embeddableMock.name'));
+		$this->assertTrue($events[3]->containsChangesForAnyBut('id'));
+		$this->assertTrue($events[3]->containsChangesForAnyBut('embeddableMock.simpleTargetMocks'));
 
 		// REMOVE
 

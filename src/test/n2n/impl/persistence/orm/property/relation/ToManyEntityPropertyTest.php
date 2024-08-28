@@ -125,11 +125,11 @@ class ToManyEntityPropertyTest extends TestCase {
 		$this->assertTrue($events[2]->containsChangesFor('joinTableTargets'));
 		$this->assertFalse($events[2]->containsChangesFor('inverseJoinColumnTargets'));
 		$this->assertFalse($events[2]->containsChangesForAnyBut('joinTableTargets'));
-		$this->assertFalse($events[2]->containsChangesForAnyBut('inverseJoinColumnTargets'));
+		$this->assertTrue($events[2]->containsChangesForAnyBut('inverseJoinColumnTargets'));
 		$this->assertTrue($events[3]->containsChangesFor('joinTableTargets'));
 		$this->assertFalse($events[3]->containsChangesFor('inverseJoinColumnTargets'));
 		$this->assertFalse($events[3]->containsChangesForAnyBut('joinTableTargets'));
-		$this->assertFalse($events[3]->containsChangesForAnyBut('inverseJoinColumnTargets'));
+		$this->assertTrue($events[3]->containsChangesForAnyBut('inverseJoinColumnTargets'));
 
 
 		// UPDATE INVERSE JOIN COLUMN
@@ -154,11 +154,11 @@ class ToManyEntityPropertyTest extends TestCase {
 		$this->assertTrue($events[4]->containsChangesFor('inverseJoinColumnTargets'));
 		$this->assertFalse($events[4]->containsChangesFor('joinTableTargets'));
 		$this->assertFalse($events[4]->containsChangesForAnyBut('inverseJoinColumnTargets'));
-		$this->assertFalse($events[4]->containsChangesForAnyBut('joinTableTargets'));
+		$this->assertTrue($events[4]->containsChangesForAnyBut('joinTableTargets'));
 		$this->assertTrue($events[5]->containsChangesFor('inverseJoinColumnTargets'));
 		$this->assertFalse($events[5]->containsChangesFor('joinTableTargets'));
 		$this->assertFalse($events[5]->containsChangesForAnyBut('inverseJoinColumnTargets'));
-		$this->assertFalse($events[5]->containsChangesForAnyBut('joinTableTargets'));
+		$this->assertTrue($events[5]->containsChangesForAnyBut('joinTableTargets'));
 
 		// REMOVE
 

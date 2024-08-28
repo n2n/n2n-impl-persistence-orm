@@ -228,7 +228,7 @@ class ScalarValueObjectEntityPropertyTest extends TestCase {
 		$this->assertTrue($events[2]->containsChangesFor('shortString'));
 		$this->assertFalse($events[2]->containsChangesFor('positiveInt'));
 		$this->assertFalse($events[2]->containsChangesForAnyBut('shortString'));
-		$this->assertFalse($events[2]->containsChangesForAnyBut('positiveInt'));
+		$this->assertTrue($events[2]->containsChangesForAnyBut('positiveInt'));
 
 
 		// REMOVE

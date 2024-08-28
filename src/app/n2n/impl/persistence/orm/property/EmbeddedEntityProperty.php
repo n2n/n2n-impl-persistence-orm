@@ -173,7 +173,10 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 				$oldPropertyValueHash = $oldPropertyValueHashes[$propertyName] ?? null;
 			}
 
-			$property->supplyPersistAction($persistAction, $propertyValue, $propertyValueHash, $oldPropertyValueHash);
+			if ($persistAction->isNew() || $oldPropertyValueHash === null
+					|| !$propertyValueHash->matches($oldPropertyValueHash)) {
+				$property->supplyPersistAction($persistAction, $propertyValue, $propertyValueHash, $oldPropertyValueHash);
+			}
 		}
 	}
 
