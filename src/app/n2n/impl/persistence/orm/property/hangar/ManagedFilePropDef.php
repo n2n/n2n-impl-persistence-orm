@@ -58,7 +58,7 @@ class ManagedFilePropDef implements HangarPropDef {
 		return 'MangedFile';
 	}
 	
-	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
+	public function createMagCollection(?PropSourceDef $propSourceDef = null): MagCollection {
 		$magCollection = new MagCollection();
 		
 		$size = $this->columnDefaults->getDefaultStringLength();

@@ -57,7 +57,7 @@ class BinaryPropDef extends ScalarPropDefAdapter {
 	 * @see \hangar\api\HangarPropDef::createMagCollection()
 	 * @return MagCollection
 	 */
-	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
+	public function createMagCollection(?PropSourceDef $propSourceDef = null): MagCollection {
 		$optionCollection = new MagCollection();
 		
 		$size = $this->columnDefaults->getDefaultBinarySize();

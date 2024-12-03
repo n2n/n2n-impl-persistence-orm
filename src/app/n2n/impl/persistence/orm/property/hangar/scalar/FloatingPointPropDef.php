@@ -42,7 +42,7 @@ class FloatingPointPropDef extends ScalarPropDefAdapter {
 		return 'Floating Point';
 	}
 	
-	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
+	public function createMagCollection(?PropSourceDef $propSourceDef = null): MagCollection {
 		$optionCollection = new MagCollection();
 		
 		$size = $this->columnDefaults->getDefaultFloatingPointSize();

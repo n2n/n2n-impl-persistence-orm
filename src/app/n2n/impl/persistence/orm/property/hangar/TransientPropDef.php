@@ -46,7 +46,7 @@ class TransientPropDef implements HangarPropDef {
 		return 'Transient';
 	}
 	
-	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
+	public function createMagCollection(?PropSourceDef $propSourceDef = null): MagCollection {
 		$magCollection = new MagCollection();
 		
 		$typeName = null;

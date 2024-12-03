@@ -65,7 +65,7 @@ class N2nLocaleEntityProperty extends ColumnPropertyAdapter implements BasicEnti
 	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
 	}
 	
-//	public static function areConstraintsTypical(TypeConstraint $constraints = null) {
+//	public static function areConstraintsTypical(?TypeConstraint $constraints = null) {
 //		return isset($constraints) && !is_null($constraints->getParamClass())
 //				&& $constraints->getParamClass()->getName() == 'n2n\l10n\N2nLocale' && !$constraints->isArray();
 //	}

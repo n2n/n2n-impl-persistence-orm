@@ -43,7 +43,7 @@
 //	private $fileManager;
 //
 //	public function __construct(EntityModel $entityModel, AccessProxy $accessProxy,
-//			$columnName, AnnoFile $fileAnnotaiton = null) {
+//			$columnName, ?AnnoFile $fileAnnotaiton = null) {
 //		parent::__construct($accessProxy, $columnName);
 //
 //		if (isset($fileAnnotaiton)) {
@@ -128,7 +128,7 @@
 //// 		return null;
 //// 	}
 //
-//	public static function areConstraintsTypical(TypeConstraint $constraints = null) {
+//	public static function areConstraintsTypical(?TypeConstraint $constraints = null) {
 //		return isset($constraints) && !is_null($constraints->getParamClass())
 //				&& $constraints->getParamClass()->getName() == 'n2n\io\managed\File' && !$constraints->isArray();
 //	}

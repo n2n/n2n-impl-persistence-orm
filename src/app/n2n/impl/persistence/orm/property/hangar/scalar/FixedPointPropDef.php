@@ -51,7 +51,7 @@ class FixedPointPropDef extends ScalarPropDefAdapter {
 	}
 	
 
-	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
+	public function createMagCollection(?PropSourceDef $propSourceDef = null): MagCollection {
 		$optionCollection = new MagCollection();
 	
 		$numIntegerDigits = $this->columnDefaults->getDefaultFixedPointNumIntegerDigits();

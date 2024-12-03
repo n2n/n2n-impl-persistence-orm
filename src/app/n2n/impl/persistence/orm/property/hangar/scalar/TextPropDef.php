@@ -54,7 +54,7 @@ class TextPropDef extends ScalarPropDefAdapter {
 	 * {@inheritDoc}
 	 * @see \hangar\api\HangarPropDef::createMagCollection()
 	 */
-	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
+	public function createMagCollection(?PropSourceDef $propSourceDef = null): MagCollection {
 		$magCollection = new MagCollection();
 		
 		$size = $this->columnDefaults->getDefaultTextSize();

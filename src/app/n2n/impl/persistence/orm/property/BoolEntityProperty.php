@@ -125,7 +125,7 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::supplyRemoveAction()
 	 */
-	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash = null) {
+	public function supplyRemoveAction(RemoveAction $removeAction, $value, ?ValueHash $oldValueHash = null) {
 	}
 
 	/**

@@ -45,7 +45,7 @@ class StringPropDef extends ScalarPropDefAdapter {
 		return 'String';
 	}
 
-	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
+	public function createMagCollection(?PropSourceDef $propSourceDef = null): MagCollection {
 		$optionCollection = new MagCollection();
 	
 		$length = $this->columnDefaults->getDefaultStringLength();

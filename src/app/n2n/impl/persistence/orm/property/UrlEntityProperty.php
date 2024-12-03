@@ -64,7 +64,7 @@ class UrlEntityProperty extends ColumnPropertyAdapter implements BasicEntityProp
 	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
 	}
 
-//	public static function areConstraintsTypical(TypeConstraint $constraints = null) {
+//	public static function areConstraintsTypical(?TypeConstraint $constraints = null) {
 //		return isset($constraints) && !is_null($constraints->getParamClass())
 //				&& $constraints->getParamClass()->getName() == Url::class && !$constraints->isArray();
 //	}

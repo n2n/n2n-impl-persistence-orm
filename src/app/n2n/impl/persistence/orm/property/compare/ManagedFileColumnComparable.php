@@ -60,7 +60,7 @@ class ManagedFileColumnComparable extends ColumnComparableAdapter {
 		return $queryPartGroup;
 	}
 	
-	private function registerPlaceholder(File $file = null)  {
+	private function registerPlaceholder(?File $file = null)  {
 		if ($file === null) {
 			return $this->queryState->registerPlaceholderValue(null);
 		}

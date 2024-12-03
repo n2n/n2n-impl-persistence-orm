@@ -52,7 +52,7 @@ class UrlPropDef implements HangarPropDef {
 		return 'URL';
 	}
 	
-	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
+	public function createMagCollection(?PropSourceDef $propSourceDef = null): MagCollection {
 		return new MagCollection();
 	}
 	

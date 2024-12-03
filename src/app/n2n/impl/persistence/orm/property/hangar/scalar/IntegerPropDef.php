@@ -48,7 +48,7 @@ class IntegerPropDef extends ScalarPropDefAdapter {
 		return 'Integer';
 	}
 
-	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
+	public function createMagCollection(?PropSourceDef $propSourceDef = null): MagCollection {
 		$optionCollection = new MagCollection();
 	
 		$size = $this->columnDefaults->getDefaultIntegerSize();

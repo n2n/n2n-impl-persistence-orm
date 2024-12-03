@@ -52,7 +52,7 @@ class N2nLocalePropDef implements HangarPropDef {
 		return 'N2nLocale';
 	}
 	
-	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
+	public function createMagCollection(?PropSourceDef $propSourceDef = null): MagCollection {
 		return new MagCollection();
 	}
 	

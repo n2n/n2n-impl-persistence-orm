@@ -403,28 +403,28 @@ class EmbeddedNampingStrategy implements NamingStrategy {
 		$this->suffix = $suffix;
 	}
 	
-	public function buildTableName(\ReflectionClass $class, string $tableName = null): string {
+	public function buildTableName(\ReflectionClass $class, ?string $tableName = null): string {
 		return $this->prefix . $this->decoratedNamingStrategie->buildTableName($class, $tableName) 
 				. $this->suffix;
 	}
 
-	public function buildJunctionTableName(string $ownerTableName, string $propertyName, string $tableName = null): string {
+	public function buildJunctionTableName(string $ownerTableName, string $propertyName, ?string $tableName = null): string {
 		return $this->prefix . $this->decoratedNamingStrategie->buildJunctionTableName($ownerTableName, 
 				$propertyName, $tableName) . $this->suffix;
 	}
 
-	public function buildColumnName(string $propertyName, string $columnName = null): string {
+	public function buildColumnName(string $propertyName, ?string $columnName = null): string {
 		return $this->prefix . $this->decoratedNamingStrategie->buildColumnName($propertyName, 
 				$columnName) . $this->suffix;
 	}
 
 	public function buildJunctionJoinColumnName(\ReflectionClass $targetClass, string $targetIdPropertyName,
-			string $joinColumnName = null): string {
+			?string $joinColumnName = null): string {
 		return $this->prefix . $this->decoratedNamingStrategie->buildJunctionJoinColumnName($targetClass, 
 				$targetIdPropertyName, $joinColumnName) . $this->suffix;
 	}
 	
-	public function buildJoinColumnName(string $propertyName, string $targetIdPropertyName, string $joinColumnName = null): string {
+	public function buildJoinColumnName(string $propertyName, string $targetIdPropertyName, ?string $joinColumnName = null): string {
 		return $this->prefix . $this->decoratedNamingStrategie->buildJoinColumnName($propertyName, 
 				$targetIdPropertyName, $joinColumnName) . $this->suffix;
 	}

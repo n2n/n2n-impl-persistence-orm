@@ -68,7 +68,7 @@ class ManyToOnePropDef implements HangarPropDef {
 	 * @see \hangar\api\HangarPropDef::createMagCollection()
 	 * @return MagCollection
 	 */
-	public function createMagCollection(PropSourceDef $propSourceDef = null): MagCollection {
+	public function createMagCollection(?PropSourceDef $propSourceDef = null): MagCollection {
 		$magCollection = new OrmRelationMagCollection($this->huoContext->getEntityModelManager(), false);
 		
 		if (null !== $propSourceDef) {

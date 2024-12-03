@@ -158,7 +158,7 @@ class IntEntityProperty extends ColumnPropertyAdapter implements BasicEntityProp
 // 		return $value;
 // 	}
 
-// 	public static function areConstraintsTypical(TypeConstraint $constraints = null) {
+// 	public static function areConstraintsTypical(?TypeConstraint $constraints = null) {
 // 		return is_null($constraints)
 // 				|| (is_null($constraints->getParamClass()) && !$constraints->isArray());
 // 	}
