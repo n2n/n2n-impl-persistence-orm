@@ -23,7 +23,7 @@ namespace n2n\impl\persistence\orm\property\relation\util;
 
 /**
  * Accepts an {@link ArrayObject} / {@link ArrayObjectProxy} and retains the original field values of it but not until
- * the ArrayObjectProxy was initialized or {@link self::getEntityObjs()} was called.
+ * the ArrayObjectProxy was initialized or {@link self::getEntityObjs()}/{@link self::update()}/{@link self::getThenUpdateEntityObjs()} was called.
  */
 class ArrayObjectState {
 
@@ -42,6 +42,16 @@ class ArrayObjectState {
 	 */
 	function getEntityObjs(): array {
 		return $this->entityObjs ?? $this->entityObjs = $this->groupArrayObject->getArrayCopy();
+	}
+
+	function update(): void {
+		$this->entityObjs = $this->groupArrayObject->getArrayCopy();
+	}
+
+	function getThenUpdateEntityObjs(): array {
+		$entityObjs = $this->getEntityObjs();
+		$this->update();
+		return $entityObjs;
 	}
 
 }
