@@ -21,6 +21,10 @@
  */
 namespace n2n\impl\persistence\orm\property\relation\util;
 
+/**
+ * Accepts an {@link ArrayObject} / {@link ArrayObjectProxy} and retains the original field values of it but not until
+ * the ArrayObjectProxy was initialized or {@link self::getEntityObjs()} was called.
+ */
 class ArrayObjectState {
 
 	/**
