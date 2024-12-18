@@ -53,4 +53,9 @@ class ArrayObjectProxyUtils {
 			}
 		});
 	}
+
+	static function state(\ArrayObject|ArrayObjectProxy $arrayObject): ArrayObjectState {
+		return new ArrayObjectState($arrayObject);
+	}
 }
+
