@@ -87,7 +87,7 @@ class PropertyMappedToManyRelation extends MappedRelation implements ToManyRelat
 	}
 
 	public function prepareSupplyJob(SupplyJob $supplyJob, mixed $value, ?ValueHash $valueHash, ?ValueHash $oldValueHash): void {
-		$this->toManyUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
+		$this->toManyUtils->prepareSupplyJob($supplyJob, $value, $valueHash, $oldValueHash);
 // 		if (!$this->orphanRemoval || $supplyJob->isInsert()) return;
 	
 // 		if (ToManyValueHasher::checkForUntouchedProxy($value, $oldValueHash)) {

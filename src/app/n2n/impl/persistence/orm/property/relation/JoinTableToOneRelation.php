@@ -78,7 +78,7 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 	}
 	
 	public function prepareSupplyJob(SupplyJob $supplyJob, mixed $value, ?ValueHash $valueHash, ?ValueHash $oldValueHash): void {
-		$this->toOneUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
+		$this->toOneUtils->prepareSupplyJob($supplyJob, $value, $valueHash, $oldValueHash);
 	}
 	
 	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void {

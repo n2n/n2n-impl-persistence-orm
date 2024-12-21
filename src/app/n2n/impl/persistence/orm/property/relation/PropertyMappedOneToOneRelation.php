@@ -95,7 +95,7 @@ class PropertyMappedOneToOneRelation extends MappedRelation implements ToOneRela
 	 * @param SupplyJob $supplyJob
 	 */
 	public function prepareSupplyJob(SupplyJob $supplyJob, mixed $value, ?ValueHash $valueHash, ?ValueHash $oldValueHash): void {
-		$this->toOneUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
+		$this->toOneUtils->prepareSupplyJob($supplyJob, $value, $valueHash, $oldValueHash);
 	}
 
 	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash,
