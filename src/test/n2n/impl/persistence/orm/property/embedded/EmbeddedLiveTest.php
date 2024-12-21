@@ -188,6 +188,7 @@ class EmbeddedLiveTest extends TestCase {
 		$this->assertFalse($events[2]->containsChangesForAnyBut('embeddableMock.name'));
 		$this->assertTrue($events[2]->containsChangesForAnyBut('embeddableMock.simpleTargetMocks'));
 		$this->assertTrue($events[2]->containsChangesForAnyBut('id'));
+
 		$this->assertEquals(LifecycleEvent::POST_UPDATE, $events[3]->getType());
 		$this->assertTrue($events[3]->containsChangesFor('embeddableMock'));
 		$this->assertTrue($events[3]->containsChangesFor('embeddableMock.name'));

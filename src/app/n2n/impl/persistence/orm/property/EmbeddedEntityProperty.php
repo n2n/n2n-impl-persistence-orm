@@ -52,6 +52,7 @@ use n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy;
 use n2n\util\col\ArrayUtils;
 use n2n\persistence\orm\store\ValueHashCol;
 use n2n\persistence\orm\criteria\compare\CustomComparable;
+use n2n\persistence\orm\store\action\supply\SupplyJob;
 
 class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComparableEntityProperty,
 		EntityPropertyCollection, JoinableEntityProperty {
@@ -148,6 +149,29 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 		}
 
 		return $mergedObject;
+	}
+
+	function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $valueHash, ?ValueHash $oldValueHash): void {
+		assert($oldValueHash === null || $oldValueHash instanceof ValueHashCol);
+		assert($valueHash === null || $valueHash instanceof ValueHashCol);
+
+		foreach ($this->properties as $propertyName => $property)  {
+			$propertyValue = null;
+			if ($value !== null) {
+				$propertyValue = $property->readValue($value);
+			}
+
+			$propertyValueHash = $valueHash?->getValueHash($propertyName);
+			$oldPropertyValueHash = $oldValueHash?->getValueHash($propertyName);
+
+			if ($oldPropertyValueHash === null || $propertyValueHash === null
+					|| !$propertyValueHash->matches($oldPropertyValueHash)) {
+				$property->prepareSupplyJob($supplyJob, $propertyValue, $propertyValueHash, $oldPropertyValueHash);
+				$supplyJob->getActionMeta()?->markChange($property);
+			} else {
+				$supplyJob->getActionMeta()?->unmarkChange($property);
+			}
+		}
 	}
 
 	/* (non-PHPdoc)

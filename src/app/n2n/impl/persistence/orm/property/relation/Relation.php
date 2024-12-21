@@ -78,7 +78,7 @@ interface Relation {
 	 * @param mixed $oldValueHash
 	 * @param SupplyJob $supplyJob
 	 */
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash);
+	public function prepareSupplyJob(SupplyJob $supplyJob, mixed $value, ?ValueHash $valueHash, ?ValueHash $oldValueHash): void;
 	
 	/**
 	 * @param mixed $value

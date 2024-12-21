@@ -135,8 +135,8 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 				$this->targetEntityModel->getIdDef()->getEntityProperty(), $this->joinColumnName);
 	}
 	
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash): void {
-		$this->toOneUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
+	public function prepareSupplyJob(SupplyJob $supplyJob, mixed $value, ?ValueHash $valueHash, ?ValueHash $oldValueHash): void {
+		$this->toOneUtils->prepareSupplyJob($supplyJob, $value, $valueHash, $oldValueHash);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyPersistAction()

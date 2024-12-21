@@ -29,7 +29,6 @@ use n2n\impl\persistence\orm\property\relation\MasterRelation;
 use n2n\impl\persistence\orm\property\relation\MappedRelation;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\QueryState;
-use n2n\persistence\orm\property\CascadableEntityProperty;
 use n2n\persistence\orm\store\action\PersistAction;
 use n2n\persistence\orm\store\action\RemoveAction;
 use n2n\persistence\orm\query\from\meta\TreePointMeta;
@@ -41,8 +40,7 @@ use n2n\persistence\orm\criteria\JoinType;
 use n2n\impl\persistence\orm\property\relation\LazyRelation;
 use n2n\persistence\orm\query\select\Selection;
 
-abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter implements RelationEntityProperty, 
-		CascadableEntityProperty {
+abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter implements RelationEntityProperty {
 	protected $master;
 	protected $type;
 	private LazyRelation $lazyRelation;
@@ -118,8 +116,8 @@ abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter imple
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\CascadableEntityProperty::prepareSupplyJob()
 	 */
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash): void {
-		$this->getRelation()->prepareSupplyJob($supplyJob, $value, $oldValueHash);
+	public function prepareSupplyJob(SupplyJob $supplyJob, mixed $value, ?ValueHash $valueHash, ?ValueHash $oldValueHash): void {
+		$this->getRelation()->prepareSupplyJob($supplyJob, $value, $valueHash, $oldValueHash);
 	}
 
 	/**

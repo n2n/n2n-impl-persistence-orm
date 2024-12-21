@@ -55,8 +55,8 @@ class ToOneEntityProperty extends RelationEntityPropertyAdapter implements Colum
 		return $this->getRelation()->createColumnComparable($metaTreePoint, $queryState);
 	}
 	
-	public function cascade($value, $cascadeType, CascadeOperation $cascadeOperation) {
-		if ($value === null) return null;
+	public function cascade(mixed $value, int $cascadeType, CascadeOperation $cascadeOperation): void {
+		if ($value === null) return;
 		
 		if ($this->getRelation()->getCascadeType() & $cascadeType) {
 			$cascadeOperation->cascade($value);

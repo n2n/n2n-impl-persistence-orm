@@ -110,7 +110,7 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 		throw new UnsupportedOperationException();
 	}
 	
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash): void {
+	public function prepareSupplyJob(SupplyJob $supplyJob, mixed $value, ?ValueHash $valueHash, ?ValueHash $oldValueHash): void {
 		if (!$this->orphanRemoval || $oldValueHash === null || $supplyJob->isInsert()) return;
 
 		ArgUtils::assertTrue($oldValueHash instanceof ToManyValueHash);

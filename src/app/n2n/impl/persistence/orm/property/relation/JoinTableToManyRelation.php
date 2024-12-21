@@ -88,8 +88,8 @@ class JoinTableToManyRelation extends JoinTableRelation implements ToManyRelatio
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::prepareSupplyJob()
 	 */
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash): void {
-		$this->toManyUtils->prepareSupplyJob($supplyJob, $value, $oldValueHash);
+	public function prepareSupplyJob(SupplyJob $supplyJob, mixed $value, ?ValueHash $valueHash, ?ValueHash $oldValueHash): void {
+		$this->toManyUtils->prepareSupplyJob($supplyJob, $value, $valueHash, $oldValueHash);
 	}
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyPersistAction()

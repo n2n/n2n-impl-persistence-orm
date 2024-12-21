@@ -36,7 +36,7 @@ class ToManyUtils {
 		$this->master = (boolean) $master;
 	}
 
-	public function prepareSupplyJob(SupplyJob $supplyJob, $value, ?ValueHash $oldValueHash): void {
+	public function prepareSupplyJob(SupplyJob $supplyJob, mixed $value, ?ValueHash $valueHash, ?ValueHash $oldValueHash): void {
 		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToManyValueHash);
 		
 		if ($oldValueHash !== null && $oldValueHash->checkForUntouchedProxy($value)) {

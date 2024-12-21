@@ -46,7 +46,7 @@ class ToManyEntityProperty extends RelationEntityPropertyAdapter implements Cust
 				array('n2n\impl\persistence\orm\property\relation\selection\ArrayObjectProxy')));
 	}
 	
-	public function cascade($value, $cascadeType, CascadeOperation $cascadeOperation) {
+	public function cascade(mixed $value, int $cascadeType, CascadeOperation $cascadeOperation): void {
 		if ($value === null || !($this->getRelation()->getCascadeType() & $cascadeType)) return;
 		
 		if ($cascadeType !== CascadeType::REMOVE && $value instanceof ArrayObjectProxy && !$value->isInitialized()) {

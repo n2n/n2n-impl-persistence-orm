@@ -29,6 +29,9 @@ use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\persistence\orm\EntityDataException;
 use n2n\util\type\TypeUtils;
 use n2n\reflection\property\PropertyAccessException;
+use n2n\persistence\orm\store\action\supply\SupplyJob;
+use n2n\persistence\orm\store\ValueHash;
+use n2n\persistence\orm\store\operation\CascadeOperation;
 
 abstract class EntityPropertyAdapter implements EntityProperty {
 	private $entityModel;
@@ -143,7 +146,13 @@ abstract class EntityPropertyAdapter implements EntityProperty {
 	function ensureInit(): void {
 
 	}
-	
+
+	function prepareSupplyJob(SupplyJob $supplyJob, mixed $value, ?ValueHash $valueHash, ?ValueHash $oldValueHash): void {
+	}
+
+	function cascade(mixed $value, int $cascadeType, CascadeOperation $cascadeOperation): void {
+	}
+
 	public function __toString(): string {
 		return (new \ReflectionClass($this))->getShortName() . ' [' . $this->accessProxy . ']';
 	}
