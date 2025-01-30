@@ -187,9 +187,8 @@ class ScalarValueObjectEntityPropertyTest extends TestCase {
 		$tx = $tm->createTransaction();
 		$this->tem()->persist($svoem);
 
-		$this->assertCount(1, $this->lifecycleListener->getClassNames());
-		$this->assertEquals(1, $this->lifecycleListener->getNum());
-		$this->assertEquals(1, $this->lifecycleListener->prePersistNums[ScalarValueObjectEntityMock::class]);
+		$this->assertCount(0, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(0, $this->lifecycleListener->getNum());
 		$tx->commit();
 
 		$this->assertCount(1, $this->lifecycleListener->getClassNames());

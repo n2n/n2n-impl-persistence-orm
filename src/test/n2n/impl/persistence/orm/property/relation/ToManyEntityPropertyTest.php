@@ -77,14 +77,14 @@ class ToManyEntityPropertyTest extends TestCase {
 		$tx = $tm->createTransaction();
 		$this->tem()->persist($tmem);
 
-		$this->assertCount(2, $this->lifecycleListener->getClassNames());
-		$this->assertEquals(3, $this->lifecycleListener->getNum());
-		$this->assertEquals(1, $this->lifecycleListener->prePersistNums[ToManyEntityMock::class]);
-		$this->assertEquals(2, $this->lifecycleListener->prePersistNums[SimpleTargetMock::class]);
+		$this->assertCount(0, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(0, $this->lifecycleListener->getNum());
 		$tx->commit();
 
 		$this->assertCount(2, $this->lifecycleListener->getClassNames());
 		$this->assertEquals(6, $this->lifecycleListener->getNum());
+		$this->assertEquals(1, $this->lifecycleListener->prePersistNums[ToManyEntityMock::class]);
+		$this->assertEquals(2, $this->lifecycleListener->prePersistNums[SimpleTargetMock::class]);
 		$this->assertEquals(1, $this->lifecycleListener->postPersistNums[ToManyEntityMock::class]);
 		$this->assertEquals(2, $this->lifecycleListener->postPersistNums[SimpleTargetMock::class]);
 		$this->assertCount(2, $this->lifecycleListener->events[ToManyEntityMock::class]);

@@ -143,9 +143,8 @@ class EmbeddedLiveTest extends TestCase {
 		$tx = $tm->createTransaction();
 		$this->tem()->persist($ecm);
 
-		$this->assertCount(1, $this->lifecycleListener->getClassNames());
-		$this->assertEquals(1, $this->lifecycleListener->getNum());
-		$this->assertEquals(1, $this->lifecycleListener->prePersistNums[EmbeddedContainerMock::class]);
+		$this->assertCount(0, $this->lifecycleListener->getClassNames());
+		$this->assertEquals(0, $this->lifecycleListener->getNum());
 
 		$tx->commit();
 

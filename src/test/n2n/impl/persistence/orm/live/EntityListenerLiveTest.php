@@ -13,6 +13,9 @@ use n2n\impl\persistence\orm\property\relation\util\ArrayObjectProxyUtils;
 use n2n\persistence\orm\OrmUtils;
 use n2n\impl\persistence\orm\live\mock\OttoEntityListenerMock;
 use n2n\persistence\orm\model\mock\EntityListenerMock;
+use n2n\test\TestEnv;
+use n2n\core\util\N2nUtil;
+use n2n\core\util\ClosureCommitListener;
 
 class EntityListenerLiveTest extends TestCase {
 
@@ -58,31 +61,26 @@ class EntityListenerLiveTest extends TestCase {
 		$otto2 = new ObservableTargetTestObj(2);
 		$otto2->setHoleradio('huii 2');
 
-
 		$oto1 = new ObservableTestObj(1);
 		$oto1->setObservableTargetTestObjs(new \ArrayObject([$otto1]));
 		$oto1->setObservableTargetTestObj($otto2);
 
 		$tem->persist($oto1);
 
-		$this->assertCount(1, $oto1->getMethodCalls());
-		$this->assertEquals('_prePersist', $oto1->getMethodCalls()[0]);
-
-		$this->assertCount(1, $otto1->getMethodCalls());
-		$this->assertEquals('_prePersist', $otto1->getMethodCalls()[0]);
-
-		$this->assertCount(1, $otto2->getMethodCalls());
-		$this->assertEquals('_prePersist', $otto2->getMethodCalls()[0]);
+		$this->assertCount(0, $oto1->getMethodCalls());
 
 		$tx->commit();
 
 		$this->assertCount(2, $oto1->getMethodCalls());
+		$this->assertEquals('_prePersist', $oto1->getMethodCalls()[0]);
 		$this->assertEquals('_postPersist', $oto1->getMethodCalls()[1]);
 
 		$this->assertCount(2, $otto1->getMethodCalls());
+		$this->assertEquals('_prePersist', $otto1->getMethodCalls()[0]);
 		$this->assertEquals('_postPersist', $otto1->getMethodCalls()[1]);
 
 		$this->assertCount(2, $otto2->getMethodCalls());
+		$this->assertEquals('_prePersist', $otto2->getMethodCalls()[0]);
 		$this->assertEquals('_postPersist', $otto2->getMethodCalls()[1]);
 
 		// test postLoad
