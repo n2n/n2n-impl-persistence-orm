@@ -41,6 +41,7 @@ use n2n\util\uri\Url;
 use n2n\util\type\TypeConstraints;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
+use n2n\util\magic\MagicContext;
 
 class UrlEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	public function __construct(AccessProxy $accessProxy, $columnName) {
@@ -130,7 +131,7 @@ class UrlEntityProperty extends ColumnPropertyAdapter implements BasicEntityProp
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
 	 */
-	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, MagicContext $magicContext): ValueHash {
 		if ($value === null) return new CommonValueHash(null);
 		return new CommonValueHash((string) $value);
 	}

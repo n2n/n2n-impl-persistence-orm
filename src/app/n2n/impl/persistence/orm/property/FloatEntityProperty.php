@@ -41,6 +41,7 @@ use n2n\util\type\TypeName;
 use n2n\util\type\TypeConstraints;
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\query\select\Selection;
+use n2n\util\magic\MagicContext;
 
 class FloatEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	/**
@@ -105,7 +106,7 @@ class FloatEntityProperty extends ColumnPropertyAdapter implements BasicEntityPr
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
 	 */
-	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, MagicContext $magicContext): ValueHash {
 		return new CommonValueHash($value);
 	}
 

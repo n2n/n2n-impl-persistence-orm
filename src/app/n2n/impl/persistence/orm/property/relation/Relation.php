@@ -29,6 +29,7 @@ use n2n\persistence\orm\query\from\meta\TreePointMeta;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\store\ValueHash;
+use n2n\util\magic\MagicContext;
 
 interface Relation {
 	
@@ -94,5 +95,5 @@ interface Relation {
 	 */
 	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash);
 	
-	public function createValueHash(mixed $value, EntityManager $em): ValueHash;
+	public function createValueHash(mixed $value, MagicContext $magicContext): ValueHash;
 }

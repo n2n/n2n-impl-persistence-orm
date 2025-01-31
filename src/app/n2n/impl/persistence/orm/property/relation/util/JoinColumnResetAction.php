@@ -44,7 +44,7 @@ class JoinColumnResetAction extends ActionAdapter {
 		$this->joinIdRaw = $joinIdRaw;
 	}
 	
-	protected function exec() {
+	protected function exec(Pdo $pdo): void {
 		$metaData = $this->pdo->getMetaData();
 	
 		$updateBuilder = $metaData->createUpdateStatementBuilder();

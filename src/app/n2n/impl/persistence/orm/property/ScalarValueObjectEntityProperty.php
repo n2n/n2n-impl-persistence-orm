@@ -31,6 +31,7 @@ use n2n\spec\valobj\err\IllegalValueException;
 use n2n\persistence\orm\CorruptedDataException;
 use n2n\util\type\ValueIncompatibleWithConstraintsException;
 use n2n\util\type\UnionTypeConstraint;
+use n2n\util\magic\MagicContext;
 
 class ScalarValueObjectEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 
@@ -107,7 +108,7 @@ class ScalarValueObjectEntityProperty extends ColumnPropertyAdapter implements B
 	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
 	}
 
-	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, MagicContext $magicContext): ValueHash {
 		assert($value === null || $value instanceof ScalarValueObject);
 		return new CommonValueHash($value?->toScalar());
 	}

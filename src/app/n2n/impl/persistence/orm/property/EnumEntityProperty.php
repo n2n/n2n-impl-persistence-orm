@@ -39,6 +39,7 @@ use n2n\util\EnumUtils;
 use n2n\impl\persistence\orm\property\compare\EnumColumnComparable;
 use n2n\impl\persistence\orm\property\select\EnumSelection;
 use n2n\persistence\orm\query\select\Selection;
+use n2n\util\magic\MagicContext;
 
 class EnumEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 
@@ -80,7 +81,7 @@ class EnumEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $rawValue, null, $this);
 	}
 
-	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, MagicContext $magicContext): ValueHash {
 		if ($value === null) return new CommonValueHash(null);
 		return new CommonValueHash($this->valueToRep($value));
 	}

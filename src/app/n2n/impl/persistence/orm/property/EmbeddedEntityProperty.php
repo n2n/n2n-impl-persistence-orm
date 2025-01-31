@@ -53,6 +53,7 @@ use n2n\util\col\ArrayUtils;
 use n2n\persistence\orm\store\ValueHashCol;
 use n2n\persistence\orm\criteria\compare\CustomComparable;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
+use n2n\util\magic\MagicContext;
 
 class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComparableEntityProperty,
 		EntityPropertyCollection, JoinableEntityProperty {
@@ -231,14 +232,14 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 		}
 	}
 
-	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, MagicContext $magicContext): ValueHash {
 		$valueHashCol = new ValueHashCol();
 		foreach ($this->properties as $propertyName => $property)  {
 			$propertyValue = null;
 			if ($value !== null) {
 				$propertyValue = $property->readValue($value);
 			}
-			$valueHashCol->putValueHash($propertyName, $property->createValueHash($propertyValue, $em));
+			$valueHashCol->putValueHash($propertyName, $property->createValueHash($propertyValue, $magicContext));
 		}
 		return $valueHashCol;
 	}

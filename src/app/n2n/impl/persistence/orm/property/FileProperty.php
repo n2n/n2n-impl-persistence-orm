@@ -132,7 +132,7 @@
 //		return isset($constraints) && !is_null($constraints->getParamClass())
 //				&& $constraints->getParamClass()->getName() == 'n2n\io\managed\File' && !$constraints->isArray();
 //	}
-//	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
+//	public function createValueHash(mixed $value, MagicContext $magicContext): ValueHash {
 //	}
 //
 //	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {

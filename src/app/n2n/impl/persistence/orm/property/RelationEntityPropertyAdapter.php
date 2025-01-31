@@ -39,6 +39,7 @@ use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\criteria\JoinType;
 use n2n\impl\persistence\orm\property\relation\LazyRelation;
 use n2n\persistence\orm\query\select\Selection;
+use n2n\util\magic\MagicContext;
 
 abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter implements RelationEntityProperty {
 	protected $master;
@@ -140,8 +141,8 @@ abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter imple
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
 	 */
-	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
-		return $this->getRelation()->createValueHash($value, $em);
+	public function createValueHash(mixed $value, MagicContext $magicContext): ValueHash {
+		return $this->getRelation()->createValueHash($value, $magicContext);
 	}
 	
 	public function hasTargetEntityModel(): bool {

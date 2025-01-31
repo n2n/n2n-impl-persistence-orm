@@ -48,6 +48,7 @@ use n2n\util\type\ArgUtils;
 use n2n\impl\persistence\orm\property\relation\util\ToOneValueHash;
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\query\select\Selection;
+use n2n\util\magic\MagicContext;
 
 class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, ActionDependency {
 	private $joinColumnName;
@@ -224,7 +225,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 // 	}
 
 	
-	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, MagicContext $magicContext): ValueHash {
 		return ToOneValueHasher::createFromEntityModel($this->targetEntityModel)
 				->createValueHash($value);
 	}

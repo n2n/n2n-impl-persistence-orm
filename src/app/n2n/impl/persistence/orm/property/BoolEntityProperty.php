@@ -40,6 +40,7 @@ use n2n\persistence\orm\query\select\SimpleSelection;
 use n2n\util\type\TypeConstraints;
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\query\select\Selection;
+use n2n\util\magic\MagicContext;
 
 class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	/**
@@ -108,7 +109,7 @@ class BoolEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::createValueHash()
 	 */
-	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, MagicContext $magicContext): ValueHash {
 		if ($value === null) return new CommonValueHash(null);
 		return new CommonValueHash($this->valueToRep($value));
 	}

@@ -40,6 +40,7 @@ use n2n\impl\persistence\orm\property\relation\util\ToManyAnalyzer;
 use n2n\util\type\ArgUtils;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\orm\criteria\compare\CustomComparable;
+use n2n\util\magic\MagicContext;
 
 class PropertyMappedToManyRelation extends MappedRelation implements ToManyRelation {
 	private $toManyUtils;
@@ -81,7 +82,7 @@ class PropertyMappedToManyRelation extends MappedRelation implements ToManyRelat
 		return $toManySelection;
 	}
 
-	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, MagicContext $magicContext): ValueHash {
 		return ToManyValueHasher::createFromEntityModel($this->targetEntityModel)
 				->createValueHash($value);
 	}

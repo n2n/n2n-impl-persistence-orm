@@ -39,6 +39,7 @@ use n2n\persistence\orm\store\CommonValueHash;
 use n2n\util\type\TypeConstraints;
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\query\select\Selection;
+use n2n\util\magic\MagicContext;
 
 class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	public function __construct(AccessProxy $accessProxy, $columnName) {
@@ -80,7 +81,7 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $rawValue, null, $this);
 	}
 
-	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, MagicContext $magicContext): ValueHash {
 		if ($value === null) return new CommonValueHash(null);
 		return new CommonValueHash($this->valueToRep($value));
 	}

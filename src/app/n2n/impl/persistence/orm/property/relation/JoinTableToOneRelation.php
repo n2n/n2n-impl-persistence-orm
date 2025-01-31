@@ -40,6 +40,7 @@ use n2n\impl\persistence\orm\property\relation\util\ToOneValueHash;
 use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\query\select\Selection;
+use n2n\util\magic\MagicContext;
 
 class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation {
 	private $toOneUtils;
@@ -116,7 +117,7 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 		});
 	}
 	
-	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, MagicContext $magicContext): ValueHash {
 		return ToOneValueHasher::createFromEntityModel($this->targetEntityModel)
 				->createValueHash($value);
 	}

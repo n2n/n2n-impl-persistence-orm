@@ -45,6 +45,7 @@ use n2n\impl\persistence\orm\property\relation\compare\ToManyCustomComparable;
 use n2n\impl\persistence\orm\property\relation\compare\InverseJoinColumnToManyQueryItemFactory;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\orm\criteria\compare\CustomComparable;
+use n2n\util\magic\MagicContext;
 
 class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToManyRelation {
 	private $inverseJoinColumnName;
@@ -199,7 +200,7 @@ class InverseJoinColumnOneToManyRelation extends MasterRelation implements ToMan
 // 	public function supplyInverseToOneRemoveAction($targetValue, $targetValueHash, RemoveAction $targetRemoveAction) {
 // 	}
 	
-	public function createValueHash(mixed $value, EntityManager $em): ValueHash {
+	public function createValueHash(mixed $value, MagicContext $magicContext): ValueHash {
 		$analyzer = new ToManyValueHasher($this->targetEntityModel->getIdDef()
 				->getEntityProperty());
 		return $analyzer->createValueHash($value);
