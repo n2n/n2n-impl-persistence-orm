@@ -128,7 +128,7 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 	 * @see \n2n\persistence\orm\property\EntityProperty::createSelection()
 	 */
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
-		return new EmbeddedSelection($this, $metaTreePoint->requestPropertyJoinedTreePoint($this->getName(), false));
+		return new EmbeddedSelection($this, $metaTreePoint->requestCustomPropertyJoinTreePoint($this, false));
 	}
 
 	/* (non-PHPdoc)
