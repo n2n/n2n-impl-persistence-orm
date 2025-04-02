@@ -55,6 +55,8 @@ use n2n\spec\valobj\scalar\IntValueObject;
 use n2n\spec\valobj\scalar\FloatValueObject;
 use n2n\spec\valobj\scalar\BoolValueObject;
 use n2n\util\ex\ExUtils;
+use n2n\util\calendar\Time;
+use n2n\impl\persistence\orm\property\calendar\TimeEntityProperty;
 
 class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	const PROP_FILE_NAME_SUFFIX = '.originalName';
@@ -138,6 +140,10 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 					return;
 				case \DateTime::class:
 					$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy,
+							$classSetup->requestColumn($propertyName)));
+					return;
+				case Time::class:
+					$classSetup->provideEntityProperty(new TimeEntityProperty($propertyAccessProxy,
 							$classSetup->requestColumn($propertyName)));
 					return;
 				case \n2n\l10n\N2nLocale::class:
