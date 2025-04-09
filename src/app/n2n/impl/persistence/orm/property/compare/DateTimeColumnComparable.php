@@ -29,6 +29,7 @@ use n2n\spec\dbo\meta\data\impl\QueryPlaceMarker;
 use n2n\persistence\meta\data\QueryPartGroup;
 use n2n\persistence\orm\criteria\compare\ColumnComparableAdapter;
 use n2n\persistence\orm\criteria\compare\CriteriaComparator;
+use n2n\util\type\TypeConstraints;
 
 class DateTimeColumnComparable extends ColumnComparableAdapter {
 	private $queryState;
@@ -39,19 +40,32 @@ class DateTimeColumnComparable extends ColumnComparableAdapter {
 		
 		$this->queryState = $queryState;
 	}
-	
+
+	function getTypeConstraint($operator) {
+		if ($operator === CriteriaComparator::OPERATOR_LIKE || $operator === CriteriaComparator::OPERATOR_NOT_LIKE) {
+			return TypeConstraints::type([\DateTime::class, 'string', null]);
+		}
+
+		return parent::getTypeConstraint($operator);
+	}
+
 	private function buildDateTimeRawValue($value) {
 		return $this->queryState->getEntityManager()->getPdo()->getMetaData()->getDialect()
 				->getOrmDialectConfig()->buildDateTimeRawValue($value);
 	}
 	
 	public function buildCounterpartQueryItemFromValue(string $operator, mixed $value): QueryItem {
+		if (is_string($value)
+				&& ($operator === CriteriaComparator::OPERATOR_LIKE || $operator === CriteriaComparator::OPERATOR_NOT_LIKE)) {
+			return new QueryPlaceMarker($this->queryState->registerPlaceholderValue($value));
+		}
+
 		if ($operator != CriteriaComparator::OPERATOR_IN && $operator != CriteriaComparator::OPERATOR_NOT_IN) {
 			ArgUtils::valType($value, 'DateTime', true);
 			return new QueryPlaceMarker($this->queryState->registerPlaceholderValue(
 					$this->buildDateTimeRawValue($value)));
-		} 
-		
+		}
+
 		ArgUtils::valArray($value, 'DateTime');
 		
 		$queryPartGroup = new QueryPartGroup();
