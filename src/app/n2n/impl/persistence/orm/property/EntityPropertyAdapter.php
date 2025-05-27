@@ -32,6 +32,7 @@ use n2n\reflection\property\PropertyAccessException;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\store\operation\CascadeOperation;
+use n2n\persistence\orm\CorruptedDataException;
 
 abstract class EntityPropertyAdapter implements EntityProperty {
 	private $entityModel;
@@ -88,20 +89,27 @@ abstract class EntityPropertyAdapter implements EntityProperty {
 	public function getName() {
 		return $this->accessProxy->getPropertyName();
 	}
-	
-	
+
+
 	/**
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::writeValue()
 	 */
-	public function writeValue($object, $value) {
-		$this->accessProxy->setValue($object, $value);
+	public function writeValue(object $object, mixed $value): void {
+		try {
+			$this->accessProxy->setValue($object, $value);
+		} catch (PropertyAccessException $e) {
+			throw new CorruptedDataException('Value of type ' . TypeUtils::getTypeInfo($value) . ' could not be '
+							. ' written to EntityProperty of type ' . get_class($this) . '. Reason: '
+							. $e->getMessage(),
+					previous: $e);
+		}
 	}
 	
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::readValue()
 	 */
-	public function readValue($object) {
+	public function readValue(object $object): mixed {
 		try {
 			return $this->accessProxy->getValue($object);
 		} catch (PropertyAccessException $e) {
