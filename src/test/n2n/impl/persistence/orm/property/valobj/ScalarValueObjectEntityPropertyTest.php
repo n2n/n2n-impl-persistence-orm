@@ -123,6 +123,9 @@ class ScalarValueObjectEntityPropertyTest extends TestCase {
 	}
 
 
+	/**
+	 * @throws DboException
+	 */
 	function testColumnComparableForNull() {
 		$this->pdoUtil->insert('scalar_value_object_entity_mock', ['id' => 1, 'positive_int' => 3, 'short_string' => null]);
 		$this->pdoUtil->insert('scalar_value_object_entity_mock', ['id' => 1, 'positive_int' => 3, 'short_string' => 'a']);

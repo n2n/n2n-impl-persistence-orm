@@ -66,7 +66,7 @@ abstract class ColumnPropertyAdapter extends EntityPropertyAdapter implements Co
 	
 	public function equals($obj) {
 		return $obj instanceof EntityProperty
-				&& $obj->getEntityModel()->equals($this->entityModel)
+				&& $obj->getEntityModel()->equals($this->getEntityModel())
 				&& $obj->getName() == $this->getName();
 	}
 }
