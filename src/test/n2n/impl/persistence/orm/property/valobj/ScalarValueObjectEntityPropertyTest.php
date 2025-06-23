@@ -122,6 +122,20 @@ class ScalarValueObjectEntityPropertyTest extends TestCase {
 		$this->assertEquals(1, $entityMocks[0]->positiveInt->toScalar());
 	}
 
+
+	function testColumnComparableForNull() {
+		$this->pdoUtil->insert('scalar_value_object_entity_mock', ['id' => 1, 'positive_int' => 3, 'short_string' => null]);
+		$this->pdoUtil->insert('scalar_value_object_entity_mock', ['id' => 1, 'positive_int' => 3, 'short_string' => 'a']);
+
+		$em = $this->emPool->getEntityManagerFactory()->getExtended();
+
+		$entityMocks = $em->createSimpleCriteria(ScalarValueObjectEntityMock::class, ['shortString' => NULL])
+				->toQuery()->fetchArray();
+		$this->assertCount(1, $entityMocks);
+		$this->assertInstanceOf(ScalarValueObjectEntityMock::class, $entityMocks[0]);
+		$this->assertNull($entityMocks[0]->shortString);
+	}
+
 	function testPersist(): void {
 		$em = $this->emPool->getEntityManagerFactory()->getExtended();
 

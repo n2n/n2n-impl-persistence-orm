@@ -64,7 +64,7 @@ class ScalarValueObjectEntityProperty extends ColumnPropertyAdapter implements B
 		};
 
 		return new CallbackColumnComparable($queryItem, $queryState,
-				TypeConstraints::type([/*$this->scalarTypeConstraint*/ 'scalar', $this->class->getName()]), $callback);
+				TypeConstraints::type(['scalar', $this->class->getName(), 'null']), $callback);
 	}
 
 	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): ColumnComparable {
