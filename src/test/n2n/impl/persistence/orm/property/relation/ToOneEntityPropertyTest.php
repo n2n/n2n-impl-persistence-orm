@@ -206,17 +206,29 @@ class ToOneEntityPropertyTest extends TestCase {
 				$this->createMock(TreePointMeta::class));
 		$leftTreePoint->setJoinType(JoinType::LEFT);
 
+		$crossTreePoint = new JoinedEntityTreePoint($this->createMock(QueryState::class),
+				$this->createMock(TreePointMeta::class));
+		$crossTreePoint->setJoinType(JoinType::CROSS);
+
+		$rightTreePoint = new JoinedEntityTreePoint($this->createMock(QueryState::class),
+				$this->createMock(TreePointMeta::class));
+		$rightTreePoint->setJoinType(JoinType::RIGHT);
+
 		$entityModel = $this->emPool->getEntityModelManager()->getEntityModelByClass(ToOneEntityMock::class);
 		$entityProperty = $entityModel->getEntityPropertyByName('joinColumnTarget');
 		$this->assertInstanceOf(ToOneEntityProperty::class, $entityProperty);
 		$this->assertEquals(JoinType::getValues(), $entityProperty->getAvailableJoinTypes($innerTreePoint));
 		$this->assertEquals(JoinType::getValues(), $entityProperty->getAvailableJoinTypes($leftTreePoint));
+		$this->assertEquals(JoinType::getValues(), $entityProperty->getAvailableJoinTypes($crossTreePoint));
+		$this->assertEquals(JoinType::getValues(), $entityProperty->getAvailableJoinTypes($rightTreePoint));
 
 		$entityModel = $this->emPool->getEntityModelManager()->getEntityModelByClass(ToOneMandatoryEntityMock::class);
 		$entityProperty = $entityModel->getEntityPropertyByName('joinColumnTarget');
 		$this->assertInstanceOf(ToOneEntityProperty::class, $entityProperty);
 		$this->assertEquals([JoinType::INNER, JoinType::RIGHT], $entityProperty->getAvailableJoinTypes($innerTreePoint));
 		$this->assertEquals(JoinType::getValues(), $entityProperty->getAvailableJoinTypes($leftTreePoint));
+		$this->assertEquals(JoinType::getValues(), $entityProperty->getAvailableJoinTypes($crossTreePoint));
+		$this->assertEquals([JoinType::INNER, JoinType::RIGHT], $entityProperty->getAvailableJoinTypes($rightTreePoint));
 	}
 
 	function testInnerLeftJoin() {
