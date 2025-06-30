@@ -76,7 +76,8 @@ class ToOneEntityProperty extends RelationEntityPropertyAdapter implements Colum
 
 	public function getAvailableJoinTypes(TreePoint $treePoint): array {
 		if ($this->accessProxy->getSetterConstraint()->allowsNull()
-				|| $treePoint->getJoinType() === JoinType::LEFT) {
+				|| $treePoint->getJoinType() === JoinType::LEFT
+				|| $treePoint->getJoinType() === JoinType::CROSS) {
 			return parent::getAvailableJoinTypes($treePoint);
 		}
 
