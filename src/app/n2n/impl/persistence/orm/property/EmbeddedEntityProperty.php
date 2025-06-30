@@ -54,6 +54,7 @@ use n2n\persistence\orm\store\ValueHashCol;
 use n2n\persistence\orm\criteria\compare\CustomComparable;
 use n2n\persistence\orm\store\action\supply\SupplyJob;
 use n2n\util\magic\MagicContext;
+use n2n\persistence\orm\query\from\TreePoint;
 
 class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComparableEntityProperty,
 		EntityPropertyCollection, JoinableEntityProperty {
@@ -262,7 +263,7 @@ class EmbeddedEntityProperty extends EntityPropertyAdapter implements CustomComp
 		return $this->readValue($entityObj);
 	}
 
-	public function getAvailableJoinTypes(): array {
+	public function getAvailableJoinTypes(TreePoint $treePoint): array {
 		return [JoinType::INNER];
 	}
 }
@@ -287,7 +288,7 @@ class EmbeddedTreePoint extends ExtendableTreePoint implements JoinedTreePoint {
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\query\from\JoinedTreePoint::getJoinType()
 	 */
-	public function getJoinType() {
+	public function getJoinType(): string {
 		return JoinType::INNER;
 	}
 

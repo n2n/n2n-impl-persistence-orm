@@ -32,6 +32,7 @@ use n2n\util\type\TypeConstraints;
 use n2n\impl\persistence\orm\property\relation\LazyRelation;
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\criteria\JoinType;
+use n2n\persistence\orm\query\from\TreePoint;
 
 class ToOneEntityProperty extends RelationEntityPropertyAdapter implements ColumnComparableEntityProperty, 
 		QueryItemRepresentableEntityProperty {
@@ -73,9 +74,10 @@ class ToOneEntityProperty extends RelationEntityPropertyAdapter implements Colum
 		return $value;
 	}
 
-	public function getAvailableJoinTypes(): array {
-		if ($this->accessProxy->getSetterConstraint()->allowsNull()) {
-			return parent::getAvailableJoinTypes();
+	public function getAvailableJoinTypes(TreePoint $treePoint): array {
+		if ($this->accessProxy->getSetterConstraint()->allowsNull()
+				|| $treePoint->getJoinType() === JoinType::LEFT) {
+			return parent::getAvailableJoinTypes($treePoint);
 		}
 
 		if ($this->isFromMany()) {

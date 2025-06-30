@@ -40,6 +40,7 @@ use n2n\persistence\orm\criteria\JoinType;
 use n2n\impl\persistence\orm\property\relation\LazyRelation;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\util\magic\MagicContext;
+use n2n\persistence\orm\query\from\TreePoint;
 
 abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter implements RelationEntityProperty {
 	protected $master;
@@ -161,7 +162,7 @@ abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter imple
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\JoinableEntityProperty::getAvailableJoinTypes()
 	 */
-	public function getAvailableJoinTypes(): array {
+	public function getAvailableJoinTypes(TreePoint $treePoint): array {
 		return JoinType::getValues();
 	}
 

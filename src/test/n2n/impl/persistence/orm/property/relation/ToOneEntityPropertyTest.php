@@ -14,6 +14,10 @@ use n2n\impl\persistence\orm\property\relation\mock\ToOneEntityMock;
 use n2n\impl\persistence\orm\property\relation\mock\ToOneMandatoryEntityMock;
 use n2n\impl\persistence\orm\property\ToOneEntityProperty;
 use n2n\persistence\meta\data\JoinType;
+use n2n\impl\persistence\orm\property\relation\mock\ToOneWrapperEntityMock;
+use n2n\persistence\orm\query\from\JoinedEntityTreePoint;
+use n2n\persistence\orm\query\QueryState;
+use n2n\persistence\orm\query\from\meta\TreePointMeta;
 
 class ToOneEntityPropertyTest extends TestCase {
 
@@ -28,19 +32,24 @@ class ToOneEntityPropertyTest extends TestCase {
 //				new EntityModelFactory([CommonEntityPropertyProvider::class]));
 
 		$this->emPool = GeneralTestEnv::setUpEmPool([ToOneEntityMock::class, ToOneMandatoryEntityMock::class,
-				SimpleTargetMock::class]);
+				ToOneWrapperEntityMock::class, SimpleTargetMock::class]);
 		$this->pdoPool = $this->emPool->getPdoPool();
 
 		$metaData = $this->pdoPool->getPdo()->getMetaData();
 		$database = $metaData->getDatabase();
 		$metaEntityFactory = $database->createMetaEntityFactory();
 
-		$table = $metaEntityFactory->createTable('to_one_entity_mock');
+		$table = $metaEntityFactory->createTable('to_one_wrapper_entity_mock');
+		$columnFactory = $table->createColumnFactory();
+		$columnFactory->createIntegerColumn('id', 32);
+		$columnFactory->createIntegerColumn('to_one_id', 32);
+
+		$table = $metaEntityFactory->createTable('to_one_mandatory_entity_mock');
 		$columnFactory = $table->createColumnFactory();
 		$columnFactory->createIntegerColumn('id', 32);
 		$columnFactory->createIntegerColumn('join_column_target_id', 32);
 
-		$table = $metaEntityFactory->createTable('to_one_mandatory_entity_mock');
+		$table = $metaEntityFactory->createTable('to_one_entity_mock');
 		$columnFactory = $table->createColumnFactory();
 		$columnFactory->createIntegerColumn('id', 32);
 		$columnFactory->createIntegerColumn('join_column_target_id', 32);
@@ -189,21 +198,29 @@ class ToOneEntityPropertyTest extends TestCase {
 	}
 
 	function testGetAvailableJoinTypes() {
+		$innerTreePoint = new JoinedEntityTreePoint($this->createMock(QueryState::class),
+				$this->createMock(TreePointMeta::class));
+		$innerTreePoint->setJoinType(JoinType::INNER);
+
+		$leftTreePoint = new JoinedEntityTreePoint($this->createMock(QueryState::class),
+				$this->createMock(TreePointMeta::class));
+		$leftTreePoint->setJoinType(JoinType::LEFT);
+
 		$entityModel = $this->emPool->getEntityModelManager()->getEntityModelByClass(ToOneEntityMock::class);
 		$entityProperty = $entityModel->getEntityPropertyByName('joinColumnTarget');
 		$this->assertInstanceOf(ToOneEntityProperty::class, $entityProperty);
-		$this->assertEquals(JoinType::getValues(), $entityProperty->getAvailableJoinTypes());
+		$this->assertEquals(JoinType::getValues(), $entityProperty->getAvailableJoinTypes($innerTreePoint));
+		$this->assertEquals(JoinType::getValues(), $entityProperty->getAvailableJoinTypes($leftTreePoint));
 
 		$entityModel = $this->emPool->getEntityModelManager()->getEntityModelByClass(ToOneMandatoryEntityMock::class);
 		$entityProperty = $entityModel->getEntityPropertyByName('joinColumnTarget');
 		$this->assertInstanceOf(ToOneEntityProperty::class, $entityProperty);
-		$this->assertEquals([JoinType::INNER, JoinType::RIGHT], $entityProperty->getAvailableJoinTypes());
+		$this->assertEquals([JoinType::INNER, JoinType::RIGHT], $entityProperty->getAvailableJoinTypes($innerTreePoint));
+		$this->assertEquals(JoinType::getValues(), $entityProperty->getAvailableJoinTypes($leftTreePoint));
 	}
 
 	function testInnerLeftJoin() {
 		$tm = $this->pdoPool->getTransactionManager();
-		$this->lifecycleListener = GeneralTestEnv::getLifecycleListener();
-
 
 		$entityMock = new ToOneEntityMock();
 		$entityMock->id = 1;
@@ -231,6 +248,31 @@ class ToOneEntityPropertyTest extends TestCase {
 		$mandatoryEntityMock = $this->tem()->createCriteria()->select('em')->from(ToOneMandatoryEntityMock::class, 'em')
 				->where(['em.joinColumnTarget.holeradio' => null])->endClause()->toQuery()->fetchSingle();
 		$this->assertNull($mandatoryEntityMock?->id);
+
+		$tx->commit();
+	}
+
+	function testLeftLeftJoin() {
+		$tm = $this->pdoPool->getTransactionManager();
+
+		$wrapperEntityMock = new ToOneWrapperEntityMock();
+		$wrapperEntityMock->id = 1;
+
+		$tx = $tm->createTransaction();
+		$this->tem()->persist($wrapperEntityMock);
+		$tx->commit();
+
+		$tx = $tm->createTransaction(true);
+		$this->assertEquals(0, $this->tem()->createCriteria()->select('COUNT(1)')
+				->from(ToOneMandatoryEntityMock::class, 'e')->toQuery()->fetchSingle());
+		$this->assertEquals(1, $this->tem()->createCriteria()->select('COUNT(1)')
+				->from(ToOneWrapperEntityMock::class, 'e')->toQuery()->fetchSingle());
+
+		// toOne.joinColumnTarget must not be a INNER JOIN because the base table is LEFT JOINED table
+		$entityMock = $this->tem()->createCriteria()->select('em')->from(ToOneWrapperEntityMock::class, 'em')
+				->where(['em.toOne.joinColumnTarget.holeradio' => null])->orMatch('em.id', '=', 1)->endClause()
+				->toQuery()->fetchSingle();
+		$this->assertEquals(1, $entityMock?->id);
 
 		$tx->commit();
 	}
