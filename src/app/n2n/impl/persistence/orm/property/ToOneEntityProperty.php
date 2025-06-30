@@ -23,17 +23,15 @@ namespace n2n\impl\persistence\orm\property;
 
 use n2n\persistence\orm\property\ColumnComparableEntityProperty;
 use n2n\persistence\orm\property\QueryItemRepresentableEntityProperty;
-use n2n\impl\persistence\orm\property\relation\ToOneRelation;
-use n2n\util\type\TypeConstraint;
 use n2n\persistence\orm\query\from\MetaTreePoint;
 use n2n\persistence\orm\query\QueryState;
 use n2n\persistence\orm\store\operation\MergeOperation;
 use n2n\persistence\orm\CascadeType;
 use n2n\persistence\orm\store\operation\CascadeOperation;
-use n2n\persistence\orm\model\EntityPropertyCollection;
 use n2n\util\type\TypeConstraints;
 use n2n\impl\persistence\orm\property\relation\LazyRelation;
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
+use n2n\persistence\orm\criteria\JoinType;
 
 class ToOneEntityProperty extends RelationEntityPropertyAdapter implements ColumnComparableEntityProperty, 
 		QueryItemRepresentableEntityProperty {
@@ -73,6 +71,14 @@ class ToOneEntityProperty extends RelationEntityPropertyAdapter implements Colum
 		}
 		
 		return $value;
+	}
+
+	public function getAvailableJoinTypes(): array {
+		if ($this->accessProxy->getSetterConstraint()->allowsNull()) {
+			return parent::getAvailableJoinTypes();
+		}
+
+		return [JoinType::INNER];
 	}
 	
 //	public function hasEmbeddedEntityPropertyCollection(): bool {

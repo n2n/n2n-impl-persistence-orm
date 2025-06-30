@@ -4,16 +4,16 @@ namespace n2n\impl\persistence\orm\property\relation;
 
 use n2n\impl\persistence\orm\test\GeneralTestEnv;
 use n2n\test\DbTestPdoUtil;
-use n2n\impl\persistence\orm\property\relation\mock\ToManyEntityMock;
 use n2n\impl\persistence\orm\live\mock\SimpleTargetMock;
 use PHPUnit\Framework\TestCase;
 use n2n\persistence\ext\EmPool;
 use n2n\persistence\ext\PdoPool;
-use n2n\impl\persistence\orm\live\mock\EmbeddedContainerMock;
-use n2n\impl\persistence\orm\live\mock\EmbeddableMock;
 use n2n\impl\persistence\orm\live\mock\LifecycleListener;
 use n2n\persistence\orm\EntityManager;
 use n2n\impl\persistence\orm\property\relation\mock\ToOneEntityMock;
+use n2n\impl\persistence\orm\property\relation\mock\ToOneMandatoryEntityMock;
+use n2n\impl\persistence\orm\property\ToOneEntityProperty;
+use n2n\persistence\meta\data\JoinType;
 
 class ToOneEntityPropertyTest extends TestCase {
 
@@ -27,7 +27,8 @@ class ToOneEntityPropertyTest extends TestCase {
 //		$this->emm = new EntityModelManager([ScalarValueObjectEntityMock::class],
 //				new EntityModelFactory([CommonEntityPropertyProvider::class]));
 
-		$this->emPool = GeneralTestEnv::setUpEmPool([ToOneEntityMock::class, SimpleTargetMock::class]);
+		$this->emPool = GeneralTestEnv::setUpEmPool([ToOneEntityMock::class, ToOneMandatoryEntityMock::class,
+				SimpleTargetMock::class]);
 		$this->pdoPool = $this->emPool->getPdoPool();
 
 		$metaData = $this->pdoPool->getPdo()->getMetaData();
@@ -35,6 +36,11 @@ class ToOneEntityPropertyTest extends TestCase {
 		$metaEntityFactory = $database->createMetaEntityFactory();
 
 		$table = $metaEntityFactory->createTable('to_one_entity_mock');
+		$columnFactory = $table->createColumnFactory();
+		$columnFactory->createIntegerColumn('id', 32);
+		$columnFactory->createIntegerColumn('join_column_target_id', 32);
+
+		$table = $metaEntityFactory->createTable('to_one_mandatory_entity_mock');
 		$columnFactory = $table->createColumnFactory();
 		$columnFactory->createIntegerColumn('id', 32);
 		$columnFactory->createIntegerColumn('join_column_target_id', 32);
@@ -180,5 +186,52 @@ class ToOneEntityPropertyTest extends TestCase {
 		$this->assertCount(2, $this->lifecycleListener->getClassNames());
 		$this->assertEquals(24, $this->lifecycleListener->getNum());
 		$this->assertEquals(1, $this->lifecycleListener->postRemoveNums[ToOneEntityMock::class]);
+	}
+
+	function testGetAvailableJoinTypes() {
+		$entityModel = $this->emPool->getEntityModelManager()->getEntityModelByClass(ToOneEntityMock::class);
+		$entityProperty = $entityModel->getEntityPropertyByName('joinColumnTarget');
+		$this->assertInstanceOf(ToOneEntityProperty::class, $entityProperty);
+		$this->assertEquals(JoinType::getValues(), $entityProperty->getAvailableJoinTypes());
+
+		$entityModel = $this->emPool->getEntityModelManager()->getEntityModelByClass(ToOneMandatoryEntityMock::class);
+		$entityProperty = $entityModel->getEntityPropertyByName('joinColumnTarget');
+		$this->assertInstanceOf(ToOneEntityProperty::class, $entityProperty);
+		$this->assertEquals([JoinType::INNER], $entityProperty->getAvailableJoinTypes());
+	}
+
+	function testInnerLeftJoin() {
+		$tm = $this->pdoPool->getTransactionManager();
+		$this->lifecycleListener = GeneralTestEnv::getLifecycleListener();
+
+
+		$entityMock = new ToOneEntityMock();
+		$entityMock->id = 1;
+
+		$mandatoryEntityMock = new ToOneMandatoryEntityMock();
+		$mandatoryEntityMock->id = 1;
+
+
+		$tx = $tm->createTransaction();
+		$this->tem()->persist($entityMock);
+		$this->tem()->persist($mandatoryEntityMock);
+		$tx->commit();
+
+
+		$tx = $tm->createTransaction(true);
+		$this->assertEquals(1, $this->tem()->createCriteria()->select('COUNT(1)')
+				->from(ToOneEntityMock::class, 'e')->toQuery()->fetchSingle());
+		$this->assertEquals(1, $this->tem()->createCriteria()->select('COUNT(1)')
+				->from(ToOneMandatoryEntityMock::class, 'e')->toQuery()->fetchSingle());
+
+		$entityMock = $this->tem()->createCriteria()->select('em')->from(ToOneEntityMock::class, 'em')
+				->where(['em.joinColumnTarget.holeradio' => null])->endClause()->toQuery()->fetchSingle();
+		$this->assertEquals(1, $entityMock?->id);
+		// no result, because an INNER JOIN will be used since joinColumnTarget has a not-null-type.
+		$mandatoryEntityMock = $this->tem()->createCriteria()->select('em')->from(ToOneMandatoryEntityMock::class, 'em')
+				->where(['em.joinColumnTarget.holeradio' => null])->endClause()->toQuery()->fetchSingle();
+		$this->assertNull($mandatoryEntityMock?->id);
+
+		$tx->commit();
 	}
 }
