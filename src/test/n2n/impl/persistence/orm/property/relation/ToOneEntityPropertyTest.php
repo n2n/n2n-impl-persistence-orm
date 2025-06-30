@@ -197,7 +197,7 @@ class ToOneEntityPropertyTest extends TestCase {
 		$entityModel = $this->emPool->getEntityModelManager()->getEntityModelByClass(ToOneMandatoryEntityMock::class);
 		$entityProperty = $entityModel->getEntityPropertyByName('joinColumnTarget');
 		$this->assertInstanceOf(ToOneEntityProperty::class, $entityProperty);
-		$this->assertEquals([JoinType::INNER], $entityProperty->getAvailableJoinTypes());
+		$this->assertEquals([JoinType::INNER, JoinType::RIGHT], $entityProperty->getAvailableJoinTypes());
 	}
 
 	function testInnerLeftJoin() {

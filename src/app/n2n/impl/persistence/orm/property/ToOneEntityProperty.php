@@ -78,6 +78,10 @@ class ToOneEntityProperty extends RelationEntityPropertyAdapter implements Colum
 			return parent::getAvailableJoinTypes();
 		}
 
+		if ($this->isFromMany()) {
+			return [JoinType::INNER, JoinType::RIGHT];
+		}
+
 		return [JoinType::INNER];
 	}
 	

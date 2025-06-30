@@ -64,7 +64,11 @@ abstract class RelationEntityPropertyAdapter extends EntityPropertyAdapter imple
 	public function isToMany(): bool {
 		return $this->type == self::TYPE_ONE_TO_MANY || $this->type == self::TYPE_MANY_TO_MANY;
 	}
-	
+
+	function isFromMany(): bool {
+		return $this->type == self::TYPE_MANY_TO_ONE || $this->type == self::TYPE_MANY_TO_MANY;
+	}
+
 	public function copy($value) {
 		return $value;
 	}
