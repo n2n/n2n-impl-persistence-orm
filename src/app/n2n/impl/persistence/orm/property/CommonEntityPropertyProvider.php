@@ -48,22 +48,14 @@ use n2n\reflection\attribute\PropertyAttribute;
 use n2n\reflection\attribute\Attribute;
 use n2n\reflection\property\PropertyAccessProxy;
 use n2n\util\type\TypeConstraints;
-use n2n\persistence\orm\attribute\AttributeOverrides;
-use n2n\util\type\TypeUtils;
-use n2n\spec\valobj\scalar\StringValueObject;
-use n2n\spec\valobj\scalar\IntValueObject;
-use n2n\spec\valobj\scalar\FloatValueObject;
-use n2n\spec\valobj\scalar\BoolValueObject;
-use n2n\util\ex\ExUtils;
-use n2n\util\calendar\Time;
-use n2n\impl\persistence\orm\property\calendar\TimeEntityProperty;
 
 class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	const PROP_FILE_NAME_SUFFIX = '.originalName';
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityPropertyProvider::setupPropertyIfSuitable()
 	 */
-	public function setupPropertyIfSuitable(PropertyAccessProxy $propertyAccessProxy, ClassSetup $classSetup): void {
+	public function setupPropertyIfSuitable(PropertyAccessProxy $propertyAccessProxy,
+			ClassSetup $classSetup): void {
 
 		$attributeSet = ReflectionContext::getAttributeSet($classSetup->getClass());
 		$propertyName = $propertyAccessProxy->getPropertyName();
@@ -138,7 +130,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 					$classSetup->provideEntityProperty(new StringEntityProperty($propertyAccessProxy,
 							$classSetup->requestColumn($propertyName)));
 					return;
-				case \DateTime::class:
+				case \DateTimeInterface::class:
 					$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy,
 							$classSetup->requestColumn($propertyName)));
 					return;
@@ -244,7 +236,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		return true;
 	}
 	
-	private function checkForRelations(AccessProxy $propertyAccessProxy,
+	private function checkForRelations(PropertyAccessProxy $propertyAccessProxy,
 			ClassSetup $classSetup) {
 		$propertyName = $propertyAccessProxy->getPropertyName();
 		$attributeSet = $classSetup->getAttributeSet();
@@ -276,7 +268,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		return false;
 	}
 	
-	private function provideOneToOne(AccessProxy $propertyAccessProxy, 
+	private function provideOneToOne(PropertyAccessProxy $propertyAccessProxy,
 			PropertyAttribute $oneToOneAttribute, ClassSetup $classSetup) {
 		$oneToOne = $oneToOneAttribute->getInstance();
 		ArgUtils::assertTrue($oneToOne instanceof OneToOne);
@@ -299,7 +291,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		}, $toOneProperty->isMaster());
 	}
 	
-	private function provideManyToOne(AccessProxy $propertyAccessProxy, 
+	private function provideManyToOne(PropertyAccessProxy $propertyAccessProxy,
 			PropertyAttribute $manyToOneAttribute, ClassSetup $classSetup) {
 		$toOneProperty = new ToOneEntityProperty($propertyAccessProxy, true, 
 				RelationEntityProperty::TYPE_MANY_TO_ONE);
@@ -313,7 +305,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		}, true);
 	}
 	
-	private function provideOneToMany(AccessProxy $propertyAccessProxy,
+	private function provideOneToMany(PropertyAccessProxy $propertyAccessProxy,
 			PropertyAttribute $oneToManyAttribute, ClassSetup $classSetup) {
 		$oneToMany = $oneToManyAttribute->getInstance();
 		$toManyProperty = new ToManyEntityProperty($propertyAccessProxy,

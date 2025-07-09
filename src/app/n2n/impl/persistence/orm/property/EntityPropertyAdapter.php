@@ -95,21 +95,14 @@ abstract class EntityPropertyAdapter implements EntityProperty {
 	 * {@inheritDoc}
 	 * @see \n2n\persistence\orm\property\EntityProperty::writeValue()
 	 */
-	public function writeValue(object $object, mixed $value): void {
-		try {
-			$this->accessProxy->setValue($object, $value);
-		} catch (PropertyAccessException $e) {
-			throw new CorruptedDataException('Value of type ' . TypeUtils::getTypeInfo($value) . ' could not be '
-							. ' written to EntityProperty of type ' . get_class($this) . '. Reason: '
-							. $e->getMessage(),
-					previous: $e);
-		}
+	public function writeValue($object, $value): void {
+		$this->accessProxy->setValue($object, $value);
 	}
 	
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\property\EntityProperty::readValue()
 	 */
-	public function readValue(object $object): mixed {
+	public function readValue($object): mixed {
 		try {
 			return $this->accessProxy->getValue($object);
 		} catch (PropertyAccessException $e) {

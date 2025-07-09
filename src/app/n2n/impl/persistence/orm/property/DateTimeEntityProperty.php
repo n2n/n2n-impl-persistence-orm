@@ -40,11 +40,12 @@ use n2n\util\type\TypeConstraints;
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\util\magic\MagicContext;
+use n2n\util\type\TypeConstraint;
 
 class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	public function __construct(AccessProxy $accessProxy, $columnName) {
 		parent::__construct(
-				$accessProxy->createRestricted(TypeConstraints::namedType(\DateTime::class, true)),
+				$accessProxy->createRestricted(TypeConstraints::namedType(\DateTimeInterface::class, true)),
 				$columnName);
 	}
 
@@ -63,12 +64,12 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 	}
 
 	public function valueToRep(mixed $value): string {
-		ArgUtils::assertTrue($value instanceof \DateTime);
+		ArgUtils::assertTrue($value instanceof \DateTimeInterface);
 		
 		return $value->getTimestamp();
 	}
 
-	public function repToValue(string $rep): mixed {		
+	public function repToValue(string $rep): mixed {
 		ArgUtils::assertTrue(is_numeric($rep));
 		$value = new \DateTime();
 		$value->setTimestamp($rep);
@@ -91,8 +92,12 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 			return $value;
 		}
 		
-		ArgUtils::assertTrue($value instanceof \DateTime);
-		return clone $value;
+		ArgUtils::assertTrue($value instanceof \DateTimeInterface);
+		// Handle DateTimeImmutable vs DateTime cloning properly
+		if ($value instanceof \DateTimeImmutable) {
+			return $value; // DateTimeImmutable is already immutable, no need to clone
+		}
+		return clone $value; // Clone DateTime for safety
 	}
 
 	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {

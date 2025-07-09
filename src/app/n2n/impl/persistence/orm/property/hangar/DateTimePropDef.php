@@ -76,7 +76,7 @@ class DateTimePropDef implements HangarPropDef {
 	 * @see \hangar\api\HangarPropDef::updatePropSourceDef()
 	 */
 	public function updatePropSourceDef(DataSet $dataSet, PropSourceDef $propSourceDef) {
-		$propSourceDef->setPhpTypeDef(new PhpTypeDef('\DateTime'));
+		$propSourceDef->setPhpTypeDef(new PhpTypeDef('\DateTimeInterface'));
 	}
 	
 	/**
@@ -108,8 +108,12 @@ class DateTimePropDef implements HangarPropDef {
 	 */
 	public function testCompatibility(PropSourceDef $propSourceDef): int {
 		if ($propSourceDef->hasPhpPropertyAnno(AnnoDateTime::class)) return CompatibilityLevel::COMMON;
-		if (null !== ($phpTypeDef = $propSourceDef->getPhpTypeDef()) && 
-				$phpTypeDef->getLocalName() === '\DateTime') return CompatibilityLevel::COMMON; 
+		if (null !== ($phpTypeDef = $propSourceDef->getPhpTypeDef())) {
+			$localName = $phpTypeDef->getLocalName();
+			if ($localName === '\DateTime' || $localName === '\DateTimeImmutable' || $localName === '\DateTimeInterface') {
+				return CompatibilityLevel::COMMON;
+			}
+		}
 		
 		return CompatibilityLevel::NOT_COMPATIBLE; 
 	}
