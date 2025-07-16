@@ -181,9 +181,9 @@ class ManyToManyPropDef implements HangarPropDef {
 				$columnFactory = $table->createColumnFactory();
 				//@todo id column defs from hangar
 				$columnFactory->createIntegerColumn($joinColumnName, 
-						$this->columnDefaults->getDefaultIntegerSize(), $this->columnDefaults->getDefaultInterSigned());
+						$this->columnDefaults->getDefaultIntegerSize(), $this->columnDefaults->getDefaultInterSigned())->setNullAllowed(false);
 				$columnFactory->createIntegerColumn($inverseJoinColumnName, $this->columnDefaults->getDefaultIntegerSize(), 
-						$this->columnDefaults->getDefaultInterSigned());
+						$this->columnDefaults->getDefaultInterSigned())->setNullAllowed(false);
 				$table->createIndex(IndexType::PRIMARY, array($joinColumnName, $inverseJoinColumnName));
 			}
 		}
