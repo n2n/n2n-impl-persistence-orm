@@ -26,6 +26,7 @@ use n2n\persistence\orm\property\BasicEntityProperty;
 use n2n\persistence\orm\model\EntityModel;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\util\ex\IllegalStateException;
+use n2n\persistence\orm\OrmUtils;
 
 class ToOneValueHasher {
 	private $idEntityProperty;
@@ -38,8 +39,10 @@ class ToOneValueHasher {
 		if ($value === null) return new ToOneValueHash(false, null);
 		ArgUtils::assertTrue(is_object($value));
 		
-		$id = $this->idEntityProperty->readValue($value);
-		if ($id === null) return new ToOneValueHash(true, null);
+		$id = OrmUtils::extractId($value) ?? $this->idEntityProperty->readValue($value);
+		if ($id === null) {
+			return new ToOneValueHash(true, null);
+		}
 		
 		return new ToOneValueHash(true, $this->idEntityProperty->valueToRep($id));
 	}
