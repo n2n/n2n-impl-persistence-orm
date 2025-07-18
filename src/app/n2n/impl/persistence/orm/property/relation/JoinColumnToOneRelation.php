@@ -49,6 +49,8 @@ use n2n\impl\persistence\orm\property\relation\util\ToOneValueHash;
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\util\magic\MagicContext;
+use n2n\persistence\orm\OrmUtils;
+use n2n\persistence\orm\store\action\ActionQueue;
 
 class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, ActionDependency {
 	private $joinColumnName;
@@ -139,6 +141,17 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 	public function prepareSupplyJob(SupplyJob $supplyJob, mixed $value, ?ValueHash $valueHash, ?ValueHash $oldValueHash): void {
 		$this->toOneUtils->prepareSupplyJob($supplyJob, $value, $valueHash, $oldValueHash);
 	}
+
+	private function obtainTargetPersistAction(PersistAction $persistAction, mixed $value): PersistAction {
+		try {
+			return $persistAction->getActionQueue()->getPersistAction($value);
+		} catch (PersistenceOperationException $e) {
+			throw new PersistenceOperationException($this->entityProperty->toPropertyString() . ' of entity obj '
+					. EntityInfo::buildEntityString($persistAction->getEntityModel(), $persistAction->getId())
+					. ' contains value that can not be persisted.', 0, $e, 3);
+		}
+	}
+
 	/* (non-PHPdoc)
 	 * @see \n2n\impl\persistence\orm\property\relation\Relation::supplyPersistAction()
 	 */
@@ -153,17 +166,19 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 		$pdo = $actionQueue->getEntityManager()->getPdo();
 //		$targetPersistAction = $persistAction->getActionQueue()->getPersistAction($value);
 
-		try {
-			$targetPersistAction = $persistAction->getActionQueue()->getPersistAction($value);
-		} catch (PersistenceOperationException $e) {
-			throw new PersistenceOperationException($this->entityProperty->toPropertyString() . ' of entity obj '
-				. EntityInfo::buildEntityString($persistAction->getEntityModel(), $persistAction->getId())
-				. ' contains value that can not be persisted.', 0, $e, 3);
+		$targetId = OrmUtils::extractId($value);
+		$targetPersistAction = null;
+
+		if ($targetId === null) {
+			$targetPersistAction = $this->obtainTargetPersistAction($persistAction, $value);
+			if ($targetPersistAction->hasId()) {
+				$targetId = $targetPersistAction->getId();
+			}
 		}
 
-		if ($targetPersistAction->hasId()) {
+		if ($targetId !== null) {
 			$persistAction->getMeta()->setRawValue($this->entityModel, $this->joinColumnName, 
-					$this->getTargetIdEntityProperty()->buildRaw($targetPersistAction->getId(), $pdo),
+					$this->getTargetIdEntityProperty()->buildRaw($targetId, $pdo),
 					null, $this->entityProperty);
 			return;
 		}

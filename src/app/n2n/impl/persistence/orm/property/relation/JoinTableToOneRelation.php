@@ -41,6 +41,7 @@ use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\util\magic\MagicContext;
+use n2n\persistence\orm\OrmUtils;
 
 class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation {
 	private $toOneUtils;
@@ -73,7 +74,7 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
 		$idSelection = $metaTreePoint->requestPropertySelection($this->createTargetIdTreePath());
 	
-		$toOneRelationSelection = new ToOneRelationSelection($this->entityModel, $idSelection, $queryState);
+		$toOneRelationSelection = new ToOneRelationSelection($this->targetEntityModel, $idSelection, $queryState);
 		$toOneRelationSelection->setLazy($this->fetchType == FetchType::LAZY);
 		return $toOneRelationSelection;
 	}
@@ -84,11 +85,11 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 	
 	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void {
 		ArgUtils::assertTrue($oldValueHash === null || $oldValueHash instanceof ToOneValueHash);
-		
+
 		if ($value === null) {
-			if ($oldValueHash === null || $oldValueHash->getEntityIdRep() === null) return;
-						
-			$this->createJoinTableActionFromPersistAction($persistAction);		
+			if ($oldValueHash === null || $oldValueHash->getIdRep() === null) return;
+
+			$this->createJoinTableActionFromPersistAction($persistAction);
 			return;
 		}
 
@@ -96,24 +97,34 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 
 		$targetIdProperty = $this->targetEntityModel->getIdDef()->getEntityProperty();
 		$actionQueue = $persistAction->getActionQueue();
-		$targetPersistAction = $actionQueue->getPersistAction($value);
+
+		$targetId = OrmUtils::extractId($value);
+		$targetPersistAction = null;
+
+		if ($targetId === null) {
+			$targetPersistAction = $actionQueue->getPersistAction($value);
+			if ($targetPersistAction->hasId()) {
+				$targetId = $targetPersistAction->getId();
+			}
+		}
 		
-		if ($targetPersistAction->hasId()) {
-			$targetIdRep = $targetIdProperty->valueToRep($targetPersistAction->getId());
-			if ($oldValueHash !== null && $targetIdRep === $oldValueHash->getEntityIdRep()) return;
+		if ($targetId !== null) {
+			$targetIdRep = $targetIdProperty->valueToRep($targetId);
+			if ($oldValueHash !== null && $targetIdRep === $oldValueHash->getIdRep()) return;
 
 			$joinTableAction = $this->createJoinTableActionFromPersistAction($persistAction);
-			$joinTableAction->addInverseJoinIdRaw($targetIdProperty->buildRaw($targetPersistAction->getId(), $joinTableAction->getPdo()));
+			$joinTableAction->addInverseJoinIdRaw($targetIdProperty->buildRaw($targetId, $joinTableAction->getPdo()));
 			return;
 		}		
 	
 		$joinTableAction = $this->createJoinTableActionFromPersistAction($persistAction);
 		$joinTableAction->addDependent($targetPersistAction);
-		$targetPersistAction->executeAtEnd(function () use ($joinTableAction, $targetPersistAction, $targetIdProperty) {
+		assert($valueHash instanceof ToOneValueHash);
+		$targetPersistAction->executeAtEnd(function () use ($joinTableAction, $targetPersistAction, $targetIdProperty, $valueHash) {
 			$joinTableAction->addInverseJoinIdRaw($targetIdProperty->buildRaw($targetPersistAction->getId(), $joinTableAction->getPdo()));
 			
 			$hasher = new ToOneValueHasher($this->getTargetIdEntityProperty());
-			$hasher->reportId($targetId, $valueHash);
+			$hasher->reportId($targetPersistAction->getId(), $valueHash);
 		});
 	}
 	
