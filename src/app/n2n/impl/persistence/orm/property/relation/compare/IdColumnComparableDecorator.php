@@ -27,6 +27,7 @@ use n2n\util\type\TypeConstraint;
 use n2n\persistence\orm\criteria\compare\CriteriaComparator;
 use n2n\util\type\ArgUtils;
 use n2n\spec\dbo\meta\data\QueryItem;
+use n2n\persistence\orm\OrmUtils;
 
 class IdColumnComparableDecorator implements ColumnComparable {
 	private $idColumnComparable;	
@@ -88,6 +89,6 @@ class IdColumnComparableDecorator implements ColumnComparable {
 		if ($value === null) return null;
 		
 		ArgUtils::assertTrue(is_object($value));
-		return $this->idEntityProperty->readValue($value);
+		return OrmUtils::extractId($value) ?? $this->idEntityProperty->readValue($value);
 	}
 }

@@ -102,4 +102,67 @@ class ToOneLazyEntityPropertyTest extends TestCase {
 		$tx->commit();
 	}
 
+	function testLazyJoinColumnComparison() {
+		$tm = $this->pdoPool->getTransactionManager();
+
+		$entityMock = new ToOneLazyEntityMock();
+		$entityMock->id = 1;
+		$simpleTargetMock = new SimpleTargetMock();
+		$simpleTargetMock->id = 2;
+		$simpleTargetMock->holeradio = 'join column target';
+		$entityMock->joinColumnTarget = $simpleTargetMock;
+
+		$tx = $tm->createTransaction();
+		$this->tem()->persist($entityMock);
+		$tx->commit();
+
+
+		$tx = $tm->createTransaction(true);
+
+		$entityMock = $this->tem()->find(ToOneLazyEntityMock::class, 1);
+		$simpleTargetMock = $entityMock->joinColumnTarget;
+
+		$this->assertFalse(OrmUtils::isInitialized($simpleTargetMock));
+
+		$entityMock = $this->tem()->createSimpleCriteria(ToOneLazyEntityMock::class, ['joinColumnTarget' => $simpleTargetMock])
+				->toQuery()->fetchSingle();
+		$this->assertInstanceOf(ToOneLazyEntityMock::class, $entityMock);
+		$this->assertSame($simpleTargetMock, $entityMock->joinColumnTarget);
+
+		$this->assertFalse(OrmUtils::isInitialized($simpleTargetMock));
+
+		$tx->commit();
+	}
+
+	function testLazyJoinTableComparison() {
+		$tm = $this->pdoPool->getTransactionManager();
+
+		$entityMock = new ToOneLazyEntityMock();
+		$entityMock->id = 1;
+		$simpleTargetMock = new SimpleTargetMock();
+		$simpleTargetMock->id = 3;
+		$simpleTargetMock->holeradio = 'join table target';
+		$entityMock->joinTableTarget = $simpleTargetMock;
+
+		$tx = $tm->createTransaction();
+		$this->tem()->persist($entityMock);
+		$tx->commit();
+
+		$tx = $tm->createTransaction(true);
+
+		$entityMock = $this->tem()->find(ToOneLazyEntityMock::class, 1);
+		$simpleTargetMock = $entityMock->joinTableTarget;
+
+		$this->assertFalse(OrmUtils::isInitialized($simpleTargetMock));
+
+		$entityMock = $this->tem()->createSimpleCriteria(ToOneLazyEntityMock::class, ['joinTableTarget' => $simpleTargetMock])
+				->toQuery()->fetchSingle();
+		$this->assertInstanceOf(ToOneLazyEntityMock::class, $entityMock);
+		$this->assertSame($simpleTargetMock, $entityMock->joinTableTarget);
+
+		$this->assertFalse(OrmUtils::isInitialized($simpleTargetMock));
+
+		$tx->commit();
+	}
+
 }

@@ -59,13 +59,10 @@ class JoinTableToOneRelation extends JoinTableRelation implements ToOneRelation 
 	}
 
 	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): ColumnComparable {
-		$comparisonStargegy = $metaTreePoint->requestPropertyComparisonStrategy($this->createTargetIdTreePath())
+		$columnComparable = $metaTreePoint->requestPropertyComparisonStrategy($this->createTargetIdTreePath())
 				->getColumnComparable();
-		
-		IllegalStateException::assertTrue($comparisonStargegy->getType() == ComparisonStrategy::TYPE_COLUMN);
-		
-		$meta = $metaTreePoint->getMeta();
-		return new IdColumnComparableDecorator($comparisonStargegy->getColumnComparable(), 
+
+		return new IdColumnComparableDecorator($columnComparable,
 				$this->targetEntityModel);
 	}
 	/* (non-PHPdoc)
