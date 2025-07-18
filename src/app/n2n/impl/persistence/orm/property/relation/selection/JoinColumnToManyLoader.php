@@ -41,7 +41,8 @@ class JoinColumnToManyLoader extends ToManyLoaderAdapter {
 	public function loadEntities($relatedId) {
 		$this->utils->initialize();
 		$this->utils->setSelection(new EntityObjSelection($this->utils->entityModel, 
-				$this->utils->queryState, $this->utils->metaTreePoint));
+				$this->utils->metaTreePoint, $this->utils->queryState->getPersistenceContext(),
+				$this->utils->queryState->getEntityManager()->getLoadingQueue()));
 		
 		$relatedIdQueryColumn = $this->utils->metaTreePoint->getMeta()->registerColumn(
 				$this->utils->entityModel, $this->relatedIdJoinColumnName);

@@ -48,7 +48,7 @@ class JoinTableToManyLoader extends ToManyLoaderAdapter {
 	public function loadEntities($relatedId) {
 		$this->utils->initialize();
 		$this->utils->setSelection(new EntityObjSelection($this->utils->entityModel, 
-				$this->utils->queryState, $this->utils->metaTreePoint));
+				$this->utils->metaTreePoint, $this->utils->persistenceContext, $this->utils->loadingQueue));
 		
 		$idQueryColumn = $this->utils->entityModel->getIdDef()->getEntityProperty()->createQueryColumn(
 				$this->utils->metaTreePoint->getMeta(), $this->utils->queryState);
