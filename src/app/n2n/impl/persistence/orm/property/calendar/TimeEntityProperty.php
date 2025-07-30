@@ -42,6 +42,7 @@ use n2n\persistence\orm\query\select\Selection;
 use n2n\util\magic\MagicContext;
 use n2n\impl\persistence\orm\property\ColumnPropertyAdapter;
 use n2n\util\calendar\Time;
+use n2n\util\DateParseException;
 
 class TimeEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	public function __construct(AccessProxy $accessProxy, $columnName) {
@@ -95,11 +96,19 @@ class TimeEntityProperty extends ColumnPropertyAdapter implements BasicEntityPro
 	public function supplyRemoveAction(RemoveAction $removeAction, $value, ValueHash $oldValueHash) {
 	}
 
-	public function parseValue(mixed $raw, Pdo $pdo): mixed {
-		return new Time($raw);
+	public function parseValue(mixed $raw, Pdo $pdo): ?Time {
+		if ($raw === null) {
+			return null;
+		}
+
+		try {
+			return new Time($raw);
+		} catch (DateParseException $e) {
+			throw new \InvalidArgumentException($e->getMessage(), previous: $e);
+		}
 	}
 
-	public function buildRaw(mixed $value, Pdo $pdo): mixed {
+	public function buildRaw(mixed $value, Pdo $pdo): ?string {
 		return ($value === null ? null : (string) $value);
 	}
 
