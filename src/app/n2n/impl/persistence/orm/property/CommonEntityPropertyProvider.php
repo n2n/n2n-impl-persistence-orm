@@ -45,7 +45,6 @@ use n2n\persistence\orm\attribute\OneToMany;
 use n2n\persistence\orm\attribute\ManyToMany;
 use n2n\persistence\orm\attribute\Embedded;
 use n2n\reflection\attribute\PropertyAttribute;
-use n2n\reflection\attribute\Attribute;
 use n2n\reflection\property\PropertyAccessProxy;
 use n2n\util\type\TypeConstraints;
 use n2n\persistence\orm\attribute\AttributeOverrides;
@@ -141,6 +140,8 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 							$classSetup->requestColumn($propertyName)));
 					return;
 				case \DateTime::class:
+				case \DateTimeImmutable::class:
+				case \DateTimeInterface::class:
 					$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy,
 							$classSetup->requestColumn($propertyName)));
 					return;
