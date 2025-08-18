@@ -28,6 +28,7 @@ use n2n\persistence\orm\CorruptedDataException;
 use n2n\persistence\orm\query\select\ValueBuilder;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\orm\query\select\EagerValueBuilder;
+use DateTimeImmutable;
 
 class DateTimeSelection implements Selection {
 	private $queryItem;
@@ -50,8 +51,14 @@ class DateTimeSelection implements Selection {
 	 * @see \n2n\persistence\orm\query\select\Selection::createValueBuilder()
 	 */
 	public function createValueBuilder(): ValueBuilder {
+		$dateTimeInterface = $this->ormDialectConfig->parseDateTime($this->value);
+
 		try {
-			return new EagerValueBuilder($this->ormDialectConfig->parseDateTime($this->value));
+			if ($this->mutable) {
+				return new EagerValueBuilder(\DateTime::createFromInterface($dateTimeInterface));
+			} else {
+				return new EagerValueBuilder(\DateTimeImmutable::createFromInterface($dateTimeInterface));
+			}
 		} catch (\InvalidArgumentException $e) {
 			throw new CorruptedDataException(null, 0, $e);
 		}
