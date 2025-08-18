@@ -140,10 +140,13 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 							$classSetup->requestColumn($propertyName)));
 					return;
 				case \DateTime::class:
+					$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy,
+							$classSetup->requestColumn($propertyName), true));
+					return;
 				case \DateTimeImmutable::class:
 				case \DateTimeInterface::class:
 					$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy,
-							$classSetup->requestColumn($propertyName)));
+							$classSetup->requestColumn($propertyName), false));
 					return;
 				case Time::class:
 					$classSetup->provideEntityProperty(new TimeEntityProperty($propertyAccessProxy,

@@ -43,23 +43,9 @@ use n2n\util\col\ArrayUtils;
 use n2n\util\type\NamedTypeConstraint;
 
 class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
-	private readonly bool $mutable;
-	private readonly bool $nullable;
 
-	public function __construct(AccessProxy $accessProxy, $columnName) {
+	public function __construct(AccessProxy $accessProxy, $columnName, private bool $mutable) {
 		parent::__construct($accessProxy->createRestricted(TypeConstraints::namedType(\DateTimeInterface::class, true)), $columnName);
-
-		$setterConstraint = $this->accessProxy->getSetterConstraint();
-		$this->nullable = $setterConstraint->allowsNull();
-		$this->mutable = $this->determineMutableType($setterConstraint);
-	}
-
-	private function determineMutableType($setterConstraint): bool {
-		$namedTypeConstraints = $setterConstraint->getNamedTypeConstraints();
-		$dateTimeConstraint = ArrayUtils::find($namedTypeConstraints,
-				fn(NamedTypeConstraint $constraint) => $constraint->getTypeName() === \DateTime::class);
-
-		return $dateTimeConstraint !== null;
 	}
 
 	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): ColumnComparable {
@@ -86,11 +72,11 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 		ArgUtils::assertTrue(is_numeric($rep));
 		if ($this->mutable) {
 			$value = new \DateTime();
-			$value->setTimestamp($rep);
-			return $value;
+		} else {
+			$value = new \DateTimeImmutable();
 		}
 
-		return \DateTimeImmutable::createFromTimestamp($rep);
+		return $value->setTimestamp($rep);
 	}
 
 	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void {
@@ -128,16 +114,16 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 				->getDialect()->getOrmDialectConfig());
 	}
 
-	public function writeValue(object $object, mixed $value): void {
-		if ($this->nullable && $value === null) {
-			parent::writeValue($object, null);
-			return;
-		}
-
-		$convertedValue = $this->mutable
-				? \DateTime::createFromInterface($value)
-				: \DateTimeImmutable::createFromInterface($value);
-
-		parent::writeValue($object, $convertedValue);
-	}
+//	public function writeValue(object $object, mixed $value): void {
+//		if ($this->nullable && $value === null) {
+//			parent::writeValue($object, null);
+//			return;
+//		}
+//
+//		$convertedValue = $this->mutable
+//				? \DateTime::createFromInterface($value)
+//				: \DateTimeImmutable::createFromInterface($value);
+//
+//		parent::writeValue($object, $convertedValue);
+//	}
 }
