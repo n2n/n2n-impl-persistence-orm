@@ -14,7 +14,7 @@ use n2n\impl\persistence\orm\live\mock\LifecycleListener;
 #[EntityListeners(LifecycleListener::class)]
 class ScalarValueObjectEntityMock {
 	#[Id(generated: false)]
-	public int $id;
+	public PositiveInt $id;
 	public PositiveInt $positiveInt;
 	public ?ShortString $shortString = null;
 

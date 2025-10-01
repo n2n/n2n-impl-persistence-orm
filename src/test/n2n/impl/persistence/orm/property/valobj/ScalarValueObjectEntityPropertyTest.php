@@ -79,13 +79,16 @@ class ScalarValueObjectEntityPropertyTest extends TestCase {
 		$this->assertTrue($namedTypes[0]->allowsNull());
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testSelection() {
 		$this->pdoUtil->insert('scalar_value_object_entity_mock', ['id' => 1, 'positive_int' => 3]);
 
 		$em = $this->emPool->getEntityManagerFactory()->getExtended();
 		$entityMock = $em->find(ScalarValueObjectEntityMock::class, 1);
 
-		$this->assertEquals(1, $entityMock->id);
+		$this->assertEquals(1, $entityMock->id->toScalar());
 		$this->assertEquals(3, $entityMock->positiveInt->toScalar());
 	}
 
@@ -139,11 +142,14 @@ class ScalarValueObjectEntityPropertyTest extends TestCase {
 		$this->assertNull($entityMocks[0]->shortString);
 	}
 
+	/**
+	 * @throws DboException
+	 */
 	function testPersist(): void {
 		$em = $this->emPool->getEntityManagerFactory()->getExtended();
 
 		$entityMock = new ScalarValueObjectEntityMock();
-		$entityMock->id = 1;
+		$entityMock->id = new PositiveInt(1);
 		$entityMock->positiveInt = ExUtils::try(fn () => new PositiveInt(3));
 
 		$tm = $this->emPool->getPdoPool()->getTransactionManager();
@@ -157,11 +163,15 @@ class ScalarValueObjectEntityPropertyTest extends TestCase {
 		$this->assertEquals(3, $rows[0]['positive_int']);
 	}
 
+	/**
+	 * @throws DboException
+	 * @throws IllegalValueException
+	 */
 	function testMerge(): void {
 		$em = $this->emPool->getEntityManagerFactory()->getExtended();
 
 		$entityMock = new ScalarValueObjectEntityMock();
-		$entityMock->id = 1;
+		$entityMock->id = new PositiveInt(1);
 		$entityMock->positiveInt = ExUtils::try(fn () => new PositiveInt(3));
 
 		$tm = $this->emPool->getPdoPool()->getTransactionManager();
@@ -197,7 +207,7 @@ class ScalarValueObjectEntityPropertyTest extends TestCase {
 		$this->lifecycleListener = GeneralTestEnv::getLifecycleListener();
 
 		$svoem = new ScalarValueObjectEntityMock();
-		$svoem->id = 1;
+		$svoem->id = new PositiveInt(1);
 		$svoem->positiveInt = ExUtils::try(fn () => new PositiveInt(4));
 
 		$this->assertCount(0, $this->lifecycleListener->getClassNames());

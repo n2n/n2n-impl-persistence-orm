@@ -114,8 +114,11 @@ class ScalarValueObjectEntityProperty extends ColumnPropertyAdapter implements B
 	}
 
 	public function valueToRep(mixed $value): string {
-		assert($value instanceof StringValueObject);
-		return $value->toScalar();
+		ArgUtils::valType($value, ['scalar', ScalarValueObject::class]);
+		if ($value instanceof ScalarValueObject) {
+			return $value->toScalar();
+		}
+		return (string) $value;
 	}
 
 	public function repToValue(string $rep): mixed {
@@ -132,7 +135,7 @@ class ScalarValueObjectEntityProperty extends ColumnPropertyAdapter implements B
 	}
 
 	public function buildRaw(mixed $value, Pdo $pdo): mixed {
-		ArgUtils::assertTrue($value === null || $value instanceof StringValueObject);
+		ArgUtils::assertTrue($value === null || $value instanceof ScalarValueObject);
 		return $value?->toScalar();
 	}
 }
