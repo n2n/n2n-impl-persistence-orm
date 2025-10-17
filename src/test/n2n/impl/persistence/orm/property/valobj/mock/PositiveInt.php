@@ -5,7 +5,7 @@ namespace n2n\impl\persistence\orm\property\valobj\mock;
 use n2n\spec\valobj\scalar\IntValueObject;
 use n2n\spec\valobj\err\IllegalValueException;
 
-class PositiveInt implements IntValueObject {
+class PositiveInt implements IntValueObject, \Stringable {
 
 	/**
 	 * @inheritDoc
@@ -15,6 +15,10 @@ class PositiveInt implements IntValueObject {
 	}
 
 	function toScalar(): int {
+		return $this->value;
+	}
+
+	function __toString(): string {
 		return $this->value;
 	}
 }
