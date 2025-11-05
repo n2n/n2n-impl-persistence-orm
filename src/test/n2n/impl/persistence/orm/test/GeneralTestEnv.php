@@ -11,6 +11,7 @@ use n2n\persistence\orm\model\EntityModelFactory;
 use n2n\impl\persistence\orm\property\CommonEntityPropertyProvider;
 use n2n\util\magic\impl\SimpleMagicContext;
 use n2n\impl\persistence\orm\live\mock\LifecycleListener;
+use n2n\spec\tx\TransactionIsolationLevel;
 
 class GeneralTestEnv {
 
@@ -19,7 +20,7 @@ class GeneralTestEnv {
 	static function setUpEmPool(array $registeredClassNames, array $magicContextObjs = []): EmPool {
 		$pdoPool = new PdoPool(
 				[PdoPool::DEFAULT_DS_NAME => new PersistenceUnitConfig('default', 'sqlite::memory:', '', '',
-						PersistenceUnitConfig::TIL_SERIALIZABLE, SqliteDialect::class,
+						TransactionIsolationLevel::TIL_SERIALIZABLE, SqliteDialect::class,
 						false, null)],
 				new TransactionManager(), null, null);
 
