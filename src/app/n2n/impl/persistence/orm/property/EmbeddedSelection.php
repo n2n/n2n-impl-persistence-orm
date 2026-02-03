@@ -69,7 +69,7 @@ class EmbeddedSelection implements Selection {
 			try {
 				$propertyValueBuilders[$propertyString] = $selection->createValueBuilder();
 			} catch (CorruptedDataException $e) {
-				throw new CorruptedDataException('Build value for ' . $entityProperty . ': ' . $e->getMessage(),
+				throw new CorruptedDataException('Could not build value for ' . $entityProperty . ': ' . $e->getMessage(),
 						previous: $e);
 			}
 		}
