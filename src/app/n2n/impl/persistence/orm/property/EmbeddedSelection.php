@@ -28,6 +28,7 @@ use n2n\persistence\orm\query\select\ValueBuilder;
 use n2n\reflection\ReflectionUtils;
 use n2n\util\ex\IllegalStateException;
 use n2n\persistence\orm\query\select\Selection;
+use n2n\persistence\orm\CorruptedDataException;
 
 class EmbeddedSelection implements Selection {
 	private $embeddedEntityProperty;
@@ -65,7 +66,12 @@ class EmbeddedSelection implements Selection {
 		foreach ($this->embeddedEntityProperty->getEntityProperties() as $entityProperty) {
 			$propertyString = $entityProperty->toPropertyString();
 			$selection = $this->selectionGroup->getSelectionByKey($propertyString);
-			$propertyValueBuilders[$propertyString] = $selection->createValueBuilder();
+			try {
+				$propertyValueBuilders[$propertyString] = $selection->createValueBuilder();
+			} catch (CorruptedDataException $e) {
+				throw new CorruptedDataException('Build value for ' . $entityProperty . ': ' . $e->getMessage(),
+						previous: $e);
+			}
 		}
 		
 		return new EmbeddedValueBuilder($this->embeddedEntityProperty, $propertyValueBuilders);
