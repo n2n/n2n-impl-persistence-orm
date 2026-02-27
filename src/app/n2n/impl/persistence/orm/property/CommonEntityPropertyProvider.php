@@ -59,6 +59,7 @@ use n2n\util\calendar\Time;
 use n2n\impl\persistence\orm\property\calendar\TimeEntityProperty;
 use n2n\util\calendar\Date;
 use n2n\impl\persistence\orm\property\calendar\DateEntityProperty;
+use n2n\io\managed\impl\MonthlyDirFileLocator;
 
 class CommonEntityPropertyProvider implements EntityPropertyProvider {
 	const PROP_FILE_NAME_SUFFIX = '.originalName';
@@ -106,7 +107,7 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 			if (null !== ($fileLocator = $managedFileAttribute->getFileLocator())) {
 				$manageFileEntityProperty->setFileLocator($fileLocator);
 			} else {
-				$manageFileEntityProperty->setFileLocator(new SimpleFileLocator(
+				$manageFileEntityProperty->setFileLocator(new MonthlyDirFileLocator(
 						mb_strtolower(IoUtils::stripSpecialChars($classSetup->getClass()->getShortName()))));
 			}
 			
