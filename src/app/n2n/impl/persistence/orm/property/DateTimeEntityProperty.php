@@ -39,9 +39,6 @@ use n2n\util\type\TypeConstraints;
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\util\magic\MagicContext;
-use n2n\util\col\ArrayUtils;
-use n2n\util\type\NamedTypeConstraint;
-
 class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 
 	public function __construct(AccessProxy $accessProxy, $columnName, private bool $mutable) {
@@ -59,7 +56,7 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
 		return new DateTimeSelection($this->createQueryColumn($metaTreePoint->getMeta()),
 				$queryState->getEntityManager()->getPdo()->getMetaData()
-						->getDialect()->getOrmDialectConfig());
+						->getDialect()->getOrmDialectConfig(), $this->mutable);
 	}
 
 	public function valueToRep(mixed $value): string {
@@ -111,19 +108,6 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 
 	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState): Selection {
 		return new DateTimeSelection($queryItem, $queryState->getEntityManager()->getPdo()->getMetaData()
-				->getDialect()->getOrmDialectConfig());
+				->getDialect()->getOrmDialectConfig(), $this->mutable);
 	}
-
-//	public function writeValue(object $object, mixed $value): void {
-//		if ($this->nullable && $value === null) {
-//			parent::writeValue($object, null);
-//			return;
-//		}
-//
-//		$convertedValue = $this->mutable
-//				? \DateTime::createFromInterface($value)
-//				: \DateTimeImmutable::createFromInterface($value);
-//
-//		parent::writeValue($object, $convertedValue);
-//	}
 }

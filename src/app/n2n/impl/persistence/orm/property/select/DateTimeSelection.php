@@ -28,18 +28,17 @@ use n2n\persistence\orm\CorruptedDataException;
 use n2n\persistence\orm\query\select\ValueBuilder;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\persistence\orm\query\select\EagerValueBuilder;
-use DateTimeImmutable;
 
 class DateTimeSelection implements Selection {
 	private $queryItem;
 	private $ormDialectConfig;
 	private $value;
 
-	public function __construct(QueryItem $queryItem, OrmDialectConfig $ormDialectConfig) {
+	public function __construct(QueryItem $queryItem, OrmDialectConfig $ormDialectConfig, private bool $mutable) {
 		$this->queryItem = $queryItem;
 		$this->ormDialectConfig = $ormDialectConfig;
 	}
-	
+
 	public function getSelectQueryItems(): array {
 		return array($this->queryItem);
 	}
@@ -47,18 +46,17 @@ class DateTimeSelection implements Selection {
 	public function bindColumns(PdoStatement $stmt, array $columnAliases): void {
 		$stmt->shareBindColumn($columnAliases[0], $this->value);
 	}
-	/* (non-PHPdoc)
-	 * @see \n2n\persistence\orm\query\select\Selection::createValueBuilder()
-	 */
-	public function createValueBuilder(): ValueBuilder {
-		$dateTimeInterface = $this->ormDialectConfig->parseDateTime($this->value);
 
+	public function createValueBuilder(): ValueBuilder {
 		try {
-			if ($this->mutable) {
-				return new EagerValueBuilder(\DateTime::createFromInterface($dateTimeInterface));
-			} else {
-				return new EagerValueBuilder(\DateTimeImmutable::createFromInterface($dateTimeInterface));
+			$parsed = $this->ormDialectConfig->parseDateTime($this->value);
+			if ($parsed === null) {
+				return new EagerValueBuilder(null);
 			}
+			if ($this->mutable) {
+				return new EagerValueBuilder(\DateTime::createFromInterface($parsed));
+			}
+			return new EagerValueBuilder(\DateTimeImmutable::createFromInterface($parsed));
 		} catch (\InvalidArgumentException $e) {
 			throw new CorruptedDataException(null, 0, $e);
 		}

@@ -71,8 +71,9 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		$propertyName = $propertyAccessProxy->getPropertyName();
 
 		if (null !== ($dateTimeAttribute = $attributeSet->getPropertyAttribute($propertyName, DateTime::class))) {
-			$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy, 
-					$classSetup->requestColumn($propertyName)), array($dateTimeAttribute));
+			$mutable = $this->isDateTimeMutable($propertyAccessProxy);
+			$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy,
+					$classSetup->requestColumn($propertyName), $mutable), array($dateTimeAttribute));
 			return;
 		}
 		
@@ -210,7 +211,17 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 			}
 		}
 	}
-	
+
+	private function isDateTimeMutable(PropertyAccessProxy $propertyAccessProxy): bool {
+		foreach ($propertyAccessProxy->getGetterConstraint()->getNamedTypeConstraints() as $namedTypeConstraint) {
+			$typeName = $namedTypeConstraint->getTypeName();
+			if ($typeName === \DateTimeImmutable::class || $typeName === \DateTimeInterface::class) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	private function checkForEmbedded(AccessProxy $propertyAccessProxy,
 			ClassSetup $classSetup): bool {
 		$propertyName = $propertyAccessProxy->getPropertyName();

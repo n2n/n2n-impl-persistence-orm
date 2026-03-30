@@ -321,6 +321,40 @@ class DateTimeEntityPropertyImmutableTest extends TestCase {
 	}
 
 	/**
+	 * Test that assigning a mutable DateTime to a DateTimeImmutable/DateTimeInterface typed property
+	 * is persisted correctly and comes back as DateTimeImmutable after retrieval from database.
+	 */
+	function testMutableAssignedToImmutableField(): void {
+		$em = $this->emPool->getEntityManagerFactory()->getExtended();
+
+		$entityMock = new DateTimeInterfaceEntityMock();
+		$entityMock->id = 10;
+		$entityMock->mutableField = new DateTime('1985-09-07 13:01:02');
+		$entityMock->immutableField = new DateTimeImmutable('1985-09-07 14:01:02');
+		// Assign a mutable DateTime to a DateTimeInterface-typed field (PHP allows this)
+		$entityMock->interfaceField = new DateTime('1985-09-07 15:01:02');
+
+		$tm = $this->emPool->getPdoPool()->getTransactionManager();
+		$tx = $tm->createTransaction();
+		$em->persist($entityMock);
+		$tx->commit();
+
+		// Verify it was persisted correctly
+		$rows = $this->pdoUtil->select('date_time_interface_entity_mock');
+		$this->assertCount(1, $rows);
+		$this->assertEquals('1985-09-07 15:01:02', $rows[0]['interface_field']);
+
+		// Clear cache and retrieve fresh from database
+		$em->clear();
+		$retrieved = $em->find(DateTimeInterfaceEntityMock::class, 10);
+
+		// The ORM should return DateTimeImmutable for a DateTimeInterface-typed field
+		$this->assertInstanceOf(DateTimeImmutable::class, $retrieved->interfaceField);
+		$this->assertNotInstanceOf(DateTime::class, $retrieved->interfaceField);
+		$this->assertEquals('1985-09-07 15:01:02', $retrieved->interfaceField->format('Y-m-d H:i:s'));
+	}
+
+	/**
 	 * Test valueToRep method works with all DateTime types
 	 * @throws \DateMalformedStringException
 	 */
