@@ -33,19 +33,17 @@ use n2n\persistence\orm\store\action\PersistAction;
 use n2n\persistence\orm\store\operation\MergeOperation;
 use n2n\persistence\Pdo;
 use n2n\persistence\orm\store\action\RemoveAction;
-use n2n\persistence\orm\EntityManager;
 use n2n\persistence\orm\store\ValueHash;
 use n2n\persistence\orm\store\CommonValueHash;
 use n2n\util\type\TypeConstraints;
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\util\magic\MagicContext;
-
 class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
-	public function __construct(AccessProxy $accessProxy, $columnName) {
-		parent::__construct(
-				$accessProxy->createRestricted(TypeConstraints::namedType(\DateTime::class, true)),
-				$columnName);
+
+	public function __construct(AccessProxy $accessProxy, $columnName, readonly bool $mutable) {
+		parent::__construct($accessProxy->createRestricted(
+				TypeConstraints::namedType(\DateTimeInterface::class, true)), $columnName);
 	}
 
 	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): ColumnComparable {
@@ -55,29 +53,32 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 	public function createColumnComparableFromQueryItem(QueryItem $queryItem, QueryState $queryState): ColumnComparable {
 		return new DateTimeColumnComparable($queryItem, $queryState);
 	}
-	
+
 	public function createSelection(MetaTreePoint $metaTreePoint, QueryState $queryState): Selection {
 		return new DateTimeSelection($this->createQueryColumn($metaTreePoint->getMeta()),
 				$queryState->getEntityManager()->getPdo()->getMetaData()
-						->getDialect()->getOrmDialectConfig());
+						->getDialect()->getOrmDialectConfig(), $this->mutable);
 	}
 
 	public function valueToRep(mixed $value): string {
-		ArgUtils::assertTrue($value instanceof \DateTime);
-		
+		ArgUtils::assertTrue($value instanceof \DateTimeInterface);
+
 		return $value->getTimestamp();
 	}
 
-	public function repToValue(string $rep): mixed {		
+	public function repToValue(string $rep): mixed {
 		ArgUtils::assertTrue(is_numeric($rep));
-		$value = new \DateTime();
-		$value->setTimestamp($rep);
-		return $value;
+		if ($this->mutable) {
+			$value = new \DateTime();
+		} else {
+			$value = new \DateTimeImmutable();
+		}
+
+		return $value->setTimestamp($rep);
 	}
-	
+
 	public function supplyPersistAction(PersistAction $persistAction, $value, ValueHash $valueHash, ?ValueHash $oldValueHash): void {
 		$rawValue = $this->buildRaw($value, $persistAction->getActionQueue()->getEntityManager()->getPdo());
-		
 		$persistAction->getMeta()->setRawValue($this->getEntityModel(), $this->getColumnName(), $rawValue, null, $this);
 	}
 
@@ -90,8 +91,8 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 		if ($sameEntity || $value === null) {
 			return $value;
 		}
-		
-		ArgUtils::assertTrue($value instanceof \DateTime);
+
+		ArgUtils::assertTrue($value instanceof \DateTimeInterface);
 		return clone $value;
 	}
 
@@ -108,6 +109,6 @@ class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntit
 
 	public function createSelectionFromQueryItem(QueryItem $queryItem, QueryState $queryState): Selection {
 		return new DateTimeSelection($queryItem, $queryState->getEntityManager()->getPdo()->getMetaData()
-				->getDialect()->getOrmDialectConfig());
+				->getDialect()->getOrmDialectConfig(), $this->mutable);
 	}
 }

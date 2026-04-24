@@ -23,7 +23,6 @@ namespace n2n\impl\persistence\orm\property\compare;
 
 use n2n\util\type\ArgUtils;
 use n2n\spec\dbo\meta\data\QueryItem;
-use n2n\util\type\TypeConstraint;
 use n2n\persistence\orm\query\QueryState;
 use n2n\spec\dbo\meta\data\impl\QueryPlaceMarker;
 use n2n\persistence\meta\data\QueryPartGroup;
@@ -35,15 +34,15 @@ class DateTimeColumnComparable extends ColumnComparableAdapter {
 	private $queryState;
 	
 	public function __construct(QueryItem $comparableQueryItem, QueryState $queryState) {
-		parent::__construct(CriteriaComparator::getOperators(false), 
-				TypeConstraint::createSimple('DateTime', true), $comparableQueryItem);
+		parent::__construct(CriteriaComparator::getOperators(false),
+				TypeConstraints::namedType(\DateTimeInterface::class, true), $comparableQueryItem);
 		
 		$this->queryState = $queryState;
 	}
 
 	function getTypeConstraint($operator) {
 		if ($operator === CriteriaComparator::OPERATOR_LIKE || $operator === CriteriaComparator::OPERATOR_NOT_LIKE) {
-			return TypeConstraints::type([\DateTime::class, 'string', null]);
+			return TypeConstraints::type([\DateTimeInterface::class, 'string', null]);
 		}
 
 		return parent::getTypeConstraint($operator);
@@ -61,12 +60,12 @@ class DateTimeColumnComparable extends ColumnComparableAdapter {
 		}
 
 		if ($operator != CriteriaComparator::OPERATOR_IN && $operator != CriteriaComparator::OPERATOR_NOT_IN) {
-			ArgUtils::valType($value, 'DateTime', true);
+			ArgUtils::valType($value, \DateTimeInterface::class, true);
 			return new QueryPlaceMarker($this->queryState->registerPlaceholderValue(
 					$this->buildDateTimeRawValue($value)));
 		}
 
-		ArgUtils::valArray($value, 'DateTime');
+		ArgUtils::valArray($value, \DateTimeInterface::class);
 		
 		$queryPartGroup = new QueryPartGroup();
 		foreach ($value as $fieldValue) {
@@ -78,13 +77,5 @@ class DateTimeColumnComparable extends ColumnComparableAdapter {
 	}
 	
 	public function buildCounterpartPlaceholder($operator, $value) {
-		
 	}
-	
-// 	public function parseComparableValue($operator, $value) {
-// 		
-		
-// 		return $value;
-// 	}
-	
 }

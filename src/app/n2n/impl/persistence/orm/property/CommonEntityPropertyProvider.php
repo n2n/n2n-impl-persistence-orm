@@ -45,7 +45,6 @@ use n2n\persistence\orm\attribute\OneToMany;
 use n2n\persistence\orm\attribute\ManyToMany;
 use n2n\persistence\orm\attribute\Embedded;
 use n2n\reflection\attribute\PropertyAttribute;
-use n2n\reflection\attribute\Attribute;
 use n2n\reflection\property\PropertyAccessProxy;
 use n2n\util\type\TypeConstraints;
 use n2n\persistence\orm\attribute\AttributeOverrides;
@@ -72,8 +71,9 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 		$propertyName = $propertyAccessProxy->getPropertyName();
 
 		if (null !== ($dateTimeAttribute = $attributeSet->getPropertyAttribute($propertyName, DateTime::class))) {
-			$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy, 
-					$classSetup->requestColumn($propertyName)), array($dateTimeAttribute));
+			$mutable = $this->isDateTimeMutable($propertyAccessProxy);
+			$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy,
+					$classSetup->requestColumn($propertyName), $mutable), array($dateTimeAttribute));
 			return;
 		}
 		
@@ -143,7 +143,12 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 					return;
 				case \DateTime::class:
 					$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy,
-							$classSetup->requestColumn($propertyName)));
+							$classSetup->requestColumn($propertyName), true));
+					return;
+				case \DateTimeImmutable::class:
+				case \DateTimeInterface::class:
+					$classSetup->provideEntityProperty(new DateTimeEntityProperty($propertyAccessProxy,
+							$classSetup->requestColumn($propertyName), false));
 					return;
 				case Time::class:
 					$classSetup->provideEntityProperty(new TimeEntityProperty($propertyAccessProxy,
@@ -206,7 +211,17 @@ class CommonEntityPropertyProvider implements EntityPropertyProvider {
 			}
 		}
 	}
-	
+
+	private function isDateTimeMutable(PropertyAccessProxy $propertyAccessProxy): bool {
+		foreach ($propertyAccessProxy->getGetterConstraint()->getNamedTypeConstraints() as $namedTypeConstraint) {
+			$typeName = $namedTypeConstraint->getTypeName();
+			if ($typeName === \DateTimeImmutable::class || $typeName === \DateTimeInterface::class) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	private function checkForEmbedded(AccessProxy $propertyAccessProxy,
 			ClassSetup $classSetup): bool {
 		$propertyName = $propertyAccessProxy->getPropertyName();
