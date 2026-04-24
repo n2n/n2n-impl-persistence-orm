@@ -26,7 +26,6 @@ use n2n\impl\persistence\orm\test\GeneralTestEnv;
 use n2n\test\DbTestPdoUtil;
 use n2n\persistence\ext\EmPool;
 use n2n\persistence\ext\PdoPool;
-use n2n\persistence\orm\EntityManager;
 use n2n\impl\persistence\orm\property\calendar\mock\DateTimeInterfaceEntityMock;
 use n2n\spec\dbo\err\DboException;
 use n2n\impl\persistence\orm\property\DateTimeEntityProperty;
@@ -70,16 +69,19 @@ class DateTimeEntityPropertyImmutableTest extends TestCase {
 		$this->assertInstanceOf(DateTimeEntityProperty::class, $entityProperty);
 		assert($entityProperty instanceof DateTimeEntityProperty);
 		$this->assertEquals('mutable_field', $entityProperty->getColumnName());
+		$this->assertTrue($entityProperty->mutable);
 
 		$entityProperty = $entityModel->getLevelEntityPropertyByName('immutableField');
 		$this->assertInstanceOf(DateTimeEntityProperty::class, $entityProperty);
 		assert($entityProperty instanceof DateTimeEntityProperty);
 		$this->assertEquals('immutable_field', $entityProperty->getColumnName());
+		$this->assertFalse($entityProperty->mutable);
 
 		$entityProperty = $entityModel->getLevelEntityPropertyByName('interfaceField');
 		$this->assertInstanceOf(DateTimeEntityProperty::class, $entityProperty);
 		assert($entityProperty instanceof DateTimeEntityProperty);
 		$this->assertEquals('interface_field', $entityProperty->getColumnName());
+		$this->assertFalse($entityProperty->mutable);
 	}
 
 	/**

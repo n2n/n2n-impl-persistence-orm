@@ -12,6 +12,7 @@ use n2n\impl\persistence\orm\property\DateTimeEntityProperty;
 use n2n\persistence\orm\CorruptedDataException;
 use DateTime;
 use DateTimeImmutable;
+use n2n\spec\dbo\err\DboException;
 
 /**
  * Tests for DateTimeEntityProperty using the #[DateTime] attribute with explicit type hints.
@@ -55,20 +56,24 @@ class DateTimeAttributeEntityPropertyTest extends TestCase {
 		$this->assertInstanceOf(DateTimeEntityProperty::class, $mutableProperty);
 		assert($mutableProperty instanceof DateTimeEntityProperty);
 		$this->assertEquals('mutable_field', $mutableProperty->getColumnName());
+		$this->assertTrue($mutableProperty->mutable);
 
 		$immutableProperty = $entityModel->getLevelEntityPropertyByName('immutableField');
 		$this->assertInstanceOf(DateTimeEntityProperty::class, $immutableProperty);
 		assert($immutableProperty instanceof DateTimeEntityProperty);
 		$this->assertEquals('immutable_field', $immutableProperty->getColumnName());
+		$this->assertFalse($immutableProperty->mutable);
 
 		$interfaceProperty = $entityModel->getLevelEntityPropertyByName('interfaceField');
 		$this->assertInstanceOf(DateTimeEntityProperty::class, $interfaceProperty);
 		assert($interfaceProperty instanceof DateTimeEntityProperty);
 		$this->assertEquals('interface_field', $interfaceProperty->getColumnName());
+		$this->assertFalse($interfaceProperty->mutable);
 	}
 
 	/**
 	 * Test selecting mutable DateTime values from database.
+	 * @throws DboException
 	 */
 	function testSelectionMutable(): void {
 		$this->pdoUtil->insert('date_time_attribute_entity_mock', [
@@ -86,6 +91,7 @@ class DateTimeAttributeEntityPropertyTest extends TestCase {
 
 	/**
 	 * Test selecting immutable DateTimeImmutable values from database.
+	 * @throws DboException
 	 */
 	function testSelectionImmutable(): void {
 		$this->pdoUtil->insert('date_time_attribute_entity_mock', [
@@ -103,6 +109,7 @@ class DateTimeAttributeEntityPropertyTest extends TestCase {
 
 	/**
 	 * Test selecting DateTimeInterface values from database (should resolve to DateTimeImmutable).
+	 * @throws DboException
 	 */
 	function testSelectionInterface(): void {
 		$this->pdoUtil->insert('date_time_attribute_entity_mock', [
@@ -120,6 +127,7 @@ class DateTimeAttributeEntityPropertyTest extends TestCase {
 
 	/**
 	 * Test selecting null values for nullable DateTime fields.
+	 * @throws DboException
 	 */
 	function testSelectionNullValues(): void {
 		$this->pdoUtil->insert('date_time_attribute_entity_mock', [
@@ -136,6 +144,7 @@ class DateTimeAttributeEntityPropertyTest extends TestCase {
 
 	/**
 	 * Test persisting mutable DateTime.
+	 * @throws DboException
 	 */
 	function testPersistMutable(): void {
 		$em = $this->emPool->getEntityManagerFactory()->getExtended();
@@ -156,6 +165,7 @@ class DateTimeAttributeEntityPropertyTest extends TestCase {
 
 	/**
 	 * Test persisting DateTimeImmutable.
+	 * @throws DboException
 	 */
 	function testPersistImmutable(): void {
 		$em = $this->emPool->getEntityManagerFactory()->getExtended();
@@ -177,6 +187,7 @@ class DateTimeAttributeEntityPropertyTest extends TestCase {
 
 	/**
 	 * Test persisting DateTimeInterface (as DateTimeImmutable instance).
+	 * @throws DboException
 	 */
 	function testPersistInterface(): void {
 		$em = $this->emPool->getEntityManagerFactory()->getExtended();
@@ -242,6 +253,7 @@ class DateTimeAttributeEntityPropertyTest extends TestCase {
 
 	/**
 	 * Test merge with mutable DateTime.
+	 * @throws DboException
 	 */
 	function testMergeMutable(): void {
 		$em = $this->emPool->getEntityManagerFactory()->getExtended();
@@ -266,6 +278,7 @@ class DateTimeAttributeEntityPropertyTest extends TestCase {
 
 	/**
 	 * Test merge with DateTimeImmutable.
+	 * @throws DboException
 	 */
 	function testMergeImmutable(): void {
 		$em = $this->emPool->getEntityManagerFactory()->getExtended();
@@ -289,6 +302,7 @@ class DateTimeAttributeEntityPropertyTest extends TestCase {
 
 	/**
 	 * Test merge update with mutable DateTime.
+	 * @throws DboException
 	 */
 	function testMergeUpdateMutable(): void {
 		$em = $this->emPool->getEntityManagerFactory()->getExtended();
@@ -316,6 +330,7 @@ class DateTimeAttributeEntityPropertyTest extends TestCase {
 
 	/**
 	 * Test that corrupted date strings throw CorruptedDataException.
+	 * @throws DboException
 	 */
 	function testCorruptedSelection(): void {
 		$this->pdoUtil->insert('date_time_attribute_entity_mock', [
@@ -373,6 +388,7 @@ class DateTimeAttributeEntityPropertyTest extends TestCase {
 
 	/**
 	 * Test criteria query with mutable DateTime comparison.
+	 * @throws DboException
 	 */
 	function testColumnComparableMutable(): void {
 		$this->pdoUtil->insert('date_time_attribute_entity_mock', [
@@ -397,6 +413,7 @@ class DateTimeAttributeEntityPropertyTest extends TestCase {
 
 	/**
 	 * Test persisting null for nullable fields.
+	 * @throws DboException
 	 */
 	function testPersistNullValues(): void {
 		$em = $this->emPool->getEntityManagerFactory()->getExtended();

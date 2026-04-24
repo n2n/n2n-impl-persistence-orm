@@ -41,8 +41,9 @@ use n2n\persistence\orm\query\select\Selection;
 use n2n\util\magic\MagicContext;
 class DateTimeEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 
-	public function __construct(AccessProxy $accessProxy, $columnName, private bool $mutable) {
-		parent::__construct($accessProxy->createRestricted(TypeConstraints::namedType(\DateTimeInterface::class, true)), $columnName);
+	public function __construct(AccessProxy $accessProxy, $columnName, readonly bool $mutable) {
+		parent::__construct($accessProxy->createRestricted(
+				TypeConstraints::namedType(\DateTimeInterface::class, true)), $columnName);
 	}
 
 	public function createColumnComparable(MetaTreePoint $metaTreePoint, QueryState $queryState): ColumnComparable {

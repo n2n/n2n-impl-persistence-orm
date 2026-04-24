@@ -50,16 +50,17 @@ class DateTimeSelection implements Selection {
 	public function createValueBuilder(): ValueBuilder {
 		try {
 			$parsed = $this->ormDialectConfig->parseDateTime($this->value);
-			if ($parsed === null) {
-				return new EagerValueBuilder(null);
-			}
-			if ($this->mutable) {
-				return new EagerValueBuilder(\DateTime::createFromInterface($parsed));
-			}
-			return new EagerValueBuilder(\DateTimeImmutable::createFromInterface($parsed));
 		} catch (\InvalidArgumentException $e) {
 			throw new CorruptedDataException(null, 0, $e);
 		}
+
+		if ($parsed === null) {
+			return new EagerValueBuilder(null);
+		}
+		if ($this->mutable) {
+			return new EagerValueBuilder(\DateTime::createFromInterface($parsed));
+		}
+		return new EagerValueBuilder(\DateTimeImmutable::createFromInterface($parsed));
 	}
 
 }
