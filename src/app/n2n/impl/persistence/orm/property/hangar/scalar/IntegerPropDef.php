@@ -25,7 +25,7 @@ use hangar\api\DbInfo;
 use n2n\spec\dbo\meta\structure\IndexType;
 use n2n\persistence\orm\model\EntityModelFactory;
 use n2n\spec\dbo\meta\structure\ColumnFactory;
-use n2n\util\type\attrs\DataSet;
+use n2n\util\attr\DataSet;
 use hangar\api\PropSourceDef;
 use n2n\impl\web\dispatch\mag\model\BoolMag;
 use n2n\persistence\meta\structure\Size;
