@@ -42,6 +42,7 @@ use n2n\util\type\TypeConstraints;
 use n2n\persistence\orm\criteria\compare\ColumnComparable;
 use n2n\persistence\orm\query\select\Selection;
 use n2n\util\magic\MagicContext;
+use n2n\persistence\orm\store\datadefinition\DdTableUpdateProcess;
 
 class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityProperty {
 	/**
@@ -149,6 +150,9 @@ class StringEntityProperty extends ColumnPropertyAdapter implements BasicEntityP
 		return new SimpleSelection($queryItem, TypeName::STRING);
 	}
 
+	function updateDataDefinition(DdTableUpdateProcess $process): void {
+		$process->putColumn($process->columnFactory->createStringColumn($this->getColumnName(), 255));
+	}
 
 
 // 	public function getTypeConstraint() {
