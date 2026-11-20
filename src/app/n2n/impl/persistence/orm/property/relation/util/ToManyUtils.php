@@ -33,7 +33,7 @@ class ToManyUtils {
 	
 	public function __construct(ToManyRelation $toManyRelation, $master) {
 		$this->toManyRelation = $toManyRelation;	
-		$this->master = (boolean) $master;
+		$this->master = (bool) $master;
 	}
 
 	public function prepareSupplyJob(SupplyJob $supplyJob, mixed $value, ?ValueHash $valueHash, ?ValueHash $oldValueHash): void {

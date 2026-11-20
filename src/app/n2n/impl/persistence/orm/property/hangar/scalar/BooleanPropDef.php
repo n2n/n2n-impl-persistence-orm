@@ -21,7 +21,7 @@
  */
 namespace n2n\impl\persistence\orm\property\hangar\scalar;
 
-use n2n\util\type\attrs\DataSet;
+use n2n\util\attr\DataSet;
 use n2n\spec\dbo\meta\structure\ColumnFactory;
 use hangar\api\DbInfo;
 use hangar\api\PropSourceDef;
@@ -55,7 +55,7 @@ class BooleanPropDef extends ScalarPropDefAdapter {
 	public function createMagCollection(?PropSourceDef $propSourceDef = null): MagCollection {
 		$magCollection = new MagCollection();
 		$magCollection->addMag(self::PROP_NAME_DEFAULT_VALUE, 
-				new EnumMag('Default Value', [null => 'No Default', 'true' => 'true', 'false' => 'false'], 
+				new EnumMag('Default Value', ['' => 'No Default', 'true' => 'true', 'false' => 'false'], 
 						(null !== $propSourceDef) ? $propSourceDef->getPhpProperty()->getValue() : null));
 		return $magCollection;
 	}

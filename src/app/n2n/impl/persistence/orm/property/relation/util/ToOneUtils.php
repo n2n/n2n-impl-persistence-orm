@@ -32,7 +32,7 @@ class ToOneUtils {
 	
 	public function __construct(ToOneRelation $toOneRelation, $master) {
 		$this->toOneRelation = $toOneRelation;	
-		$this->master = (boolean) $master;
+		$this->master = (bool) $master;
 	}
 
 	public function prepareSupplyJob(SupplyJob $supplyJob, mixed $value, ?ValueHash $valueHash, ?ValueHash $oldValueHash): void {

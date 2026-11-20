@@ -45,7 +45,7 @@ abstract class RelationSelection implements Selection{
 	}
 	
 	public function setLazy($lazy) {
-		$this->lazy = (boolean) $lazy;
+		$this->lazy = (bool) $lazy;
 	}
 	
 	public function isLazy() {
