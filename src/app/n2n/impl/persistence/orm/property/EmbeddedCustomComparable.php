@@ -57,7 +57,7 @@ class EmbeddedCustomComparable implements CustomComparable {
 	 * @see \n2n\persistence\orm\criteria\compare\CustomComparable::compareWithValue()
 	 */
 	public function compareWithValue(QueryComparator $queryComparator, $operator, $object) {
-		if ($object !== null && !is_a($object, $this->embeddedEntityProperty->getTargetClass()->getName())) {
+		if ($object !== null && !($object instanceof ($this->embeddedEntityProperty->getTargetClass()->getName()))) {
 			throw new CriteriaConflictException('Type ' . $this->embeddedEntityProperty->getTargetClass()->getName() 
 					. ' required. Given: ' . TypeUtils::getTypeInfo($object));
 		}

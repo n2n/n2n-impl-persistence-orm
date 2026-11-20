@@ -79,7 +79,7 @@ class ArrayObjectProxy extends \ArrayObject {
 
 	function registerInitializedListener(ArrayObjectInitializedListener $initializedListener) {
 		IllegalStateException::assertTrue(!$this->isInitialized());
-		$this->initializedListeners->attach($initializedListener);
+		$this->initializedListeners->offsetSet($initializedListener);
 	}
 
 	public function registerArrayObjectInitializedListener(ArrayObjectInitializedListener $initializedListener) {
