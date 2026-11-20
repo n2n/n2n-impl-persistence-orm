@@ -55,7 +55,7 @@ class BooleanPropDef extends ScalarPropDefAdapter {
 	public function createMagCollection(?PropSourceDef $propSourceDef = null): MagCollection {
 		$magCollection = new MagCollection();
 		$magCollection->addMag(self::PROP_NAME_DEFAULT_VALUE, 
-				new EnumMag('Default Value', [null => 'No Default', 'true' => 'true', 'false' => 'false'], 
+				new EnumMag('Default Value', ['' => 'No Default', 'true' => 'true', 'false' => 'false'], 
 						(null !== $propSourceDef) ? $propSourceDef->getPhpProperty()->getValue() : null));
 		return $magCollection;
 	}

@@ -61,7 +61,7 @@ class OrmRelationMagCollection extends MagCollection {
 		}
 		
 		$this->addMag(self::PROP_NAME_TARGET_ENTITY_CLASS, new EnumMag('Target Entity',
-				[null => null] + $this->targetEntityClassOptions, null, true,
+				['' => null] + $this->targetEntityClassOptions, null, true,
 				array('test' => $addMappedBy ? 'hangar-orm-relation-target-entity'  : 'hangar-autocompletion'),
 				array('test' => 'hangar-orm-relation-target-entity-container')));
 		
