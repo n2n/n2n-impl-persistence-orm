@@ -260,7 +260,7 @@ class JoinColumnToOneRelation extends MasterRelation implements ToOneRelation, A
 //	}
 	
 //	private function isRemoveActionMarked(RemoveAction $removeAction): bool {
-//		return (boolean) $removeAction->getAttribute(get_class($this));
+//		return (bool) $removeAction->getAttribute(get_class($this));
 //	}
 	/* (non-PHPdoc)
 	 * @see \n2n\persistence\orm\model\ActionDependency::removeActionSupplied()
